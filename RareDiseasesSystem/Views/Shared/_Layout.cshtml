@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>@ViewData["Title"] - RareDiseasesSystem</title>
+
+    <link rel="stylesheet" href="~/lib/element-ui/theme-chalk/index.css" />
+
+    <link href="~/styles/theme/black/index.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+
+    <style type="text/css">
+        .el-row:last-child {
+            margin-bottom: 10px;
+        }
+
+        .el-card__body > .el-row {
+            height: auto !important;
+            min-height: 350px !important;
+        }
+
+        .el-upload__input {
+            display: none !important;
+        }
+        .panel-heading{
+            padding:5px 15px;
+        }
+        .panel-body {
+            padding: 5px;
+            background-color:#eee;
+        }
+        .breadcrumbs{
+            background:none;
+        }
+        .paddinglr5px{
+            padding:0 5px;
+
+        }
+        .el-textarea__inner {
+            height: calc(100vh - 240px)
+        }
+        .showIndicator {
+            height: calc(100vh - 203px)
+        }
+    </style>
+
+
+
+</head>
+<body>
+    <div id="mainArea" class="mainArea">
+        <div class="sys-header">
+            <span class="system-text">
+                罕见病临床决策CDSS
+            </span>
+            <span class="admin-menu">
+                <v-user-menu ref="userMenu"
+                             :login-user="loginUser">
+                </v-user-menu>
+            </span>
+
+            <span class="menu" style="float:right;">
+                <el-menu v-bind:default-active="menuActiveIndex" mode="horizontal"
+                         text-color="rgba(255, 255, 255, 0.5)"
+                         active-text-color="#fff">
+                    <el-menu-item index="0" class="menu-item"><a href="/Home/Index">表征疾病</a></el-menu-item>
+                    <el-menu-item index="1" class="menu-item"><a href="http://wwww.baidu.com" target="_blank">HPO术语详情</a></el-menu-item>
+                    <el-menu-item index="2" class="menu-item"><a href="/RareDisease/Search">罕见病详情</a></el-menu-item>
+                    <el-menu-item index="3" class="menu-item">HPO规则配置</el-menu-item>
+                    <el-menu-item index="4" class="menu-item"><a href="/Log/Index">日志管理</a></el-menu-item>
+                </el-menu>
+
+            </span>
+
+        </div>
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+    <footer class="sys-footer">
+        <span style="padding-left:10px;" class="footer-logo">
+        </span>
+
+        <span class="copyright">
+            上海柯林布瑞信息技术有限公司 Copyright© 2020 clinbrain All Rights Reserved
+        </span>
+    </footer>
+    <div id="component-template">
+
+    </div>
+
+
+
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+
+    <script type="text/javascript" src="~/lib/vue/vue.js"></script>
+    <script type="text/javascript" src="~/lib/element-ui/index.js"></script>
+
+    <script>
+        var loginUser = {};
+        if (sessionStorage.getItem("currentUser") == null) {
+            $.ajax({
+                url: "/Login/GetUserName",
+                type: "GET",
+                dataType: 'json',
+                async: false,
+                success: function (data) {
+                    if (data && data.success) {
+                        sessionStorage.setItem("currentUser", data.data)
+                    }
+                    else {
+                        console.log(data.msg);
+                    }
+                }
+            });
+        }
+        loginUser.name = sessionStorage.getItem("currentUser") 
+
+        var menuActiveIndex = 0;
+        // 回退按钮导致菜单选中失效
+        var navList = [
+            { index: "0", path: "Home/Index", name:"表征疾病" },
+            { index: "1", path: "xx", name:"HPO术语详情" },
+            { index: "2", path: "RareDisease/Search", name:"罕见病详情" },
+            { index: "3", path: "yy", name:"HPO规则配置" },
+            { index: "4", path: "Log/Index", name:"日志管理" }
+        ];
+
+        url = window.location.href;
+        for (var i = 0; i < navList.length; i++) {
+            if (url.indexOf(navList[i].path) > 0) {
+                menuActiveIndex = navList[i].index;
+            }
+        }
+
+        
+    </script>
+    <script src="~/js/components.js"></script>
+    <script src="~/js/site.js"></script>
+
+
+    @RenderSection("Scripts", required: false)
+
+
+
+</body>
+</html>

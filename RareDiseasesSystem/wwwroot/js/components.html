@@ -1,0 +1,319 @@
+<!--用户模块-->
+<template id="v-user-menu">
+    <div>
+        <el-dropdown v-on:command="menuClick">
+            <span class="el-dropdown-link">
+                欢迎您,{{loginUser.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="logout">注销</el-dropdown-item>
+            </el-dropdown-menu>
+        </el-dropdown>
+    </div>
+</template>
+
+<!--罕见病搜索模块-->
+<template id="v-disease-search">
+    <el-col :span="8" class="paddinglr5px">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">查询罕见病</div>
+            <div class="panel-body">
+                <div class="breadcrumbs">
+                    <el-input style="width:80%;"
+                              v-model="search"
+                              placeholder="事件"
+                              v-on:keyup.enter.native="onSearch">
+                    </el-input>
+                    <span style="float: right;">
+                        <el-button v-on:click="onSearch" type="primary">搜索</el-button>
+                    </span>
+                </div>
+                <div style="background-color:white">
+                    <el-table v-bind:data="deseaseSearchedList"
+                              v-loading="loading"
+                              :show-header="false"
+                              style="width: 100%">
+                        <el-table-column prop="name"
+                                         label="名称" min-width="7">
+                        </el-table-column>
+                        <el-table-column min-width="3">
+                            <template slot-scope="scope">
+                                <a :href="'../121diseases.html'+scope.row.anchor"
+                                   target="_blank">详情</a>
+
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination background style="float:right;"
+                                   layout="total, prev, pager, next"
+                                   v-on:current-change="searchDiseaseList"
+                                   v-bind:total="total"
+                                   v-bind:current-page.sync="pageIndex">
+                    </el-pagination>
+
+                </div>
+            </div>
+
+
+        </div>
+    </el-col>
+</template>
+
+<template id="v-disease-cdss">
+    <div>
+        <el-col :span="8" class="paddinglr5px">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">文本识别</div>
+                <div class="panel-body">
+                    <div class="breadcrumbs">
+                        <el-button type="primary" v-on:click.stop
+                                   v-on:click="onPopImportEMRDlg()">
+                            患者病例
+                        </el-button>
+                        <span style="float: right;">
+                            <el-button type="info">导入</el-button>
+                            <el-button type="info" v-on:click="onClearPatientEMR">清空</el-button>
+                        </span>
+                    </div>
+                    <div>
+                        <el-input type="textarea"
+                                  :rows="5"
+                                  placeholder="患者病历"
+                                  v-model="patientEMRDetail">
+                        </el-input>
+                    </div>
+                    <div class="breadcrumbs" style="margin-top:10px">
+                        <span style="float: right;">
+                            <el-button type="primary" v-on:click="onAnalyzePatientEMR">解析</el-button>
+                        </span>
+                    </div>
+                </div>
+
+
+            </div>
+        </el-col>
+        <el-col :span="8" class="paddinglr5px">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">病例所见</div>
+                <div class="panel-body">
+                    <div>
+                        <template>
+                            <el-table :data="patientHPOList"
+                                      :show-header="false"
+                                      class="showIndicator">
+                                <el-table-column prop="name"
+                                                 label="表征术语"
+                                                 width="180">
+                                </el-table-column>
+                                <el-table-column>
+                                    <template slot-scope="scope">
+
+                                        <el-button v-on:click.stop
+                                                   v-if="scope.row.editable"
+                                                   class="delete-button"
+                                                   v-on:click="onPopEditSubGroupDialog(scope.row)">
+                                            详情
+                                        </el-button>
+                                        <el-button v-on:click="onDeletePatientHPOList(scope.row)"
+                                                   v-on:click.stop type="text"
+                                                   class="delete-button"
+                                                   size="small">删除</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                    <div class="breadcrumbs" style="margin-top:10px">
+                        <el-button type="primary" v-on:click="onSearchHPODlg()">添加体征</el-button>
+                        <span style="float: right;">
+                            <el-button type="primary" v-on:click="onSubmitHPODataForAnalyze">提交所见</el-button>
+                        </span>
+                    </div>
+                </div>
+
+
+            </div>
+        </el-col>
+        <el-col :span="8" class="paddinglr5px">
+            <div class="panel panel-default" style="margin-bottom:10px">
+                <!-- Default panel contents -->
+                <div class="panel-heading">普通疾病</div>
+                <div class="panel-body">
+                    <div>
+                        <template>
+                            <el-table :data="normalDiseaseList">
+                                <el-table-column prop="name"
+                                                 label="普通疾病名称">
+                                </el-table-column>
+                                <el-table-column prop="likeness"
+                                                 label="相似度">
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">罕见疾病</div>
+                <div class="panel-body">
+                    <div>
+                        <template>
+                            <el-table :data="rareDiseaseList">
+                                <el-table-column prop="name"
+                                                 label="普通疾病名称">
+                                </el-table-column>
+                                <el-table-column prop="likeness"
+                                                 label="相似度">
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+        </el-col>
+
+        <el-dialog title="患者病例" v-bind:visible.sync="importEMRDlg">
+            <div style="min-height:460px;overflow-x:hidden;">
+                <el-row :gutter="10">
+                    <el-col :span="6">
+                        <div>
+                            <el-input style="width:100%;" v-model="patientCardNo"
+                                      placeholder="身份证号码"
+                                      v-on:keyup.enter.native="onSearchPatient"></el-input>
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-button v-on:click="onSearchPatient">搜索</el-button>
+                    </el-col>
+                    <el-col :span="10" class="text-right">
+                        <el-button class="group-in" v-on:click="onImportPatientEMRText">导入患者病例</el-button>
+                    </el-col>
+                </el-row>
+                <el-table v-bind:data="patientOverview"
+                          style="width: 100%; margin-top:10px;">
+                    <el-table-column prop="iEMPINumber"
+                                     label="姓名">
+                    </el-table-column>
+                    <el-table-column prop="name"
+                                     label="姓名">
+                    </el-table-column>
+                    <el-table-column prop="gender"
+                                     label="性别">
+                    </el-table-column>
+                    <el-table-column prop="cardNo"
+                                     label="身份证号">
+                    </el-table-column>
+                    <el-table-column prop="tel"
+                                     label="联系方式">
+                    </el-table-column>
+                    <el-table-column prop="address"
+                                     label="联系人">
+                    </el-table-column>
+                </el-table>
+                <div></div>
+
+                <el-table v-bind:data="patientVisitList"
+                          style="width: 100%; margin-top:10px;">
+                    <el-table-column prop="visitTime"
+                                     label="就诊时间">
+                    </el-table-column>
+                    <el-table-column prop="visitType"
+                                     label="就诊类别">
+                    </el-table-column>
+                    <el-table-column prop="diagDesc"
+                                     label="诊断">
+                    </el-table-column>
+                    <el-table-column prop="center"
+                                     label="机构">
+                    </el-table-column>
+                </el-table>
+                <el-pagination background style="float:right;"
+                               layout="total, prev, pager, next" v-on:current-change="patientLocalPaging"
+                               v-bind:total="patientVisitListTotal"
+                               v-bind:current-page.sync="patientVisitListIndex">
+                </el-pagination>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="查询HPO" v-bind:visible.sync="searchHPODlg">
+            <div style="min-height:360px;overflow-x:hidden;">
+                <el-row :gutter="10">
+                    <el-col :span="6">
+                        <div>
+                            <el-input style="width:100%;" v-model="searchHPOText"
+                                      placeholder="输入表征术语"
+                                      v-on:keyup.enter.native="onSearchHPOList"></el-input>
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-button v-on:click="onSearchHPOList">搜索</el-button>
+                    </el-col>
+                    <el-col :span="10" class="text-right">
+                        <el-button class="group-in" v-on:click="onSearchedHPOSelectionIn">添加</el-button>
+                    </el-col>
+                </el-row>
+                <el-table v-bind:data="searchedHPOList"
+                          v-on:selection-change="onSearchedHPOSelectionChange"
+                          style="width: 100%; margin-top:10px;">
+                    <el-table-column type="selection"
+                                     width="50">
+                    </el-table-column>
+                    <el-table-column prop="name"
+                                     label="表征术语">
+                    </el-table-column>
+                </el-table>
+
+                <el-pagination background style="float:right;"
+                               layout="total, prev, pager, next" v-on:current-change="hpoLocalPaging"
+                               v-bind:total="searchedHPOListTotal"
+                               v-bind:current-page.sync="searchedHPOListIndex">
+                </el-pagination>
+            </div>
+        </el-dialog>
+
+    </div>
+</template>
+
+
+
+<!--操作日志-->
+<template id="v-operation-log">
+    <el-col :span="24" class="paddinglr5px">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">操作日志</div>
+            <div class="panel-body">
+                <div style="background-color:white">
+                    <el-table v-bind:data="logList"
+                              v-loading="loading"
+                              style="width: 100%">
+                        <el-table-column prop="action"
+                                         label="操作记录" min-width="7">
+                        </el-table-column>
+                        <el-table-column prop="createdBy"
+                                         label="操作人" min-width="7">
+                        </el-table-column>
+                        <el-table-column prop="createdOn"
+                                         label="操作时间" min-width="7">
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination background style="float:right;"
+                                   layout="total, prev, pager, next"
+                                   v-on:current-change="searchOperationLogList"
+                                   v-bind:total="total"
+                                   v-bind:current-page.sync="pageIndex">
+                    </el-pagination>
+
+                </div>
+            </div>
+
+
+        </div>
+    </el-col>
+</template>
+

@@ -1,0 +1,109 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>华西老年病决策系统 - 上海柯林布瑞信息技术有限公司</title>
+    <link href="~/css/login.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div id="bg" class="login-container">
+        <div class="header">
+            <img src="~/images/login-bg-header-logo.png">
+            <span>上海柯林布瑞信息技术有限公司</span>
+            <div class="clear"></div>
+        </div>
+        <div class="login-content">
+            <div class="container">
+                <img src="~/images/login-bg.png">
+    
+                    <div class="login">
+                        <div class="header">老年病决策系统 </div>
+                        <div>
+                            <div class="el-input el-input-group el-input-group--prepend">
+                                <div class="el-input-group__prepend"><i class="iconfont clinBrain-user"></i></div>
+                                <input id="Account" name="Account" type="text" autocomplete="off" placeholder="请输入账号" class="el-input__inner">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="el-input el-input-group el-input-group--prepend">
+                                <div class="el-input-group__prepend"><i class="iconfont clinBrain-password"></i></div>
+                                <input id="Password02" name="Password" type="password" autocomplete="off" placeholder="请输入账密码" class="el-input__inner">
+                            </div>
+                        </div>
+                        <div>
+                            <button class="el-button el-button--primary submitButton" type="button">
+                                <span>登录</span>
+                            </button>
+                        </div>
+                    </div>
+                               <div class="clear"></div>
+            </div>
+        </div>
+        <div class="login-footer">
+            <img src="~/images/login-bg-footer-logo.png">
+            <div class="right">上海柯林布瑞信息技术有限公司 Copyright© @DateTime.Now.Year clinbrain All Rights Reserved </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        sessionStorage.removeItem("currentUser");
+        $(function () {
+            $("#Account").focus();
+            $(document).keyup(function (e) {
+                var theEvent = window.event || e;
+                var code = theEvent.keyCode || theEvent.which;
+                if (code == 13) {
+                    $(".submitButton").click();
+                }
+            });
+
+            $(".submitButton").click(function () {
+                Login();
+            });
+        });
+        function Login() {
+            var accInp = $("#Account").val();
+            var psdInp = $("#Password02").val();
+            if (accInp == undefined || accInp == "" || accInp == "用户名") {
+                alert('用户名不能为空！');
+                $("#Account").focus();
+                return false;
+            }
+
+            if (psdInp == undefined || psdInp == "") {
+                alert('用户密码不能为空！');
+                $("#Password02").focus();
+                return false;
+            }
+
+            var param = {
+                "userName": accInp,
+                "password": psdInp
+            };
+            $.ajax({
+                url: "/Login/Auth",
+                type: "POST",
+                data: JSON.stringify(param),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function (data) {
+                    if (data && data.success) {
+                        window.location.href = '/Home/Index';
+                    }
+                    else {
+                        alert("登录失败。")
+                    }
+                }
+            });
+
+            
+        }
+    </script>
+
+</body>
+</html>
