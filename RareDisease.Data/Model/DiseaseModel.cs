@@ -12,5 +12,8 @@ namespace RareDisease.Data.Model
 
         [JsonProperty("likeness")]
         public string Likeness { get; set; }
+
+        [JsonProperty("hpoMatchedList")]
+        public List<HPODataModel> HPOMatchedList { get; set; }
     }
 }

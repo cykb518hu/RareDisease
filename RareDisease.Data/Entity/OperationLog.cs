@@ -20,6 +20,14 @@ namespace RareDisease.Data.Entity
         [JsonProperty("action")]
         public string Action { get; set; }
 
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [JsonProperty("message")]
+        public string Message { get; set; }
+
+
         /// <summary>
         /// 创建人
         /// </summary>

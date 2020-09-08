@@ -31,6 +31,7 @@
         },
         template: "#v-disease-search",
         methods: {
+
             onSearch: function () {
                 this.pageIndex = 1;
                 this.searchDiseaseList();
@@ -56,7 +57,8 @@
                             console.log(data.msg);
                         }
                         that.loading = false;
-                    }
+                    },
+                    error: () => { that.loading = false; }
                 });
             }
         }
@@ -87,37 +89,7 @@
                 multipleSearchedHPOSelection: [],
 
                 normalDiseaseList: [],
-                rareDiseaseList: [],
-
-                nlpEngine: "",
-                nlpEngineOptions: [
-                    {
-                        value: 'engine1',
-                        label: 'String Search'
-                    },
-                    {
-                        value: 'engine2',
-                        label: 'MetaMap Lite'
-                    }
-                ],
-                isNegativeOptions: [{
-                    value: 'true',
-                    label: 'true'
-                }, {
-                    value: 'false',
-                    label: 'false'
-                }],
-                rareAnalyzeEngine: "",
-                rareAnalyzeEngineOptions: [
-                    {
-                        value: 'engine1',
-                        label: 'engine1'
-                    },
-                    {
-                        value: 'engine2',
-                        label: 'engine2'
-                    }
-                ]
+                rareDiseaseList: []
             };
         },
         template: "#v-disease-cdss",    
@@ -152,7 +124,8 @@
                             console.log(data);
                         }
                         that.loading = false;
-                    }
+                    },
+                    error: () => { that.loading = false;}
                 });
             },
             patientLocalPaging: function () {
@@ -162,7 +135,7 @@
             onImportPatientEMRText: function () {
                 var para = {};
                 para = {
-                    patientCardNo: this.patientCardNo                 
+                    patientCardNo: this.patientCardNo
                 };                
                 var that = this;
                 $.ajax({
@@ -177,7 +150,8 @@
                         else {
                             console.log(data);
                         }
-                    }
+                    },
+                    error: () => { that.loading = false; }
                 });
                 this.importEMRDlg = false;
             },
@@ -186,18 +160,9 @@
             },
 
             onAnalyzePatientEMR: function () {
-                //if (this.patientEMRDetail === undefined || this.patientEMRDetail === "") {
-                //    alert('电子病历不能为空！');
-                //    return false;
-                //}
-                //if (this.nlpEngine === undefined || this.nlpEngine === "") {
-                //    alert('请选择NLP分析引擎！');
-                //    return false;
-                //}
                 var para = {};
                 para = {
-                    patientEMRDetail: this.patientEMRDetail,
-                    nlpEngine: this.nlpEngine
+                    patientEMRDetail: this.patientEMRDetail
                 };
                 this.loading = true;
                 var that = this;
@@ -214,7 +179,8 @@
                             console.log(data);
                         }
                         that.loading = false;
-                    }
+                    },
+                    error: () => { that.loading = false; }
                 });
             },
             onDeletePatientHPOList: function (subgroup) {
@@ -225,20 +191,11 @@
                 }
             },
             onShowHpoMatchedText: function (subgroup) {
-                var text = $('#txt_patientEMR').val();
-                var textBeforePosition = text.substr(0, subgroup.startIndex);
-                $('#txt_patientEMR').blur();
-                $('#txt_patientEMR').val(textBeforePosition);
-                $('#txt_patientEMR').focus();
-                $('#txt_patientEMR').val(text);
-                $('#txt_patientEMR').selectRange(subgroup.startIndex, subgroup.endIndex); 
-
-
-               // $('#txt_patientEMR').selectRange(subgroup.startIndex, subgroup.endIndex);
-                //var node = document.getElementById("txt_patientEMR");
-               // node.selectionStart = 2;
-               // node.selectionEnd = 7;
-               // node.focus();
+                alert("1");
+                var node = document.getElementById("txt_patientEMR");
+                node.selectionStart = 2;
+                node.selectionEnd = 7;
+                node.focus();
             },
             onSearchHPODlg: function () {
                 this.searchHPODlg = true;
@@ -266,7 +223,8 @@
                             console.log(data);
                         }
                         that.loading = false;
-                    }
+                    },
+                    error: () => { that.loading = false; }
                 });
             },
             hpoLocalPaging: function () {
@@ -274,17 +232,13 @@
             },
             localPaging: function (current,list) {
                 var size = 10;
-                var tablePush = [];
-                for (var i = 0; i < list.length; i++) {
-                    if (size * (current - 1) <= i && i <= size * current - 1) {
-                        tablePush.push(list[i]);
+                const subList = list;
+                const tablePush = [];
+                subList.forEach((item, index) => {
+                    if (size * (current - 1) <= index && index <= size * current - 1) {
+                        tablePush.push(item);
                     }
-                };
-                //subList.forEach((item, index) => {
-                //    if (size * (current - 1) <= index && index <= size * current - 1) {
-                //        tablePush.push(item);
-                //    }
-                //});
+                });
                 return tablePush;
             },
 
@@ -330,7 +284,8 @@
                             console.log(data);
                         }
                         that.loading = false;
-                    }
+                    },
+                    error: () => { that.loading = false; }
                 });
             }
         }
@@ -376,7 +331,8 @@
                             console.log(data.msg);
                         }
                         that.loading = false;
-                    }
+                    },
+                    error: () => { that.loading = false; }
                 });
             }
         },

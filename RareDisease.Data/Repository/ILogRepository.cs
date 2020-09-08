@@ -10,8 +10,8 @@ namespace RareDisease.Data.Repository
 {
     public interface ILogRepository
     {
-        void Add(string action);
-        void Add(string action,string userName);
+
+        void Add(string action, string userName = "", string message = "");
         List<OperationLog> Search(int pageIndex, int pageSize, ref int totalCount);
     }
 
@@ -24,16 +24,16 @@ namespace RareDisease.Data.Repository
             _context = context;
             _httpContextAccessor = httpContextAccessor;
         }
-       
-        public void Add(string action)
-        {
-           var userName= _httpContextAccessor.HttpContext.User.Identity.Name;
-            Add(action, userName);
-        }
-        public void Add(string action, string userName)
+
+        public void Add(string action, string userName = "", string message = "")
         {
             OperationLog log = new OperationLog();
+            if(string.IsNullOrEmpty(userName))
+            {
+                userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+            }
             log.Action = action;
+            log.Message = message;
             log.Guid = Guid.NewGuid().ToString();
             log.CreatedOn = DateTime.Now;
             log.CreatedBy = userName;
