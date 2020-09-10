@@ -14,50 +14,58 @@
 
 <!--罕见病搜索模块-->
 <template id="v-disease-search">
-    <el-col :span="8" class="paddinglr5px">
-        <div class="panel panel-default">
-            <!-- Default panel contents -->
-            <div class="panel-heading">查询罕见病</div>
-            <div class="panel-body">
-                <div class="breadcrumbs">
-                    <el-input style="width:80%;"
-                              v-model="search"
-                              placeholder="事件"
-                              v-on:keyup.enter.native="onSearch">
-                    </el-input>
-                    <span style="float: right;">
-                        <el-button v-on:click="onSearch" type="primary">搜索</el-button>
-                    </span>
-                </div>
-                <div style="background-color:white">
-                    <el-table v-bind:data="deseaseSearchedList"
-                              v-loading="loading"
-                              :show-header="false"
-                              style="width: 100%">
-                        <el-table-column prop="name"
-                                         label="名称" min-width="7">
-                        </el-table-column>
-                        <el-table-column min-width="3">
-                            <template slot-scope="scope">
-                                <a :href="'../121diseases.html'+scope.row.anchor"
-                                   target="_blank">详情</a>
+    <div>
+        <el-col :span="8" class="paddinglr5px">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">罕见病查询</div>
+                <div class="panel-body">
+                    <div class="breadcrumbs">
+                        <el-input style="width:80%;"
+                                  v-model="search"
+                                  placeholder="帕金森"
+                                  v-on:keyup.enter.native="onSearch">
+                        </el-input>
+                        <span style="float: right;">
+                            <el-button v-on:click="onSearch" type="primary">搜索</el-button>
+                        </span>
+                    </div>
+                    <div style="background-color:white">
+                        <el-table v-bind:data="deseaseSearchedList"
+                                  v-loading="loading"
+                                  :show-header="false"
+                                  style="width: 100%">
+                            <el-table-column prop="name"
+                                             label="名称" min-width="7">
+                            </el-table-column>
+                            <el-table-column min-width="3">
+                                <template slot-scope="scope">
+                                    <el-link type="primary" 
+                                              v-on:click="open121HpoDetail(scope.row)">详情</el-link>
 
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <el-pagination background style="float:right;"
-                                   layout="total, prev, pager, next"
-                                   v-on:current-change="searchDiseaseList"
-                                   v-bind:total="total"
-                                   v-bind:current-page.sync="pageIndex">
-                    </el-pagination>
 
+
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-pagination background style="float:right;"
+                                       layout="total, prev, pager, next"
+                                       v-on:current-change="searchDiseaseList"
+                                       v-bind:total="total"
+                                       v-bind:current-page.sync="pageIndex">
+                        </el-pagination>
+
+                    </div>
                 </div>
+
+
             </div>
-
-
-        </div>
-    </el-col>
+        </el-col>
+        <el-col :span="16" class="paddinglr5px">
+            <div id="iframeDiv"  ></div>
+            <!--<iframe style="width:100%;height: calc(100vh - 1000px)" :src="iframeSrc"></iframe>-->
+        </el-col>
+    </div>
 </template>
 
 <template id="v-disease-cdss">
@@ -114,7 +122,7 @@
                             <el-table :data="patientHPOList"
                                       class="showIndicator">
                                 <el-table-column label="表征术语"
-                                                 min-width="29%">
+                                                 min-width="34%">
                                     <template slot-scope="scope">
                                         <el-popover placement="top-start"
                                                     width="300"
@@ -128,14 +136,14 @@
                                 </el-table-column>
                                 <el-table-column prop="hpoId"
                                                  label="Id"
-                                                 min-width="18%">
+                                                 min-width="17%">
                                 </el-table-column>
                                 <el-table-column 
-                                                 label="Negative"
+                                                 label="确定程度"
                                                  min-width="18%">
                                     <template slot-scope="scope">
-                                        <el-select v-model="scope.row.isNegative" placeholder="请选择">
-                                            <el-option v-for="item in isNegativeOptions"
+                                        <el-select v-model="scope.row.certain" placeholder="请选择">
+                                            <el-option v-for="item in certainOptions"
                                                        :key="item.value"
                                                        :label="item.label"
                                                        :value="item.value">
@@ -143,13 +151,13 @@
                                         </el-select>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="isFamily"
-                                                 label="遗传"
-                                                 min-width="10%">
+                                <el-table-column prop="isSelf"
+                                                 label="是否本人"
+                                                 min-width="8%">
                                 </el-table-column>
                                 <el-table-column prop="count"
-                                                 label="数量"
-                                                 min-width="10%">
+                                                 label="命中次数"
+                                                 min-width="8%">
                                 </el-table-column>
                                 <el-table-column min-width="15%">
                                     <template slot-scope="scope">
@@ -167,7 +175,7 @@
                         <el-button type="primary" v-on:click="onSearchHPODlg()">添加体征</el-button>
                         <span style="float: right;">
                             <template>
-                                <el-select v-model="rareAnalyzeEngine" placeholder="请选择罕见病分析引擎" style="width:200px">
+                                <el-select v-model="rareAnalyzeEngine" placeholder="请选择罕见病分析引擎" style="width:180px">
                                     <el-option v-for="item in rareAnalyzeEngineOptions"
                                                :key="item.value"
                                                :label="item.label"
@@ -175,8 +183,17 @@
                                     </el-option>
                                 </el-select>
                             </template>
+                            <template>
+                                <el-select v-model="rareDataBaseEngine" placeholder="请选择罕见病数据库" style="width:100px">
+                                    <el-option v-for="item in rareDataBaseEngineOptions"
+                                               :key="item.value"
+                                               :label="item.label"
+                                               :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
                             <el-button type="primary" v-on:click="onSubmitHPODataForAnalyze">提交所见</el-button>
-                            <el-button type="info" >基因分析</el-button>
+                            <el-button type="info" disabled>基因分析</el-button>
                         </span>
                     </div>
                 </div>
@@ -350,7 +367,30 @@
             <!-- Default panel contents -->
             <div class="panel-heading">操作日志</div>
             <div class="panel-body">
-                <div style="background-color:white">
+
+                <el-row :gutter="10">
+                    <el-col :span="8">
+                        <div>
+                            <template>
+                                <el-date-picker v-model="logDateRange"
+                                                type="daterange"
+                                                range-separator="至"
+                                                start-placeholder="开始日期"
+                                                end-placeholder="结束日期">
+                                </el-date-picker>
+                            </template>
+                        </div>
+                    </el-col>
+                    <el-col :span="4">
+                        <el-button v-on:click="onSearch" type="primary">搜索</el-button>
+                    </el-col>
+                    <el-col :span="12" class="text-right">
+                   
+                    </el-col>
+                </el-row>
+
+
+                <div style="margin-top:10px">
                     <el-table v-bind:data="logList"
                               v-loading="loading"
                               style="width: 100%">

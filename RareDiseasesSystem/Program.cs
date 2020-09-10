@@ -38,11 +38,13 @@ namespace RareDiseasesSystem
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+           // .UseUrls("http://0.0.0.0:5000")
+            .UseIISIntegration()
                 .UseStartup<Startup>()
              .ConfigureLogging(builder =>
              {
                  builder.ClearProviders();
-                 builder.SetMinimumLevel(LogLevel.Debug);
+                 builder.SetMinimumLevel(LogLevel.Warning);
              })
              .UseNLog();
     }

@@ -4,7 +4,7 @@
 // Write your JavaScript code.
 
 var main;
-$("#component-template").load("/js/components.html", function (response) {
+$("#component-template").load("/js/components.html?r=" + Math.floor(), function (response) {
     $("#component-template").html(response);
     main = new Vue({
         'el': '#mainArea',

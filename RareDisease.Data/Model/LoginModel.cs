@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RareDiseasesSystem.Models
+namespace RareDisease.Data.Model
 {
     public class LoginModel
     {
@@ -12,5 +12,8 @@ namespace RareDiseasesSystem.Models
         public string UserName { get; set; }
         [JsonProperty("password")]
         public string Password { get; set; }
+
+        [JsonProperty("role")]
+        public string Role { get; set; }
     }
 }

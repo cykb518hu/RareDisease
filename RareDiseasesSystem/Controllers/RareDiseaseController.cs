@@ -32,13 +32,12 @@ namespace RareDiseasesSystem.Controllers
 
                 var data = new List<ChinaRareDiseaseModel>();
                 int count = 0;
-                if (!string.IsNullOrEmpty(search))
-                {
-                    var list = _localMemoryCache.GetChinaRareDiseaseList();
-                    data = list.Where(x => x.Name.ToLower().Contains(search.ToLower())).ToList();
-                    count = data.Count;
-                    data = data.Skip((pageIndex - 1) * 10).Take(pageSize).ToList();
-                }
+
+                var list = _localMemoryCache.GetChinaRareDiseaseList();
+                data = list.Where(x => x.Name.ToLower().Contains(search.ToLower())).ToList();
+                count = data.Count;
+                data = data.Skip((pageIndex - 1) * 10).Take(pageSize).ToList();
+
 
                 return Json(new { success = true, data, total = count });
             }

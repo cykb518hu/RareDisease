@@ -12,7 +12,7 @@ namespace RareDisease.Data.Repository
     {
 
         void Add(string action, string userName = "", string message = "");
-        List<OperationLog> Search(int pageIndex, int pageSize, ref int totalCount);
+        List<OperationLogOutPut> Search(int pageIndex, int pageSize, DateTime startDate, DateTime endDate, string role, string userName, ref int totalCount);
     }
 
     public class LogRepository : ILogRepository
@@ -41,14 +41,29 @@ namespace RareDisease.Data.Repository
             _context.SaveChanges();
         }
 
-        public List<OperationLog> Search(int pageIndex, int pageSize, ref int totalCount)
+        public List<OperationLogOutPut> Search(int pageIndex, int pageSize, DateTime startDate, DateTime endDate, string role, string userName, ref int totalCount)
         {
             var query = _context.OperationLog.AsQueryable();
-            var countTask =  query.Count();
-            var resultsTask = query.OrderByDescending(x=>x.CreatedOn).Skip((pageIndex-1)*pageSize).Take(pageSize).ToList();
+            var countTask = 0;
+            var resultsTask = new List<OperationLog>();
+            if (role == "admin")
+            {
+                countTask=query.Count(x => x.CreatedOn >= startDate && x.CreatedOn <= endDate);
+                resultsTask = query.Where(x => x.CreatedOn > startDate && x.CreatedOn <= endDate).OrderByDescending(x => x.CreatedOn).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+            }
+            else
+            {
+                countTask = query.Count(x => x.CreatedOn >= startDate && x.CreatedOn <= endDate && x.CreatedBy == userName);
+                resultsTask = query.Where(x => x.CreatedOn > startDate && x.CreatedOn <= endDate && x.CreatedBy == userName).OrderByDescending(x => x.CreatedOn).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+            }
+             
             totalCount = countTask;
-
-            return resultsTask;
+            var list = new List<OperationLogOutPut>();
+            foreach(var r in resultsTask)
+            {
+                list.Add(new OperationLogOutPut { Action = r.Action, CreatedBy = r.CreatedBy, CreatedOn = r.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss") });
+            }
+            return list;
         }
     }
 }

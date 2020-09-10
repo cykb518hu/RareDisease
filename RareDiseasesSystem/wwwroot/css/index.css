@@ -19,10 +19,7 @@ body {
 }
 /*#endregion */
 /*#region main area */
-.mainArea {
-  height: calc(100vh - 30px);
-  overflow: auto;
-}
+
     .mainArea .container-fluid {
         padding-top: 10px;
         padding-right: 5px !important;
@@ -259,7 +256,6 @@ body {
 .el-pagination button,
 .el-pagination span:not([class*=suffix]) {
   height: 28px;
-  width: 28px;
 }
 .el-pagination.is-background .btn-next,
 .el-pagination.is-background .btn-prev,
@@ -366,11 +362,7 @@ label {
 .el-button:hover {
   background: rgba(2, 120, 228, 0.8);
 }
-.el-button.is-disabled,
-.el-button.is-disabled:focus,
-.el-button.is-disabled:hover {
-  background-color: rgba(255, 255, 255, 0.25) !important;
-}
+
 .close-button {
   background: #646464 !important;
 }
@@ -443,7 +435,8 @@ label {
   color: rgba(255, 255, 255, 0.3);
 }
 .el-input__icon {
-  line-height: 28px;
+    line-height: 28px;
+    height:auto !important;
 }
 /*#endregion */
 
@@ -573,7 +566,6 @@ el-upload input[type="file"] {
   height: 28px;
   line-height: 28px;
   margin-bottom: 10px;
-  background: #2d2d2d;
   color: rgba(255, 255, 255, 0.5);
 }
 .breadcrumbs .color-badge {

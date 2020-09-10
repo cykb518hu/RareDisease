@@ -16,11 +16,11 @@ namespace RareDisease.Data.Model
         [JsonProperty("hpoId")]
         public string HpoId { get; set; }
 
-        [JsonProperty("isNegative")]
-        public string IsNegative { get; set; }
+        [JsonProperty("certain")]
+        public string Certain { get; set; }
 
-        [JsonProperty("isFamily")]
-        public string IsFamily { get; set; }
+        [JsonProperty("isSelf")]
+        public string IsSelf { get; set; }
 
         [JsonProperty("count")]
         public int Count { get; set; }

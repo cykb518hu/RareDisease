@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NLog;
 using RareDisease.Data;
+using RareDisease.Data.Model;
 using RareDisease.Data.Repository;
 using RareDiseasesSystem.Models;
 
@@ -17,13 +19,14 @@ namespace RareDiseasesSystem.Controllers
     public class LoginController : Controller
     {
         private readonly ILogger<LoginController> _logger;
-        private readonly RareDiseaseDbContext _context;
         private readonly ILogRepository _logRepository;
-        public LoginController(ILogger<LoginController> logger, RareDiseaseDbContext context, ILogRepository logRepository)
+        private readonly ILocalMemoryCache _localMemoryCache;
+        private static NLog.Logger _logger11 = NLog.LogManager.GetCurrentClassLogger();
+        public LoginController(ILogger<LoginController> logger, ILogRepository logRepository, ILocalMemoryCache localMemoryCache)
         {
             _logger = logger;
-            _context = context;
             _logRepository = logRepository;
+            _localMemoryCache = localMemoryCache;
         }
         public IActionResult Index()
         {
@@ -31,6 +34,7 @@ namespace RareDiseasesSystem.Controllers
             {
                 if (!string.IsNullOrEmpty(HttpContext.User.Identity.Name))
                 {
+                   
                     _logRepository.Add("注销");
                 }
                 HttpContext.SignOutAsync();
@@ -42,25 +46,36 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-
-                var claims = new List<Claim>(){
-                                  new Claim(ClaimTypes.Name, loginModel.UserName),new Claim(ClaimTypes.NameIdentifier, loginModel.UserName)
-                               };
-                //init the identity instances 
-                var userPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "User"));
-                //signin 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal, new AuthenticationProperties
+                var userList = _localMemoryCache.GetUserList();
+                var user = userList.FirstOrDefault(x => x.UserName.ToLower().Equals(loginModel.UserName.ToLower()) && x.Password.ToLower().Equals(loginModel.Password.ToLower()));
+                if (user!=null)
                 {
-                    ExpiresUtc = DateTime.UtcNow.AddMinutes(30),
-                    IsPersistent = false,
-                    AllowRefresh = true
-                });
-                _logRepository.Add("登录", loginModel.UserName);
-                return Json(new { success = true });
+                    var claims = new List<Claim>(){
+                                  new Claim(ClaimTypes.Name, user.UserName),
+                                  new Claim(ClaimTypes.Role,user.Role )
+                               };
+                    //init the identity instances 
+                    var userPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "User"));
+                    //signin 
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, userPrincipal, new AuthenticationProperties
+                    {
+                        ExpiresUtc = DateTime.UtcNow.AddMinutes(30),
+                        IsPersistent = false,
+                        AllowRefresh = true
+                    });
+                    _logRepository.Add("登录", loginModel.UserName);
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, msg = "用户名密码错误！" });
+                }
+             
             }
             catch (Exception ex)
             {
                 _logger.LogError("登录失败：" + ex.ToString());
+                _logger11.Error("登录失败：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
 

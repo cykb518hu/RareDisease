@@ -22,11 +22,12 @@
     Vue.component("v-disease-search", {
         data: function () {
             return {
-                search: "",
+                search: "帕金森",
                 deseaseSearchedList: [],
                 total: 0,
                 pageIndex: 1,
-                loading: false
+                loading: false,
+                iframeSrc: "../121diseases.html"
             };
         },
         template: "#v-disease-search",
@@ -58,6 +59,40 @@
                         that.loading = false;
                     }
                 });
+            },
+            open121HpoDetail: function (subgroup) {
+                document.getElementById("iframeDiv").innerHTML = "";
+                var iframeSrc = "../121diseases.html" + subgroup.anchor;
+
+
+                //在document中创建iframe
+                var iframe = document.createElement("iframe");
+
+                //设置iframe的样式
+                iframe.style.width = "100%";
+                iframe.style.height = "calc(100vh - 100px)";
+                iframe.style.margin = "0";
+                iframe.style.padding = "0";
+                iframe.style.border = "1 solid  rgb(243,247,254)";
+
+                //绑定iframe的onload事件,处理事件的兼容问题
+                if (
+                    onload &&
+                    Object.prototype.toString.call(onload) === "[object Function]"
+                ) {
+                    if (iframe.attachEvent) {
+                        iframe.attachEvent("onload", onload);
+                    } else if (iframe.addEventListener) {
+                        iframe.addEventListener("load", onload);
+                    } else {
+                        iframe.onload = onload;
+                    }
+                }
+
+                iframe.src = iframeSrc;
+                //把iframe载入到dom以下
+                document.getElementById("iframeDiv").appendChild(iframe);
+                return iframe;
             }
         }
     });
@@ -89,7 +124,7 @@
                 normalDiseaseList: [],
                 rareDiseaseList: [],
 
-                nlpEngine: "",
+                nlpEngine: "engine1",
                 nlpEngineOptions: [
                     {
                         value: 'engine1',
@@ -100,14 +135,14 @@
                         label: 'MetaMap Lite'
                     }
                 ],
-                isNegativeOptions: [{
-                    value: 'true',
-                    label: 'true'
+                certainOptions: [{
+                    value: '阳性',
+                    label: '阳性'
                 }, {
-                    value: 'false',
-                    label: 'false'
+                    value: '隐性',
+                        label: '隐性'
                 }],
-                rareAnalyzeEngine: "",
+                rareAnalyzeEngine: "engine1",
                 rareAnalyzeEngineOptions: [
                     {
                         value: 'engine1',
@@ -117,7 +152,31 @@
                         value: 'engine2',
                         label: 'engine2'
                     }
+                ],
+                rareDataBaseEngine: "eRAM",
+                rareDataBaseEngineOptions: [
+                    {
+                        value: 'eRAM',
+                        label: 'eRAM'
+                    },
+                    {
+                        value: 'OMIM',
+                        label: 'OMIM'
+                    },
+                    {
+                        value: 'ORPHANET',
+                        label: 'ORPHANET'
+                    },
+                    {
+                        value: 'DECIPHER',
+                        label: 'DECIPHER'
+                    },
+                    {
+                        value: '整合库',
+                        label: '整合库'
+                    }
                 ]
+                
             };
         },
         template: "#v-disease-cdss",    
@@ -186,14 +245,14 @@
             },
 
             onAnalyzePatientEMR: function () {
-                //if (this.patientEMRDetail === undefined || this.patientEMRDetail === "") {
-                //    alert('电子病历不能为空！');
-                //    return false;
-                //}
-                //if (this.nlpEngine === undefined || this.nlpEngine === "") {
-                //    alert('请选择NLP分析引擎！');
-                //    return false;
-                //}
+                if (this.patientEMRDetail === undefined || this.patientEMRDetail === "") {
+                    alert('电子病历不能为空！');
+                    return false;
+                }
+                if (this.nlpEngine === undefined || this.nlpEngine === "") {
+                    alert('请选择NLP分析引擎！');
+                    return false;
+                }
                 var para = {};
                 para = {
                     patientEMRDetail: this.patientEMRDetail,
@@ -303,16 +362,36 @@
                 else {
                     var that = this;
                     this.multipleSearchedHPOSelection.map(function (item) {
-                        that.patientHPOList.push(item);
+                        var exist = false;
+                        for (var i = 0; i < that.patientHPOList.length; i++) {
+                            if (that.patientHPOList[i].name === item.name) {
+                                exist = true;
+                                break;
+                            }     
+                        }
+                        if (!exist) {
+                            that.patientHPOList.push(item);
+                        }
+                        
                     });
                     this.searchHPODlg = false;
                         
                 }
             },
             onSubmitHPODataForAnalyze: function () {
+                if (this.rareAnalyzeEngine === undefined || this.rareAnalyzeEngine === "") {
+                    alert('请选择罕见病分析引擎！');
+                    return false;
+                }
+                if (this.rareDataBaseEngine === undefined || this.rareDataBaseEngine === "") {
+                    alert('请选择罕见病数据库！');
+                    return false;
+                }
                 var para = {};
                 para = {
-                    hpoList: this.patientHPOList
+                    hpoList: this.patientHPOList,
+                    rareAnalyzeEngine: this.rareAnalyzeEngine,
+                    rareDataBaseEngine:this.rareDataBaseEngine
                 };
                 this.loading = true;
                 var that = this;
@@ -346,7 +425,8 @@
                 logList: [],
                 total: 0,
                 pageIndex: 1,
-                loading: false
+                loading: false,
+                logDateRange:""
             };
         },
         template: "#v-operation-log",
@@ -360,6 +440,7 @@
                 var param = {};
                 param.pageIndex = this.pageIndex;
                 param.pageSize = 10;
+                param.logDateRange = this.logDateRange;
                 this.loading = true;
                 var that = this;
                 $.ajax({

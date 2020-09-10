@@ -42,24 +42,23 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 var patientOverview = new List<PatientOverviewModel>();
-                var patientVisitList = new List<PatientVisitInfoModel>();          
-                if (!string.IsNullOrEmpty(patientCardNo))
-                {
-                    patientOverview.Add(new PatientOverviewModel { EMPINumber = "12345678", Address = "成都市龙泉驿区大面镇银河路118号恒大绿洲", CardNo = "511025196903220551", Gender = "男", Name = "叶问", PhoneNumber = "13550330299" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-09-03", VisitType = "住院", DiagDesc = "多巴反应性肌张力障碍", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-08-03", VisitType = "门诊", DiagDesc = "震颤", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-04-13", VisitType = "住院", DiagDesc = "肝豆状核变性", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-07-22", VisitType = "住院", DiagDesc = "发烧", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-02-21", VisitType = "住院", DiagDesc = "铁沉积性疾病", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-11-13", VisitType = "门诊", DiagDesc = "流行性感冒", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-09-15", VisitType = "门诊", DiagDesc = "发烧", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-19-03", VisitType = "住院", DiagDesc = "多系统萎缩", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2016-02-12", VisitType = "住院", DiagDesc = "脊髓小脑性共济失调", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-09-21", VisitType = "住院", DiagDesc = "运动迟缓", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-01-03", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2014-05-05", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
-                    patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2024-01-01", VisitType = "住院", DiagDesc = "流行性感冒", Center = "华西医院" });
-                }
+                var patientVisitList = new List<PatientVisitInfoModel>();
+
+                patientOverview.Add(new PatientOverviewModel { EMPINumber = "12345678", Address = "成都市龙泉驿区大面镇银河路118号恒大绿洲", CardNo = "511025196903220551", Gender = "男", Name = "叶问", PhoneNumber = "13550330299" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-09-03", VisitType = "住院", DiagDesc = "多巴反应性肌张力障碍", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-08-03", VisitType = "门诊", DiagDesc = "震颤", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-04-13", VisitType = "住院", DiagDesc = "肝豆状核变性", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-07-22", VisitType = "住院", DiagDesc = "发烧", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-02-21", VisitType = "住院", DiagDesc = "铁沉积性疾病", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-11-13", VisitType = "门诊", DiagDesc = "流行性感冒", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-09-15", VisitType = "门诊", DiagDesc = "发烧", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-19-03", VisitType = "住院", DiagDesc = "多系统萎缩", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2016-02-12", VisitType = "住院", DiagDesc = "脊髓小脑性共济失调", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-09-21", VisitType = "住院", DiagDesc = "运动迟缓", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-01-03", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2014-05-05", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2024-01-01", VisitType = "住院", DiagDesc = "流行性感冒", Center = "华西医院" });
+
 
                 return Json(new { success = true, patientOverview, patientVisitList, total = patientVisitList.Count });
             }
@@ -90,9 +89,9 @@ namespace RareDiseasesSystem.Controllers
             {
                 
                 var hpoList = new List<HPODataModel>();
-                hpoList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HpoId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 1, Editable = true ,IsNegative="false", IsFamily="false" });
-                hpoList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HpoId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Editable = true, IsNegative = "false", IsFamily = "true" });
-                hpoList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HpoId = "HP:0001260", StartIndex = 334, EndIndex = 338,  Count = 1, Editable = true, IsNegative = "true", IsFamily = "false" });
+                hpoList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HpoId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 1, Editable = true ,Certain="阳性", IsSelf="本人" });
+                hpoList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HpoId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Editable = true, Certain = "阳性", IsSelf = "他人" });
+                hpoList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HpoId = "HP:0001260", StartIndex = 334, EndIndex = 338,  Count = 1, Editable = true, Certain = "阴性", IsSelf = "本人" });
                 _logRepository.Add("电子病历分析", "", JsonConvert.SerializeObject(hpoList));
                 return Json(new { success = true, data = hpoList, });
             }
@@ -108,18 +107,18 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 var searchedHPOList = new List<HPODataModel>();
-                searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HpoId = "HP:0001337", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HpoId = "HP:0001300", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HpoId = "HP:0002067", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "强直", NameEnglish = "Rigidity", HpoId = "HP:0002063", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "姿势不稳", NameEnglish = "Postural instability", HpoId = "HP:0002172", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "核上性凝视麻痹", NameEnglish = "Supranuclear gaze palsy", HpoId = "HP:0000605", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "眼睑失用症", NameEnglish = "Eyelid apraxia", HpoId = "HP:0000658", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "肌张力障碍", NameEnglish = "Dystonia", HpoId = "HP:0001332", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "智能衰退", NameEnglish = "Mental deterioration", HpoId = "HP:0001268", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HpoId = "HP:0001260", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "曳行步态", NameEnglish = "Shuffling gait", HpoId = "HP:0002362", IsNegative = "false", IsFamily = "false", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HpoId = "HP:0000007", IsNegative = "false", IsFamily = "false", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HpoId = "HP:0001337", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HpoId = "HP:0001300", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HpoId = "HP:0002067", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "强直", NameEnglish = "Rigidity", HpoId = "HP:0002063", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "姿势不稳", NameEnglish = "Postural instability", HpoId = "HP:0002172", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "核上性凝视麻痹", NameEnglish = "Supranuclear gaze palsy", HpoId = "HP:0000605", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "眼睑失用症", NameEnglish = "Eyelid apraxia", HpoId = "HP:0000658", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "肌张力障碍", NameEnglish = "Dystonia", HpoId = "HP:0001332", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "智能衰退", NameEnglish = "Mental deterioration", HpoId = "HP:0001268", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HpoId = "HP:0001260", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "曳行步态", NameEnglish = "Shuffling gait", HpoId = "HP:0002362", Certain = "阳性", IsSelf="本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HpoId = "HP:0000007", Certain = "阳性", IsSelf="本人", Count = 1 });
                 return Json(new { success = true, data=searchedHPOList, total = searchedHPOList.Count });
             }
             catch (Exception ex)
