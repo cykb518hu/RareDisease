@@ -21,7 +21,6 @@ namespace RareDiseasesSystem.Controllers
         private readonly ILogger<LoginController> _logger;
         private readonly ILogRepository _logRepository;
         private readonly ILocalMemoryCache _localMemoryCache;
-        private static NLog.Logger _logger11 = NLog.LogManager.GetCurrentClassLogger();
         public LoginController(ILogger<LoginController> logger, ILogRepository logRepository, ILocalMemoryCache localMemoryCache)
         {
             _logger = logger;

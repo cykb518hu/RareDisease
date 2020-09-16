@@ -84,6 +84,7 @@
                         iframe.attachEvent("onload", onload);
                     } else if (iframe.addEventListener) {
                         iframe.addEventListener("load", onload);
+
                     } else {
                         iframe.onload = onload;
                     }
@@ -292,12 +293,6 @@
                 $('#txt_patientEMR').val(text);
                 $('#txt_patientEMR').selectRange(subgroup.startIndex, subgroup.endIndex); 
 
-
-               // $('#txt_patientEMR').selectRange(subgroup.startIndex, subgroup.endIndex);
-                //var node = document.getElementById("txt_patientEMR");
-               // node.selectionStart = 2;
-               // node.selectionEnd = 7;
-               // node.focus();
             },
             onSearchHPODlg: function () {
                 this.searchHPODlg = true;

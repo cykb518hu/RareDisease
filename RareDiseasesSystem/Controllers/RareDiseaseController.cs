@@ -15,10 +15,12 @@ namespace RareDiseasesSystem.Controllers
     {
         private readonly ILogger<RareDiseaseController> _logger;
         private ILocalMemoryCache _localMemoryCache;
-        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger)
+        private readonly ILogRepository _logRepository;
+        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger，ILogRepository logRepository)
         {
             _localMemoryCache = localMemoryCache;
             _logger = logger;
+            _logRepository = logRepository;
         }
         public IActionResult Search()
         {
@@ -29,7 +31,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-
+                _logRepository.Add("查询罕见病详情", "", search);
                 var data = new List<ChinaRareDiseaseModel>();
                 int count = 0;
 

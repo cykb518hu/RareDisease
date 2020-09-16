@@ -1,0 +1,130 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>华西医院罕见病研究中心科研驾驶舱</title>
+
+    <link rel="shortcut icon" href="~/images/favicon.ico" />
+
+    <link rel="stylesheet" href="~/lib/element-ui/theme-chalk/index.css" />
+
+    <link href="~/css/cabin.css" rel="stylesheet" asp-append-version="true" />
+
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+
+    <script src="~/lib/echarts/echarts.min.js"></script>
+    <script src="~/lib/echarts/echarts-wordcloud.min.js"></script>
+    <script type="text/javascript" src="~/lib/vue/vue.js"></script>
+    <script type="text/javascript" src="~/lib/element-ui/index.js"></script>
+    <script src="~/js/china.js"></script>
+</head>
+<body>
+    <div id="app" v-cloak style="overflow-y: hidden;max-height: 100vh;">
+        <div class="header">
+            <el-row>
+                <el-col v-bind:span="4">
+                    <div style="height: 1px"></div>
+                </el-col>
+                <el-col v-bind:span="16">
+                    <div class="system-title">
+                        <div class="text">
+                            华西医院罕见病研究中心科研驾驶舱
+                        </div>
+                    </div>
+                </el-col>
+                <el-col v-bind:span="4">
+                    <div class="time">
+                        <span id="currenttime" class="time">
+                        </span>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+        <div class="content">
+            <el-row :gutter="10">
+                <el-col :span="8">
+                    <div class="ci-tie" style=" height:100px">
+                        <el-row>
+                            <el-col :span="12" class="xu-xian" v-for="(item,index) in cixiData">
+                                <div class="number">
+                                    {{item.iresult}}
+                                </div>
+                                <div class="text">
+                                    {{item.ititle}}
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </div>
+                    <el-row class="row-margin">
+                        <el-col :span="24">
+                            <div class="boxall first-box">
+                                <div class="alltitle">病种分布</div>
+                                <div id="age_line_chart" class="age-timeline-chart-height overflow-hidden" style="width:100%;overflow:hidden">
+
+                                </div>
+                                <el-row class="row-margin" :gutter="10">
+                                    <el-col :span="12">
+                                        <div id="age_pie_chart" class="age-line-chart-height overflow-hidden">
+
+                                        </div>
+                                    </el-col>
+                                    <el-col :span="12" style=" position:relative;">
+                                        <div id="sex_pie_chart" class="age-line-chart-height overflow-hidden">
+
+                                        </div>
+                                    </el-col>
+                                </el-row>
+                                <div class="boxfoot"></div>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </el-col>
+                <el-col :span="8">
+                    <div class="boxall project-box">
+                        <div class="alltitle">患者地域分布</div>
+                        <div class="map-info" id="china_map_chart">
+
+                        </div>
+                        <div class="boxfoot"></div>
+                    </div>
+                </el-col>
+
+                <el-col :span="8">
+                    <div class="boxall project-box">
+
+                                <div id="disease_number_rank" class="project-box" style="padding-right:10px"></div>
+          
+                        <div class="boxfoot"></div>
+                    </div>
+                </el-col>
+
+            </el-row>
+        </div>
+    </div>
+
+    <div class="back"></div>
+    <script src="~/js/cabin.js" asp-append-version="true"></script>
+    <script>
+        $(window).on('load', function () {
+            $(".loading").fadeOut()
+        });
+
+        $(document).ready(function () {
+            var whei = $(window).width();
+            $("html").css({ fontSize: whei / 20 })
+            $(window).resize(function () {
+                var whei = $(window).width()
+                $("html").css({ fontSize: whei / 20 })
+            });
+        });
+    </script>
+</body>
+</html>

@@ -27,6 +27,7 @@ namespace RareDiseasesSystem.Controllers
         }
         public IActionResult Index()
         {
+            _logRepository.Add("查看罕见病系统首页");
             return View();
         }
 
@@ -41,6 +42,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
+                _logRepository.Add("查看患者就诊记录");
                 var patientOverview = new List<PatientOverviewModel>();
                 var patientVisitList = new List<PatientVisitInfoModel>();
 
@@ -73,7 +75,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                _logRepository.Add("提取电子病历文本");
+                _logRepository.Add("提取患者电子病历文本");
                 return Json(new { success = true, data= @"患者李**，男性，67岁，主因“右侧肢体抖动、僵硬、动作不灵活7年，累及左侧5年”，来我院门诊就诊。患者7年前无明显诱因出现右手不自主抖动，以安静状态下明显，紧张、激动时加重，平静放松后减轻，睡眠后消失；伴右侧肢体活动不灵活、僵硬，如写字慢、越写越小。症状逐渐加重，波及右下肢。5年前左侧肢体亦出现上述症状，切菜、系扣等动作慢。走路慢，小碎步，起床迈步转身费力，呈弯腰驼背姿势，症状缓慢加重。5年前开始口服美多巴，上述症状明显改善。但2年前因逐渐出现药效减退，患者自行将药量逐渐增加250mg 4id。约半年前开始出现服药2-3小时后肢体不自主扭动表现，且一天之中上述症状波动明显。发病以来便秘明显，睡眠差。发病以来否认站立头晕、吞咽困难、饮水呛咳、平衡障碍。既往：无构音障碍、CO中毒史、脑炎病史、重金属中毒史、农药中毒史、脑出血脑梗塞病史，家族中有类似疾病患者，可能有常染色体隐性遗传，无长期大量应用D2受体阻滞剂、多巴胺耗竭剂病史。专科查体：体温：36.5℃，呼吸：18次/分，脉搏：76次/分。神志清楚，面具脸，流涎较多、颜面躯干皮脂分泌增多。平卧血压120/ 80 mmHg，立位血压120/ 80mmHg。颅神经检查：双眼各向活动无障碍，无复视。面部感觉对称正常，咬肌、颞肌有力，张口下颌不偏。双侧闭目有力、示齿口角无偏斜。伸舌居中。躯体深浅感觉对称正常。慌张步态，行走时躯干前屈，双上臂无伴随动作。四肢肌力V级，四肢肌张力高，呈齿轮样强直，右侧重于右侧。肌肉无明显萎缩。双侧肢体3~5Hz粗大搓丸样静止性震颤，小写征明显。指鼻试验、跟膝胫试验稳准。肱二头肌、膝腱反射无明显亢进，双侧Hoffmann征、Babinski征阴性。颈部僵硬。双侧Kernig’ s sign (-) 。辅助检查：头颅MRI平扫未见明显异常。" });
             }
             catch (Exception ex)
@@ -92,7 +94,7 @@ namespace RareDiseasesSystem.Controllers
                 hpoList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HpoId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 1, Editable = true ,Certain="阳性", IsSelf="本人" });
                 hpoList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HpoId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Editable = true, Certain = "阳性", IsSelf = "他人" });
                 hpoList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HpoId = "HP:0001260", StartIndex = 334, EndIndex = 338,  Count = 1, Editable = true, Certain = "阴性", IsSelf = "本人" });
-                _logRepository.Add("电子病历分析", "", JsonConvert.SerializeObject(hpoList));
+                _logRepository.Add("患者电子病历分析", "", JsonConvert.SerializeObject(hpoList));
                 return Json(new { success = true, data = hpoList, });
             }
             catch (Exception ex)
@@ -106,6 +108,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
+                _logRepository.Add("查询HPO", "", searchHPOText);
                 var searchedHPOList = new List<HPODataModel>();
                 searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HpoId = "HP:0001337", Certain = "阳性", IsSelf="本人", Count = 1 });
                 searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HpoId = "HP:0001300", Certain = "阳性", IsSelf="本人", Count = 1 });
@@ -132,7 +135,6 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                _logRepository.Add("罕见病分析");
                 var rareDiseaseList = new List<DiseaseModel>();
                 rareDiseaseList.Add(new DiseaseModel { Name = "常染色体显性帕金森病8型", Likeness = "1" });
                 var hpoList1 = new List<HPODataModel>();
@@ -162,7 +164,7 @@ namespace RareDiseasesSystem.Controllers
                 normalDiseaseList.Add(new DiseaseModel { Name = "老年病", Likeness = "1" });
                 normalDiseaseList.Add(new DiseaseModel { Name = "感冒", Likeness = "0.9" });
 
-                _logRepository.Add("罕见病分析", "", JsonConvert.SerializeObject(normalDiseaseList) + JsonConvert.SerializeObject(rareDiseaseList));
+                _logRepository.Add("罕见病分析结果", "", JsonConvert.SerializeObject(normalDiseaseList) + JsonConvert.SerializeObject(rareDiseaseList));
 
                 return Json(new { success = true, normalDiseaseList, rareDiseaseList });
             }

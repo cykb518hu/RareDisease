@@ -608,3 +608,91 @@ el-upload input[type="file"] {
 }
 /*#endregion */
 
+.el-row:last-child {
+    margin-bottom: 10px;
+}
+
+.el-card__body > .el-row {
+    height: auto !important;
+    min-height: 350px !important;
+}
+
+.el-upload__input {
+    display: none !important;
+}
+
+.panel-heading {
+    padding: 5px 15px;
+}
+
+.panel-body {
+    padding: 5px;
+    background-color: #eee;
+}
+
+.breadcrumbs {
+    background: none;
+}
+
+.paddinglr5px {
+    padding: 0 5px;
+}
+
+.padding0px {
+    padding: 0px !important;
+}
+
+
+.el-textarea__inner {
+    height: calc(100vh - 220px);
+    padding: 5px;
+}
+
+.showIndicator {
+    height: calc(100vh - 173px)
+}
+
+.panel-default > .panel-heading {
+    color: #000;
+    background-color: rgb(243,247,254);
+    border-color: #ddd;
+}
+
+.panel-body {
+    background-color: #fff;
+}
+
+.patientEMR .el-dialog {
+    width: 70%
+}
+
+.el-select-dropdown__item {
+    font-size: 12px;
+}
+
+    .el-select-dropdown__item.selected {
+        font-weight: initial;
+    }
+
+.el-link.is-underline:hover:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    bottom: 0;
+    border-bottom: 0px
+}
+
+.el-divider__text, .el-link {
+    font-size: 12px;
+}
+
+.el-range-separator {
+    width: auto !important;
+    height: auto !important;
+}
+
+.el-date-editor .el-range-input, .el-date-editor .el-range-separator {
+    font-size: 12px;
+}
