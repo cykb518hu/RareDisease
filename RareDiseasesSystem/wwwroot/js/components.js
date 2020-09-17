@@ -133,7 +133,7 @@
                     },
                     {
                         value: 'engine2',
-                        label: 'MetaMap Lite'
+                        label: 'Spacy'
                     }
                 ],
                 certainOptions: [{
@@ -147,11 +147,11 @@
                 rareAnalyzeEngineOptions: [
                     {
                         value: 'engine1',
-                        label: 'engine1'
+                        label: '相似度1'
                     },
                     {
                         value: 'engine2',
-                        label: 'engine2'
+                        label: '相似度2'
                     }
                 ],
                 rareDataBaseEngine: "eRAM",
