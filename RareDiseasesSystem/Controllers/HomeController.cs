@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -19,11 +20,13 @@ namespace RareDiseasesSystem.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ILocalMemoryCache _localMemoryCache;
         private readonly ILogRepository _logRepository;
-        public HomeController(ILocalMemoryCache localMemoryCache, ILogger<HomeController> logger, ILogRepository logRepository)
+        private readonly IHostingEnvironment _env;
+        public HomeController(ILocalMemoryCache localMemoryCache, ILogger<HomeController> logger, ILogRepository logRepository,IHostingEnvironment env)
         {
             _localMemoryCache = localMemoryCache;
             _logger = logger;
             _logRepository = logRepository;
+            _env = env;
         }
         public IActionResult Index()
         {
@@ -42,6 +45,10 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
+                if(_env.IsProduction())
+                {
+
+                }
                 _logRepository.Add("查看患者就诊记录");
                 var patientOverview = new List<PatientOverviewModel>();
                 var patientVisitList = new List<PatientVisitInfoModel>();

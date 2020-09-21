@@ -218,14 +218,14 @@ function age_line_chart(data) {
             {
                 name: '男',
                 type: 'line',
-                stack: '数量',
+                //stack: '数量',
                 //data: [120, 132, 101, 134, 90, 230, 210, 132,120]
                 data: data.lineData['男']
             },
             {
                 name: '女',
                 type: 'line',
-                stack: '数量',
+                //stack: '数量',
                 //data: [220, 182, 191, 234, 290, 330, 310,101, 134]
                 data: data.lineData['女']
             }

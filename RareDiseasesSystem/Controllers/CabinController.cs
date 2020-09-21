@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RareDisease.Data.Model;
@@ -10,6 +11,7 @@ using RareDisease.Data.Repository;
 
 namespace RareDiseasesSystem.Controllers
 {
+    [Authorize]
     public class CabinController : Controller
     {
 
@@ -55,27 +57,20 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var entity = new DiseasePatientTimeLineDistributionModel
+                var data = _localMemoryCache.GetCabinPatientGenderTimeLine();
+                var entity = new PatientTimeLineDistributionModel
                 {
                     LegendData = new List<string>( ),
                     xAxisData = new List<string>(),
-                    LineData = new Dictionary<string, List<double>>()
+                    LineData = new Dictionary<string, List<int>>()
                 };
+                entity.xAxisData = data.Select(x => x.Year).ToList();
                 entity.LegendData.Add("男");
                 entity.LegendData.Add("女");
 
-                entity.xAxisData.Add("2011");
-                entity.xAxisData.Add("2012");
-                entity.xAxisData.Add("2013");
-                entity.xAxisData.Add("2014");
-                entity.xAxisData.Add("2015");
-                entity.xAxisData.Add("2016");
-                entity.xAxisData.Add("2017");
-                entity.xAxisData.Add("2018");
-                entity.xAxisData.Add("2019");
-                entity.xAxisData.Add("2020");
-                entity.LineData.Add("男", new List<double> { 5159, 7332, 15234, 6969, 200, 13757, 2977, 5573, 11587, 12876, 6224 });
-                entity.LineData.Add("女", new List<double> { 8068, 8561, 329, 18632, 10545, 15721, 3938, 17489, 10992, 19602, 9352 });
+                entity.xAxisData = data.Select(x => x.Year).ToList();
+                entity.LineData.Add("男", data.Select(x=>x.Male).ToList());
+                entity.LineData.Add("女", data.Select(x => x.Female).ToList());
 
                 return new JsonResult(new { success = true, data = entity });
             }
@@ -94,13 +89,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var ages = new[] { 65, 70, 75, 80, 85 };
-                var results = new List<SeriesDataModel>();
-                results.Add(new SeriesDataModel { Name = "65-69岁", Value = 100 });
-                results.Add(new SeriesDataModel { Name = "70-74岁", Value = 200 });
-                results.Add(new SeriesDataModel { Name = "75-79岁", Value = 300 });
-                results.Add(new SeriesDataModel { Name = "80-85岁", Value = 150 });
-                results.Add(new SeriesDataModel { Name = "> 85岁", Value = 5000 });
+                var results = _localMemoryCache.GetCabinPatientAge(); 
                 var entity = new PieChartModel
                 {
                     legendData = results.Select(x => x.Name).ToList(),
@@ -151,10 +140,6 @@ namespace RareDiseasesSystem.Controllers
                 var entity = new BarChartModel();
                 entity.AxisData = data.Select(x => x.Name).ToList();
                 entity.SeriesData = data.Select(x => x.Value).ToList();
-                //{
-                //    AxisData = new List<string> { "高血压", "恶性肿瘤", "糖尿病", "冠心病", "肺部感染", "老年性白内障", "肾囊肿", "前列腺肥大", "肝囊肿" },
-                //    SeriesData = new List<double> { 401920, 386875, 247180, 190110, 150890, 143875, 120735, 116945, 83090 }
-                //};
 
                 return new JsonResult(new { success = true, data = entity });
             }
