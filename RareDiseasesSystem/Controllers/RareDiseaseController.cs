@@ -16,7 +16,7 @@ namespace RareDiseasesSystem.Controllers
         private readonly ILogger<RareDiseaseController> _logger;
         private ILocalMemoryCache _localMemoryCache;
         private readonly ILogRepository _logRepository;
-        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger，ILogRepository logRepository)
+        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger,ILogRepository logRepository)
         {
             _localMemoryCache = localMemoryCache;
             _logger = logger;

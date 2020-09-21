@@ -74,7 +74,6 @@ namespace RareDiseasesSystem.Controllers
             catch (Exception ex)
             {
                 _logger.LogError("登录失败：" + ex.ToString());
-                _logger11.Error("登录失败：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
 

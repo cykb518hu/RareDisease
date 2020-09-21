@@ -15,10 +15,12 @@ namespace RareDiseasesSystem.Controllers
 
         private readonly ILogger<CabinController> _logger;
         private readonly ILogRepository _logRepository;
-        public CabinController(ILogger<CabinController> logger, ILogRepository logRepository)
+        private readonly ILocalMemoryCache _localMemoryCache;
+        public CabinController(ILogger<CabinController> logger, ILogRepository logRepository, ILocalMemoryCache localMemoryCache)
         {
             _logger = logger;
             _logRepository = logRepository;
+            _localMemoryCache = localMemoryCache;
         }
         public IActionResult Index()
         {
@@ -34,20 +36,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var results = new List<OverViewModel>
-                {
-                    new OverViewModel
-                    {
-                         Title = "罕见病总数（个）",
-                        Result ="137"
-                    },
-                     new OverViewModel
-                    {
-                         Title = "罕见病总数（个）",
-                        Result ="2000000"
-                    },
-
-                };
+                var results = _localMemoryCache.GetCabinOverView();
                 return new JsonResult(new { success = true, data = results });
             }
             catch (Exception ex)
@@ -134,19 +123,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var results = new List<SeriesDataModel>
-                {
-                    new SeriesDataModel
-                    {
-                        Name = "男",
-                        Value =200
-                    },
-                    new SeriesDataModel
-                    {
-                        Name = "女",
-                        Value = 250
-                    }
-                };
+                var results = _localMemoryCache.GetCabinGenderOverView();
                 var entity = new PieChartModel
                 {
                     legendData = results.Select(x => x.Name).ToList(),
@@ -170,11 +147,14 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var entity = new BarChartModel
-                {
-                    AxisData = new List<string> { "高血压", "恶性肿瘤", "糖尿病", "冠心病", "肺部感染", "老年性白内障", "肾囊肿", "前列腺肥大", "肝囊肿" },
-                    SeriesData = new List<double> { 401920, 386875, 247180, 190110, 150890, 143875, 120735, 116945, 83090 }
-                };
+                var data = _localMemoryCache.GetCabinDiseaseRank();
+                var entity = new BarChartModel();
+                entity.AxisData = data.Select(x => x.Name).ToList();
+                entity.SeriesData = data.Select(x => x.Value).ToList();
+                //{
+                //    AxisData = new List<string> { "高血压", "恶性肿瘤", "糖尿病", "冠心病", "肺部感染", "老年性白内障", "肾囊肿", "前列腺肥大", "肝囊肿" },
+                //    SeriesData = new List<double> { 401920, 386875, 247180, 190110, 150890, 143875, 120735, 116945, 83090 }
+                //};
 
                 return new JsonResult(new { success = true, data = entity });
             }
