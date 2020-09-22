@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using RareDisease.Data.Entity;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,5 +30,23 @@ namespace RareDisease.Data
         //    });
 
         //}
+    }
+
+    public class RareDiseaseGPDbContext
+    {
+        public static string RDR_ConnectionString { get; set; }
+
+        public SqlSugarClient dbgp;//用来处理事务多表查询和复杂的操作 
+        public RareDiseaseGPDbContext()
+        {
+            dbgp = new SqlSugarClient(new ConnectionConfig()
+            {
+                ConnectionString = RDR_ConnectionString,
+                //DbType = DbType.PostgreSQL,
+                DbType = DbType.SqlServer,
+                InitKeyType = InitKeyType.Attribute,//从特性读取主键和自增列信息
+                IsAutoCloseConnection = true,//开启自动释放模式和EF原理一样
+            });
+        }
     }
 }

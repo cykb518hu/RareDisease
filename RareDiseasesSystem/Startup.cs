@@ -37,10 +37,12 @@ namespace RareDiseasesSystem
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMemoryCache();
             
-            services.AddDbContext<RareDiseaseDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LocalConnection")));
+            services.AddDbContext<RareDiseaseDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LogConnection")));
+            RareDiseaseGPDbContext.RDR_ConnectionString = Configuration.GetConnectionString("LogConnection");   //为数据库连接字符串赋值
             services.AddHttpContextAccessor();
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
             services.AddScoped<ILogRepository, LogRepository>();
+            services.AddScoped<IRdrDataRepository, RdrDataRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

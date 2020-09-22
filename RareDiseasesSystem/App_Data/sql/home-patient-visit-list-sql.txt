@@ -1,0 +1,3 @@
+﻿  select '12345678' as EMPINumber,'成都市龙泉驿区大面镇银河路118号恒大绿洲' as address,
+  '511025196903220551' as cardNo, '小吴' as name,'女' as gender , '13550330299' as PhoneNumber
+  from DBO.OperationLog WHERE CreatedBy=@number
