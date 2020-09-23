@@ -13,7 +13,12 @@ namespace RareDisease.Data.Repository
     {
         List<PatientOverviewModel> GetPatientOverview(string number);
         List<PatientVisitInfoModel> GetPatientVisitList(string number);
-        string GetPatientEMRText(string patientCardNo);
+        List<PatientEMRModel> GetPatientEMRText(string patientEmpiId);
+
+        List<HPODataModel> SearchHPOList(string searchHPOText);
+
+        List<HPODataModel> GetAnalyzeHPOResult(string patientEmpiId);
+
     }
 
     public class RdrDataRepository: RareDiseaseGPDbContext,IRdrDataRepository
@@ -47,18 +52,41 @@ namespace RareDisease.Data.Repository
             return result;
         }
 
-        public string GetPatientEMRText(string patientCardNo)
+        public List<PatientEMRModel> GetPatientEMRText(string patientEmpiId)
         {
 
-            //string sql = GetSqlText("home-patient-EMR-sql.txt");
-            //var parameters = new List<SugarParameter>(){
-            //      new SugarParameter("@number",patientCardNo)
-            //};
-            ////var result = dbgp.Ado.GetString(sql);
-            //var result = dbgp.SqlQueryable<String>(sql).AddParameters(parameters);
-            //return result;
-            return "";
+            string sql = GetSqlText("home-patient-EMR-sql.txt");
+            var parameters = new List<SugarParameter>(){
+                  new SugarParameter("@number",patientEmpiId)
+            };
+            //var result = dbgp.Ado.GetString(sql);
+            var result = dbgp.SqlQueryable<PatientEMRModel>(sql).AddParameters(parameters).ToList();
+            return result;
+           // return "";
         }
+
+        public List<HPODataModel> SearchHPOList(string searchHPOText)
+        {
+
+            string sql = GetSqlText("home-search-hpo-sql.txt");
+            var parameters = new List<SugarParameter>(){
+                  new SugarParameter("@HPOText",searchHPOText)
+            };
+            var result = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
+            return result;
+        }
+
+        public List<HPODataModel> GetAnalyzeHPOResult(string patientEmpiId)
+        {
+
+            string sql = GetSqlText("home-get-hpo-result-sql.txt");
+            var parameters = new List<SugarParameter>(){
+                  new SugarParameter("@number",patientEmpiId)
+            };
+            var result = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
+            return result;
+        }
+
 
         public string GetSqlText(string fileName)
         {

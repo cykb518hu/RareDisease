@@ -106,6 +106,7 @@
             return {
                 importEMRDlg: false,
                 patientCardNo: "",
+                patientEmpiId:"",
                 patientOverview: [],
                 patientVisitList: [],
                 patientVisitListCopy: [],
@@ -188,6 +189,8 @@
             onSearchPatient: function () {
                 this.patientVisitListIndex = 1;
                 this.requestPatientEMR();
+                this.patientEMRDetail = "";
+                this.patientEmpiId = "";
             },
             requestPatientEMR: function () {
                 var para = {};
@@ -206,6 +209,9 @@
                             that.patientVisitListTotal = data.total;
                             that.patientVisitListCopy = data.patientVisitList; 
                             that.patientOverview = data.patientOverview;
+                            if (data.patientOverview.length > 0) {
+                                that.patientEmpiId = data.patientOverview[0].iEMPINumber;
+                            }
                             that.patientLocalPaging();
                         }
                         else {
@@ -222,7 +228,7 @@
             onImportPatientEMRText: function () {
                 var para = {};
                 para = {
-                    patientCardNo: this.patientCardNo                 
+                    patientEmpiId: this.patientEmpiId                 
                 };                
                 var that = this;
                 $.ajax({
@@ -250,15 +256,18 @@
                     alert('电子病历不能为空！');
                     return false;
                 }
-                if (this.nlpEngine === undefined || this.nlpEngine === "") {
-                    alert('请选择NLP分析引擎！');
-                    return false;
-                }
                 var para = {};
-                para = {
-                    patientEMRDetail: this.patientEMRDetail,
-                    nlpEngine: this.nlpEngine
-                };
+                if (this.patientEmpiId !== "") {
+                    para = {
+                        patientEmpiId: this.patientEmpiId
+                    };
+                }
+                else {
+                    para = {
+                        patientEMRDetail: this.patientEMRDetail,
+                        nlpEngine: this.nlpEngine
+                    };
+                }             
                 this.loading = true;
                 var that = this;
                 $.ajax({
