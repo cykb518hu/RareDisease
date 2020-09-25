@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using RareDisease.Data;
 using RareDisease.Data.Repository;
 
@@ -43,6 +45,17 @@ namespace RareDiseasesSystem
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IRdrDataRepository, RdrDataRepository>();
+            services.AddScoped<INLPSystemRepository, NLPSystemRepository>();
+            services.AddSwaggerGen(option =>
+            {
+                option.SwaggerDoc("罕见病", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "罕见病 API",
+                    Description = "API for 罕见病",
+                    Contact = new OpenApiContact() { Name = "胡真武", Email = "huzhenwu1989312@outlook.com" }
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,6 +69,12 @@ namespace RareDiseasesSystem
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+            app.UseSwagger();
+            //Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint
+            app.UseSwaggerUI(option =>
+            {
+                option.SwaggerEndpoint("v1/swagger.json", "罕见病 API");
+            });
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -66,6 +85,7 @@ namespace RareDiseasesSystem
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+           
         }
     }
 }
