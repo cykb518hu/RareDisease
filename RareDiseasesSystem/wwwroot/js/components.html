@@ -61,6 +61,7 @@
                                        layout="total, prev, pager, next"
                                        v-on:current-change="searchDiseaseList"
                                        v-bind:total="total"
+                                       :page-size="pageSize"
                                        v-bind:current-page.sync="pageIndex">
                         </el-pagination>
 

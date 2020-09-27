@@ -27,7 +27,8 @@
                 total: 0,
                 pageIndex: 1,
                 loading: false,
-                iframeSrc: "../121diseases.html"
+                iframeSrc: " ",
+                pageSize:5
             };
         },
         template: "#v-disease-search",
