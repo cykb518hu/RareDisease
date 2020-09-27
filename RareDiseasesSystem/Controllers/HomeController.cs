@@ -49,7 +49,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                _logRepository.Add("查看患者就诊记录");
+                _logRepository.Add("查询患者就诊记录");
                 var patientOverview = new List<PatientOverviewModel>();
                 var patientVisitList = new List<PatientVisitInfoModel>();
                 if (_env.IsProduction())
@@ -83,7 +83,7 @@ namespace RareDiseasesSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("查询病人病历错误：" + ex.ToString());
+                _logger.LogError("查询患者就诊记录：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }
@@ -93,7 +93,7 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 var data = @"患者李**，男性，67岁，主因“右侧肢体抖动、僵硬、动作不灵活7年，累及左侧5年”，来我院门诊就诊。患者7年前无明显诱因出现右手不自主抖动，以安静状态下明显，紧张、激动时加重，平静放松后减轻，睡眠后消失；伴右侧肢体活动不灵活、僵硬，如写字慢、越写越小。症状逐渐加重，波及右下肢。5年前左侧肢体亦出现上述症状，切菜、系扣等动作慢。走路慢，小碎步，起床迈步转身费力，呈弯腰驼背姿势，症状缓慢加重。5年前开始口服美多巴，上述症状明显改善。但2年前因逐渐出现药效减退，患者自行将药量逐渐增加250mg 4id。约半年前开始出现服药2-3小时后肢体不自主扭动表现，且一天之中上述症状波动明显。发病以来便秘明显，睡眠差。发病以来否认站立头晕、吞咽困难、饮水呛咳、平衡障碍。既往：无构音障碍、CO中毒史、脑炎病史、重金属中毒史、农药中毒史、脑出血脑梗塞病史，家族中有类似疾病患者，可能有常染色体隐性遗传，无长期大量应用D2受体阻滞剂、多巴胺耗竭剂病史。专科查体：体温：36.5℃，呼吸：18次/分，脉搏：76次/分。神志清楚，面具脸，流涎较多、颜面躯干皮脂分泌增多。平卧血压120/ 80 mmHg，立位血压120/ 80mmHg。颅神经检查：双眼各向活动无障碍，无复视。面部感觉对称正常，咬肌、颞肌有力，张口下颌不偏。双侧闭目有力、示齿口角无偏斜。伸舌居中。躯体深浅感觉对称正常。慌张步态，行走时躯干前屈，双上臂无伴随动作。四肢肌力V级，四肢肌张力高，呈齿轮样强直，右侧重于右侧。肌肉无明显萎缩。双侧肢体3~5Hz粗大搓丸样静止性震颤，小写征明显。指鼻试验、跟膝胫试验稳准。肱二头肌、膝腱反射无明显亢进，双侧Hoffmann征、Babinski征阴性。颈部僵硬。双侧Kernig’ s sign (-) 。辅助检查：头颅MRI平扫未见明显异常。";
-                _logRepository.Add("提取患者电子病历文本");
+                _logRepository.Add("获取患者电子病历文本", "", "patientEmpiId:" + patientEmpiId);
                 if (_env.IsProduction())
                 {
                     if (!string.IsNullOrWhiteSpace(patientEmpiId))
@@ -106,7 +106,7 @@ namespace RareDiseasesSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("提取电子病历文本错误：" + ex.ToString());
+                _logger.LogError("获取患者电子病历文本：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }
@@ -117,12 +117,12 @@ namespace RareDiseasesSystem.Controllers
             {
                 var hpoList = new List<HPODataModel>();
                 hpoList = _nLPSystemRepository.AnalyzePatientHPO(nlpEngine, patientEMRDetail, patientEmpiId);             
-                _logRepository.Add("患者电子病历分析", "", JsonConvert.SerializeObject(hpoList));
+                _logRepository.Add("获取病人HPO", "", JsonConvert.SerializeObject(hpoList));
                 return Json(new { success = true, data = hpoList, });
             }
             catch (Exception ex)
             {
-                _logger.LogError("分析电子病历错误：" + ex.ToString());
+                _logger.LogError("获取病人HPO：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }
@@ -143,48 +143,20 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult SubmitHPODataForAnalyze(List<HPODataModel> hpoList = null)
+        public JsonResult SubmitHPODataForAnalyze(string rareAnalyzeEngine, string rareDataBaseEngine,List<HPODataModel> hpoList = null)
         {
             try
             {
-                //to do
-                //API
-                var rareDiseaseList = new List<DiseaseModel>();
-                rareDiseaseList.Add(new DiseaseModel { Name = "常染色体显性帕金森病8型", Likeness = "1" });
-                var hpoList1 = new List<HPODataModel>();
-                hpoList1.Add(new HPODataModel { Name = "构音障碍", HpoId = "HP:0001260", Matched="true" });
-                hpoList1.Add(new HPODataModel { Name = "常染色体隐性遗传", HpoId = "HP:0000007", Matched = "true" });
-                hpoList1.Add(new HPODataModel { Name = "运动迟缓",  HpoId = "HP:0002067", Matched = "true" });
-                rareDiseaseList[0].HPOMatchedList = hpoList1;
-
-                rareDiseaseList.Add(new DiseaseModel { Name = "晚发型帕金森病", Likeness = "0.9" });
-                var hpoList2 = new List<HPODataModel>();
-                hpoList2.Add(new HPODataModel { Name = "震颤", HpoId = "HP:0001337", Matched = "false" });
-                hpoList2.Add(new HPODataModel { Name = "帕金森症", HpoId = "HP:0001300", Matched = "true" });
-                hpoList2.Add(new HPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "true" });
-                hpoList2.Add(new HPODataModel { Name = "眼睑失用症", HpoId = "HP:0000658", Matched = "false" });
-                rareDiseaseList[1].HPOMatchedList = hpoList2;
-
-                rareDiseaseList.Add(new DiseaseModel { Name = "帕金森病17型", Likeness = "0.8" });
-
-                var hpoList3 = new List<HPODataModel>();
-                hpoList3.Add(new HPODataModel { Name = "震颤", HpoId = "HP:0001337", Matched = "true" });
-                hpoList3.Add(new HPODataModel { Name = "常染色体隐性遗传", HpoId = "HP:0000007", Matched = "false" });
-                hpoList3.Add(new HPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "false" });
-                hpoList3.Add(new HPODataModel { Name = "曳行步态", HpoId = "HP:0002362", Matched = "false" });
-                rareDiseaseList[2].HPOMatchedList = hpoList3;
-
+                var rareDiseaseList = new List<RareDiseaseResponseModel>();
+                rareDiseaseList = _nLPSystemRepository.GetDiseaseListByHPO(hpoList, rareAnalyzeEngine, rareDataBaseEngine);
+          
+                _logRepository.Add("罕见病分析结果", "", JsonConvert.SerializeObject(rareDiseaseList));
                 var normalDiseaseList = new List<DiseaseModel>();
-                normalDiseaseList.Add(new DiseaseModel { Name = "老年病", Likeness = "1" });
-                normalDiseaseList.Add(new DiseaseModel { Name = "感冒", Likeness = "0.9" });
-
-                _logRepository.Add("罕见病分析结果", "", JsonConvert.SerializeObject(normalDiseaseList) + JsonConvert.SerializeObject(rareDiseaseList));
-
                 return Json(new { success = true, normalDiseaseList, rareDiseaseList });
             }
             catch (Exception ex)
             {
-                _logger.LogError("分析HPO错误：" + ex.ToString());
+                _logger.LogError("罕见病分析结果：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }

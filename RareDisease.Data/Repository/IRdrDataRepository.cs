@@ -15,7 +15,7 @@ namespace RareDisease.Data.Repository
         List<PatientVisitInfoModel> GetPatientVisitList(string number);
         List<PatientEMRModel> GetPatientEMRText(string patientEmpiId);
 
-        List<HPODataModel> SearchHPOList(string searchHPOText);
+        List<HPODataModel> SearchRareDiseaseList(string searchHPOText);
 
         List<HPODataModel> GetAnalyzeHPOResult(string patientEmpiId);
 
@@ -65,12 +65,12 @@ namespace RareDisease.Data.Repository
            // return "";
         }
 
-        public List<HPODataModel> SearchHPOList(string searchHPOText)
+        public List<HPODataModel> SearchRareDiseaseList(string searchHPOText)
         {
 
-            string sql = GetSqlText("home-search-hpo-sql.txt");
+            string sql = GetSqlText("home-search-disease-sql.txt");
             var parameters = new List<SugarParameter>(){
-                  new SugarParameter("@HPOText",searchHPOText)
+                  new SugarParameter("@DiseaseText",searchHPOText)
             };
             var result = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
             return result;

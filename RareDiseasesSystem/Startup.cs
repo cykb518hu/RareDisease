@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
 using RareDisease.Data;
 using RareDisease.Data.Repository;
 
@@ -31,11 +30,11 @@ namespace RareDiseasesSystem
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
-        {
-            o.LoginPath = new PathString("/Login");
-            o.AccessDeniedPath = new PathString("/Error");
-        });
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, o =>
+                {
+                    o.LoginPath = new PathString("/Login");
+                    o.AccessDeniedPath = new PathString("/Error");
+                });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMemoryCache();
             
@@ -46,21 +45,22 @@ namespace RareDiseasesSystem
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IRdrDataRepository, RdrDataRepository>();
             services.AddScoped<INLPSystemRepository, NLPSystemRepository>();
-            services.AddSwaggerGen(option =>
+            services.AddCors(options =>
             {
-                option.SwaggerDoc("罕见病", new OpenApiInfo
-                {
-                    Version = "v1",
-                    Title = "罕见病 API",
-                    Description = "API for 罕见病",
-                    Contact = new OpenApiContact() { Name = "胡真武", Email = "huzhenwu1989312@outlook.com" }
-                });
+                options.AddPolicy("any",
+                    builder =>
+                    {
+                        builder.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin();
+                    });
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            env.EnvironmentName = Configuration.GetValue<string>("EnvironmentName");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -69,16 +69,10 @@ namespace RareDiseasesSystem
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            app.UseSwagger();
-            //Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint
-            app.UseSwaggerUI(option =>
-            {
-                option.SwaggerEndpoint("v1/swagger.json", "罕见病 API");
-            });
-
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseAuthentication();
+            app.UseCors();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

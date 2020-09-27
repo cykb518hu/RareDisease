@@ -259,7 +259,8 @@
                 var para = {};
                 if (this.patientEmpiId !== "") {
                     para = {
-                        patientEmpiId: this.patientEmpiId
+                        patientEmpiId: this.patientEmpiId,
+                        nlpEngine: this.nlpEngine
                     };
                 }
                 else {

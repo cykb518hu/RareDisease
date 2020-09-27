@@ -8,14 +8,12 @@ namespace RareDisease.Data.Repository
 {
     public interface INLPSystemRepository
     {
-        List<HPODataModel> GetDiseasesByEmpiId(string nlpEngine, string empiId);
-        List<HPODataModel> GetDiseasesByEMRText(string nlpEngine, string EMRText);
 
         List<HPODataModel> AnalyzePatientHPO(string nlpEngine, string patientEMRDetail, string patientEmpiId);
 
         List<HPODataModel> SearchHPOList(string searchHPOText);
 
-        List<DiseaseModel> GetDiseases(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine);
+        List<RareDiseaseResponseModel> GetDiseaseListByHPO(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine);
     }
 
     public class NLPSystemRepository : INLPSystemRepository
@@ -29,24 +27,19 @@ namespace RareDisease.Data.Repository
             _env = env;
             _rdrDataRepository = rdrDataRepository;
         }
-        public List<HPODataModel> GetDiseasesByEmpiId(string nlpEngine, string empiId)
-        {
-            List<HPODataModel> hpoList = AnalyzePatientHPO(nlpEngine, "", empiId);
-            return hpoList;
-        }
-
-        public List<HPODataModel> GetDiseasesByEMRText(string nlpEngine,string EMRText)
-        {
-            List<HPODataModel> hpoList = AnalyzePatientHPO(nlpEngine, EMRText, "");
-            return hpoList;
-        }
-
+        /// <summary>
+        /// patientEmpiId can be empiid or cardNo
+        /// </summary>
+        /// <param name="nlpEngine"></param>
+        /// <param name="patientEMRDetail"></param>
+        /// <param name="patientEmpiId"></param>
+        /// <returns></returns>
         public List<HPODataModel> AnalyzePatientHPO(string nlpEngine, string patientEMRDetail, string patientEmpiId)
         {
             var hpoList = new List<HPODataModel>();
             if (_env.IsProduction())
             {
-                if(!string.IsNullOrWhiteSpace(patientEmpiId))
+                if (!string.IsNullOrWhiteSpace(patientEmpiId))
                 {
                     hpoList = _rdrDataRepository.GetAnalyzeHPOResult(patientEmpiId);
                 }
@@ -93,37 +86,37 @@ namespace RareDisease.Data.Repository
             return searchedHPOList;
         }
 
-        public List<DiseaseModel> GetDiseases(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine)
+        public List<RareDiseaseResponseModel> GetDiseaseListByHPO(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine)
         {
-            var rareDiseaseList = new List<DiseaseModel>();
+            var rareDiseaseList = new List<RareDiseaseResponseModel>();
             if (_env.IsProduction())
             {
                 // to do interface to get hpo list by emr text
             }
             else
             {
-                rareDiseaseList.Add(new DiseaseModel { Name = "常染色体显性帕金森病8型", Likeness = "1" });
-                var hpoList1 = new List<HPODataModel>();
-                hpoList1.Add(new HPODataModel { Name = "构音障碍", HpoId = "HP:0001260", Matched = "true" });
-                hpoList1.Add(new HPODataModel { Name = "常染色体隐性遗传", HpoId = "HP:0000007", Matched = "true" });
-                hpoList1.Add(new HPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "true" });
+                rareDiseaseList.Add(new RareDiseaseResponseModel { Name = "常染色体显性帕金森病8型", Likeness = "1" });
+                var hpoList1 = new List<RareDiseaseResponseHPODataModel>();
+                hpoList1.Add(new RareDiseaseResponseHPODataModel { Name = "构音障碍", HpoId = "HP:0001260", Matched = "true" });
+                hpoList1.Add(new RareDiseaseResponseHPODataModel { Name = "常染色体隐性遗传", HpoId = "HP:0000007", Matched = "true" });
+                hpoList1.Add(new RareDiseaseResponseHPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "true" });
                 rareDiseaseList[0].HPOMatchedList = hpoList1;
 
-                rareDiseaseList.Add(new DiseaseModel { Name = "晚发型帕金森病", Likeness = "0.9" });
-                var hpoList2 = new List<HPODataModel>();
-                hpoList2.Add(new HPODataModel { Name = "震颤", HpoId = "HP:0001337", Matched = "false" });
-                hpoList2.Add(new HPODataModel { Name = "帕金森症", HpoId = "HP:0001300", Matched = "true" });
-                hpoList2.Add(new HPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "true" });
-                hpoList2.Add(new HPODataModel { Name = "眼睑失用症", HpoId = "HP:0000658", Matched = "false" });
+                rareDiseaseList.Add(new RareDiseaseResponseModel { Name = "晚发型帕金森病", Likeness = "0.9" });
+                var hpoList2 = new List<RareDiseaseResponseHPODataModel>();
+                hpoList2.Add(new RareDiseaseResponseHPODataModel { Name = "震颤", HpoId = "HP:0001337", Matched = "false" });
+                hpoList2.Add(new RareDiseaseResponseHPODataModel { Name = "帕金森症", HpoId = "HP:0001300", Matched = "true" });
+                hpoList2.Add(new RareDiseaseResponseHPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "true" });
+                hpoList2.Add(new RareDiseaseResponseHPODataModel { Name = "眼睑失用症", HpoId = "HP:0000658", Matched = "false" });
                 rareDiseaseList[1].HPOMatchedList = hpoList2;
 
-                rareDiseaseList.Add(new DiseaseModel { Name = "帕金森病17型", Likeness = "0.8" });
+                rareDiseaseList.Add(new RareDiseaseResponseModel { Name = "帕金森病17型", Likeness = "0.8" });
 
-                var hpoList3 = new List<HPODataModel>();
-                hpoList3.Add(new HPODataModel { Name = "震颤", HpoId = "HP:0001337", Matched = "true" });
-                hpoList3.Add(new HPODataModel { Name = "常染色体隐性遗传", HpoId = "HP:0000007", Matched = "false" });
-                hpoList3.Add(new HPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "false" });
-                hpoList3.Add(new HPODataModel { Name = "曳行步态", HpoId = "HP:0002362", Matched = "false" });
+                var hpoList3 = new List<RareDiseaseResponseHPODataModel>();
+                hpoList3.Add(new RareDiseaseResponseHPODataModel { Name = "震颤", HpoId = "HP:0001337", Matched = "true" });
+                hpoList3.Add(new RareDiseaseResponseHPODataModel { Name = "常染色体隐性遗传", HpoId = "HP:0000007", Matched = "false" });
+                hpoList3.Add(new RareDiseaseResponseHPODataModel { Name = "运动迟缓", HpoId = "HP:0002067", Matched = "false" });
+                hpoList3.Add(new RareDiseaseResponseHPODataModel { Name = "曳行步态", HpoId = "HP:0002362", Matched = "false" });
                 rareDiseaseList[2].HPOMatchedList = hpoList3;
             }
             return rareDiseaseList;
