@@ -6,13 +6,14 @@ using RareDisease.Data.Model.Cabin;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace RareDisease.Data.Repository
 {
     public interface ILocalMemoryCache
     {
-        List<ChinaRareDiseaseModel> GetChinaRareDiseaseList();
+        List<RareDiseaseDetailModel> GetChinaRareDiseaseList(string search);
         List<LoginModel> GetUserList();
 
         List<OverViewModel> GetCabinOverView();
@@ -36,9 +37,16 @@ namespace RareDisease.Data.Repository
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public List<ChinaRareDiseaseModel> GetChinaRareDiseaseList()
+        public List<RareDiseaseDetailModel> GetChinaRareDiseaseList(string search)
         {
-            var result = GetList<List<ChinaRareDiseaseModel>>("ChinaRareDiseaseList", "//App_Data//ChinaRareDiseases.json");
+            var result = GetList<List<RareDiseaseDetailModel>>("ChinaRareDiseaseList", "//App_Data//ChinaRareDiseases.json");
+
+            if(!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim().ToLower();
+                result = result.Where(x => x.Name.Trim().ToLower().Contains(search) || x.NameEnglish.Trim().ToLower().Contains(search)).ToList();
+                result.ForEach(x => { x.Source = "2019名录"; x.Editable = true; });
+            }
             return result;
         }
    

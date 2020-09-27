@@ -15,7 +15,7 @@
 <!--罕见病搜索模块-->
 <template id="v-disease-search">
     <div>
-        <el-col :span="8" class="paddinglr5px">
+        <el-col :span="12" class="paddinglr5px">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
                 <div class="panel-heading">罕见病查询</div>
@@ -33,18 +33,27 @@
                     <div style="background-color:white">
                         <el-table v-bind:data="deseaseSearchedList"
                                   v-loading="loading"
-                                  :show-header="false"
                                   style="width: 100%">
-                            <el-table-column prop="name"
-                                             label="名称" min-width="7">
+                            <el-table-column prop="source"
+                                             label="知识库" min-width="10%">
                             </el-table-column>
-                            <el-table-column min-width="3">
-                                <template slot-scope="scope">
-                                    <el-link type="primary" 
-                                              v-on:click="open121HpoDetail(scope.row)">详情</el-link>
+                            <el-table-column prop="name"
+                                             label="疾病中文名称" min-width="20%">
+                            </el-table-column>
+                            <el-table-column prop="name_en"
+                                             label="疾病英文名称" min-width="30%">
+                            </el-table-column>
 
-
-
+                            <el-table-column prop="HPOId"
+                                             label="HPO" min-width="10%">
+                            </el-table-column>
+                            <el-table-column prop="HPOText"
+                                             label="HPO术语名称" min-width="30%">
+                            </el-table-column>
+                            <el-table-column min-width="8%">
+                                <template  v-if="scope.row.editable" slot-scope="scope">
+                                    <el-link type="primary"
+                                             v-on:click="open121HpoDetail(scope.row)">详情</el-link>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -61,7 +70,7 @@
 
             </div>
         </el-col>
-        <el-col :span="16" class="paddinglr5px">
+        <el-col :span="12" class="paddinglr5px">
             <div id="iframeDiv"  ></div>
             <!--<iframe style="width:100%;height: calc(100vh - 1000px)" :src="iframeSrc"></iframe>-->
         </el-col>

@@ -1,486 +1,607 @@
 [
   {
     "name": "21-羟化酶缺乏症",
+    "name_en": "21-hydroxylase deficiency",
     "anchor": "#pf5"
   },
   {
     "name": "白化病",
+    "name_en": "oculocutaneous albinism",
     "anchor": "#pfc"
   },
   {
     "name": "奥尔波特综合征",
+    "name_en": "Alport syndrome",
     "anchor": "#pf11"
   },
   {
     "name": "肌萎缩侧索硬化",
+    "name_en": "amyotrophic lateral sclerosis",
     "anchor": "#pf17"
   },
   {
     "name": "天使综合征",
+    "name_en": "Angelman syndrome",
     "anchor": "#pf1e"
   },
   {
     "name": "精氨酸酶缺乏症",
+    "name_en": "arginase deficiency",
     "anchor": "#pf24"
   },
   {
     "name": "窒息性胸腔失养症（热纳综合征）",
+    "name_en": "asphyxiating thoracic dystrophy",
     "anchor": "#pf28"
   },
   {
     "name": "非典型溶血性尿毒症综合征",
+    "name_en": "Atypical Hemolytic Uremic Syndrome",
     "anchor": "#pf2e"
   },
   {
     "name": "自身免疫性脑炎",
+    "name_en": "autoimmune encephalitis",
     "anchor": "#pf33"
   },
   {
     "name": "自身免疫性垂体炎",
+    "name_en": "autoimmune hypophysitis",
     "anchor": "#pf3d"
   },
   {
     "name": "自身免疫性胰岛素受体病",
+    "name_en": "autoimmune insulin receptopathy",
     "anchor": "#pf45"
   },
   {
     "name": "β-酮硫解酶缺乏症",
+    "name_en": "β-ketothiolase deficiency",
     "anchor": "#pf4b"
   },
   {
     "name": "生物素酶缺乏症",
+    "name_en": "biotinidase deficiency",
     "anchor": "#pf50"
   },
   {
     "name": "心脏离子通道病",
+    "name_en": "cardiac ion channelopathies",
     "anchor": "#pf55"
   },
   {
     "name": "原发性肉碱缺乏症",
+    "name_en": "primary carnitine deficiency",
     "anchor": "#pf5e"
   },
   {
     "name": "Castleman病",
+    "name_en": "Castleman disease",
     "anchor": "#pf62"
   },
   {
     "name": "腓骨肌萎缩症",
+    "name_en": "Charcot-Marie-Tooth disease",
     "anchor": "#pf67"
   },
   {
     "name": "瓜氨酸血症",
+    "name_en": "citrullinemia",
     "anchor": "#pf6c"
   },
   {
     "name": "先天性肾上腺发育不良",
+    "name_en": "congenital adrenal hypoplasia，adrenal hypoplasiacongenita",
     "anchor": "#pf71"
   },
   {
     "name": "先天性高胰岛素性低血糖血症",
+    "name_en": "congenital hyperinsulinemic hypoglycemia",
     "anchor": "#pf76"
   },
   {
     "name": "先天性肌无力综合征",
+    "name_en": "congenital myasthenic syndrome",
     "anchor": "#pf7c"
   },
   {
     "name": "先天性肌强直",
+    "name_en": "congenital myotonia",
     "anchor": "#pf84"
   },
   {
     "name": "先天性脊柱侧凸",
+    "name_en": "congenital scoliosis",
     "anchor": "#pf88"
   },
   {
     "name": "冠状动脉扩张",
+    "name_en": "coronary artery ectasia",
     "anchor": "#pf8e"
   },
   {
     "name": "先天性纯红细胞再生障碍性贫血",
+    "name_en": "Diamond-Blackfan Anemia",
     "anchor": "#pf93"
   },
   {
     "name": "Erdheim-Chester病",
+    "name_en": "ECD",
     "anchor": "#pf9a"
   },
   {
     "name": "法布里病",
+    "name_en": "Fabry disease",
     "anchor": "#pfa0"
   },
   {
     "name": "家族性地中海热",
+    "name_en": "familial Mediterranean fever",
     "anchor": "#pfa7"
   },
   {
     "name": "范科尼贫血",
+    "name_en": "Fanconi anemia",
     "anchor": "#pfae"
   },
   {
     "name": "半乳糖血症",
+    "name_en": "galactosemia",
     "anchor": "#pfb3"
   },
   {
     "name": "戈谢病",
+    "name_en": "Gaucher disease",
     "anchor": "#pfb8"
   },
   {
     "name": "全身型重症肌无力",
+    "name_en": "generalized myasthenia gravis",
     "anchor": "#pfbf"
   },
   {
     "name": "Gitelman综合征",
+    "name_en": "Gitelman syndrome",
     "anchor": "#pfc5"
   },
   {
     "name": "戊二酸血症Ⅰ型",
+    "name_en": "glutaric acidemia type",
     "anchor": "#pfcb"
   },
   {
-    "name": "糖原累积病（Ⅰ型、Ⅱ型",
+    "name": "糖原累积病（Ⅰ型、Ⅱ型）",
+    "name_en": "Glycogen Storage Disease",
     "anchor": "#pfd1"
   },
   {
     "name": "血友病",
+    "name_en": "hemophilia",
     "anchor": "#pfda"
   },
   {
     "name": "肝豆状核变性",
+    "name_en": "hepatolenticular degeneration",
     "anchor": "#pfe1"
   },
   {
     "name": "遗传性血管性水肿",
+    "name_en": "Hereditary Angioedema",
     "anchor": "#pfe7"
   },
   {
     "name": "遗传性大疱性表皮松解症",
+    "name_en": "hereditary epidermolysis bullosa",
     "anchor": "#pfed"
   },
   {
     "name": "遗传性果糖不耐受症",
+    "name_en": "hereditary fructose intolerance",
     "anchor": "#pff3"
   },
   {
     "name": "遗传性低镁血症",
+    "name_en": "Hereditary Hypomagnesemia",
     "anchor": "#pff8"
   },
   {
     "name": "遗传性多发脑梗死性痴呆",
+    "name_en": "cerebralautosomal dominant angiopathy with subcortical infarcts and leukoencephalopathy",
     "anchor": "#pfff"
   },
   {
     "name": "遗传性痉挛性截瘫",
+    "name_en": "hereditary spastic paraplegia",
     "anchor": "#pf106"
   },
   {
     "name": "全羧化酶合成酶缺乏症",
+    "name_en": "holocarboxylase synthetase deficiency",
     "anchor": "#pf10c"
   },
   {
     "name": "高同型半胱氨酸血症",
+    "name_en": "Homocysteinemia",
     "anchor": "#pf110"
   },
   {
     "name": "纯合子家族性高胆固醇血症",
+    "name_en": "familial hypercholesterolemia",
     "anchor": "#pf116"
   },
   {
     "name": "亨廷顿病",
+    "name_en": "Huntington’s disease",
     "anchor": "#pf11e"
   },
   {
     "name": "HHH综合征（高鸟氨酸血症-高氨血症-同型瓜氨酸尿症）",
+    "name_en": "Hyperornithinaemia-hyperammonaemia-homocitrullinuria Syndrome",
     "anchor": "#pf125"
   },
   {
     "name": "高苯丙氨酸血症",
+    "name_en": "hyperphenylalaninemia",
     "anchor": "#pf12a"
   },
   {
     "name": "低磷酸酯酶症",
+    "name_en": "hypophosphatasia",
     "anchor": "#pf133"
   },
   {
     "name": "低血磷性佝偻病",
+    "name_en": "hypophosphatemic rickets",
     "anchor": "#pf139"
   },
   {
     "name": "特发性心肌病",
+    "name_en": "Idiopathic Cardiomyopathy",
     "anchor": "#pf13f"
   },
   {
     "name": "特发性低促性腺激素性性腺功能减退症",
+    "name_en": "1111",
     "anchor": "#pf148"
   },
   {
     "name": "特发性肺动脉高压",
+    "name_en": "idiopathic hypogonadotropichypogonadism",
     "anchor": "#pf14f"
   },
   {
     "name": "特发性肺纤维化",
+    "name_en": "idiopathic pulmonary arterial hypertension",
     "anchor": "#pf157"
   },
   {
     "name": "IgG4相关性疾病",
+    "name_en": "idiopathic pulmonary fibrosis",
     "anchor": "#pf15e"
   },
   {
     "name": "先天性胆汁酸合成障碍",
+    "name_en": "IgG4 related disease",
     "anchor": "#pf163"
   },
   {
     "name": "异戊酸血症",
+    "name_en": "inborn errors of bile acid synthesis",
     "anchor": "#pf168"
   },
   {
     "name": "卡尔曼综合征",
+    "name_en": "isovaleric acidemia",
     "anchor": "#pf16e"
   },
   {
     "name": "朗格汉斯细胞组织细胞增生症",
+    "name_en": "idiopathic hypogonadotropichypogonadism",
     "anchor": "#pf172"
   },
   {
     "name": "莱伦综合征",
+    "name_en": "Langerhans cell histiocytosis",
     "anchor": "#pf177"
   },
   {
     "name": "Leber遗传性视神经病变",
+    "name_en": "Leber hereditary optic neuropathy",
     "anchor": "#pf17f"
   },
   {
     "name": "长链-3-羟酰基辅酶A脱氢酶缺乏症",
+    "name_en": "long chain 3-hydroxyacyl-CoA dehydrogenasedeficiency",
     "anchor": "#pf185"
   },
   {
     "name": "淋巴管肌瘤病",
+    "name_en": "lymphangioleiomyomatosis",
     "anchor": "#pf189"
   },
   {
     "name": "赖氨酸尿蛋白不耐受症",
+    "name_en": "lysinuric protein intolerance",
     "anchor": "#pf190"
   },
   {
     "name": "溶酶体酸性脂肪酶缺乏症",
+    "name_en": "lysosomal acid lipase deficiency",
     "anchor": "#pf197"
   },
   {
     "name": "枫糖尿症",
+    "name_en": "maple syrup urine disease",
     "anchor": "#pf19c"
   },
   {
     "name": "马方综合征",
+    "name_en": "Marfan syndrome",
     "anchor": "#pf1a2"
   },
   {
     "name": "McCune-Albright综合征",
+    "name_en": "McCune-Albright Syndrome",
     "anchor": "#pf1a8"
   },
   {
     "name": "中链酰基辅酶A脱氢酶缺乏症",
+    "name_en": "medium chain acyl-CoA dehydrogenase deficiency",
     "anchor": "#pf1ae"
   },
   {
     "name": "甲基丙二酸血症",
+    "name_en": "methylmalonic acidemia",
     "anchor": "#pf1b2"
   },
   {
     "name": "线粒体脑肌病",
+    "name_en": "Mitochodrial Encephalomyopathy",
     "anchor": "#pf1b9"
   },
   {
     "name": "黏多糖贮积症",
+    "name_en": "mucopolysaccharidosis",
     "anchor": "#pf1c4"
   },
   {
     "name": "多灶性运动神经病",
+    "name_en": "multifocal motor neuropathy",
     "anchor": "#pf1cd"
   },
   {
     "name": "多种酰基辅酶A脱氢酶缺乏症",
+    "name_en": "multiple acyl-CoA dehydrogenase deficiency",
     "anchor": "#pf1d3"
   },
   {
     "name": "多发性硬化",
+    "name_en": "multiple sclerosis",
     "anchor": "#pf1d8"
   },
   {
     "name": "多系统萎缩",
+    "name_en": "multiple system atrophy",
     "anchor": "#pf1e1"
   },
   {
     "name": "强直性肌营养不良",
+    "name_en": "myotonic dystrophy",
     "anchor": "#pf1e7"
   },
   {
     "name": "N-乙酰谷氨酸合成酶缺乏症",
+    "name_en": "N-acetylglutamate synthase deficiency",
     "anchor": "#pf1ed"
   },
   {
     "name": "新生儿糖尿病",
+    "name_en": "neonatal diabetes mellitus",
     "anchor": "#pf1f3"
   },
   {
     "name": "视神经脊髓炎",
+    "name_en": "Optical neuromyelitis",
     "anchor": "#pf1fa"
   },
   {
     "name": "尼曼匹克病",
+    "name_en": "Niemann-Pick disease",
     "anchor": "#pf203"
   },
   {
     "name": "非综合征型耳聋",
+    "name_en": "Non-Syndromic Deafness",
     "anchor": "#pf20a"
   },
   {
     "name": "努南综合征",
+    "name_en": "Noonan syndrome",
     "anchor": "#pf210"
   },
   {
     "name": "85.鸟氨酸氨甲酰基转移酶缺乏症",
+    "name_en": "ornithine transcarbamylase deficiency",
     "anchor": "#pf216"
   },
   {
     "name": "成骨不全症",
+    "name_en": "osteogenesis imperfecta",
     "anchor": "#pf21b"
   },
   {
     "name": "帕金森病（青年型、早发型）",
+    "name_en": "Parkinson Disease (Young-onset , Early-onset)",
     "anchor": "#pf220"
   },
   {
     "name": "阵发性睡眠性血红蛋白尿症",
+    "name_en": "paroxysmal nocturnal hemoglobinuria",
     "anchor": "#pf227"
   },
   {
     "name": "波伊茨-耶格综合征",
+    "name_en": "Peutz-Jeghers syndrome",
     "anchor": "#pf22f"
   },
   {
     "name": "苯丙酮尿症",
+    "name_en": "phenylketonuria",
     "anchor": "#pf236"
   },
   {
     "name": "POEMS综合征",
+    "name_en": "POEMS Syndrome",
     "anchor": "#pf23f"
   },
   {
     "name": "卟啉病",
+    "name_en": "Porphyria",
     "anchor": "#pf245"
   },
   {
     "name": "普拉德-威利综合征",
+    "name_en": "Prader-willi syndrome",
     "anchor": "#pf24c"
   },
   {
     "name": "原发性联合免疫缺陷病",
+    "name_en": "Primary combined immunodeficiency",
     "anchor": "#pf251"
   },
   {
     "name": "原发性遗传性肌张力不全",
+    "name_en": "primary hereditary dystonia",
     "anchor": "#pf25b"
   },
   {
     "name": "原发性轻链型淀粉样变",
+    "name_en": "Primary Light Chain Amyloidosis",
     "anchor": "#pf266"
   },
   {
     "name": "进行性家族性肝内胆汁淤积症",
+    "name_en": "progressive familial intrahepatic cholestasis",
     "anchor": "#pf26d"
   },
   {
     "name": "进行性肌营养不良",
+    "name_en": "Progressive muscular dystrophy",
     "anchor": "#pf273"
   },
   {
     "name": "丙酸血症",
+    "name_en": "propionic acidemia",
     "anchor": "#pf27a"
   },
   {
     "name": "肺泡蛋白沉积症",
+    "name_en": "pulmonary alveolar proteinosis",
     "anchor": "#pf280"
   },
   {
     "name": "囊性纤维化",
+    "name_en": "pulmonary cystic fibrosis",
     "anchor": "#pf286"
   },
   {
     "name": "视网膜色素变性",
+    "name_en": "retinitis pigmentosa",
     "anchor": "#pf28e"
   },
   {
     "name": "视网膜母细胞瘤",
+    "name_en": "retinoblastoma",
     "anchor": "#pf293"
   },
   {
     "name": "重症先天性粒细胞缺乏症",
+    "name_en": "severe congenital neutropenia",
     "anchor": "#pf29b"
   },
   {
     "name": "婴儿严重肌阵挛性癫痫",
+    "name_en": "Dravet syndrome",
     "anchor": "#pf29f"
   },
   {
     "name": "镰刀型细胞贫血病",
+    "name_en": "sickle cell disease",
     "anchor": "#pf2a6"
   },
   {
     "name": "拉塞尔-西尔弗综合征Silver-Russell syndrome",
+    "name_en": "Silver-Russell syndrome",
     "anchor": "#pf2ae"
   },
   {
     "name": "谷固醇血症",
+    "name_en": "Sitosterolemia",
     "anchor": "#pf2b5"
   },
   {
     "name": "脊髓延髓肌萎缩症(肯尼迪病)",
+    "name_en": "spinal bulbar muscular atrophy",
     "anchor": "#pf2ba"
   },
   {
     "name": "脊髓性肌萎缩症",
+    "name_en": "spinal muscular atrophy",
     "anchor": "#pf2bf"
   },
   {
     "name": "脊髓小脑性共济失调",
+    "name_en": "spinocerebellar ataxia",
     "anchor": "#pf2c5"
   },
   {
     "name": "系统性硬化症",
+    "name_en": "systemic sclerosis",
     "anchor": "#pf2cc"
   },
   {
     "name": "四氢生物喋呤缺乏症",
+    "name_en": "tetrahydrobiopterin deficiency",
     "anchor": "#pf2d2"
   },
   {
     "name": "结节性硬化症",
+    "name_en": "tuberous sclerosis complex",
     "anchor": "#pf2db"
   },
   {
     "name": "酪氨酸血症",
+    "name_en": "tyrosinemia",
     "anchor": "#pf2e2"
   },
   {
     "name": "极长链酰基辅酶A脱氢酶缺乏症",
+    "name_en": "very long chain acyl-CoA dehydrogenasedeficiency",
     "anchor": "#pf2e9"
   },
   {
     "name": "威廉姆斯综合征",
+    "name_en": "Williams syndrome",
     "anchor": "#pf2f0"
   },
   {
     "name": "湿疹-血小板减少-免疫缺陷综合征",
+    "name_en": "Wiskott-Aldrich syndrome",
     "anchor": "#pf2f6"
   },
   {
     "name": "X连锁肾上腺脑白质营养不良",
+    "name_en": "X-linked adrenoleukodystrophy",
     "anchor": "#pf2fe"
   },
   {
     "name": "X连锁无丙种球蛋白血症",
+    "name_en": "X-linked agammaglobulinemia",
     "anchor": "#pf304"
   },
   {
     "name": "X连锁淋巴增生症",
+    "name_en": "X-linked lymphoproliferative disease",
     "anchor": "#pf30a"
   }
 ]

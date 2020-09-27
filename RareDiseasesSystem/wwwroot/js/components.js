@@ -40,7 +40,7 @@
                 var param = {};
                 param.search = this.search;
                 param.pageIndex = this.pageIndex;
-                param.pageSize = 10;
+                param.pageSize = 5;
                 this.loading = true;
                 var that = this;
                 $.ajax({
@@ -62,7 +62,7 @@
             },
             open121HpoDetail: function (subgroup) {
                 document.getElementById("iframeDiv").innerHTML = "";
-                var iframeSrc = "../121diseases.html" + subgroup.anchor;
+                var iframeSrc = "../html/121.html" + subgroup.anchor;
 
 
                 //在document中创建iframe
