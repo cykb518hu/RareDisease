@@ -14,6 +14,9 @@ using RareDisease.Data.Repository;
 
 namespace RareDiseasesSystem
 {
+    /// <summary>
+    /// 这个是给第三方调用
+    /// </summary>
     public class RareDiseaseDecisionController : Controller
     {
         private readonly ILogger<RareDiseaseDecisionController> _logger;
@@ -33,8 +36,8 @@ namespace RareDiseasesSystem
             {
                 var ipAddress = HttpContext.Connection.RemoteIpAddress;
                 request.IPAddress = ipAddress.ToString();
-                var hpoList = _nLPSystemRepository.AnalyzePatientHPO(request.NlpEngine, request.EMRDetail, "");
-                var rareDiseaseList = _nLPSystemRepository.GetDiseaseListByHPO(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
+                var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, request.EMRDetail, "");
+                var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
                 _logRepository.Add("罕见病分析结果:", "API", JsonConvert.SerializeObject(request) + " " + JsonConvert.SerializeObject(rareDiseaseList));
 
                 return Json(new { success = true, rareDiseaseList });
@@ -53,8 +56,8 @@ namespace RareDiseasesSystem
             {
                 var ipAddress = HttpContext.Connection.RemoteIpAddress;
                 request.IPAddress = ipAddress.ToString();
-                var hpoList = _nLPSystemRepository.AnalyzePatientHPO(request.NlpEngine, "", request.Number);
-                var rareDiseaseList = _nLPSystemRepository.GetDiseaseListByHPO(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
+                var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, "", request.Number);
+                var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
                 _logRepository.Add("罕见病分析结果:", "API", JsonConvert.SerializeObject(request)+ " " + JsonConvert.SerializeObject(rareDiseaseList));
 
                 return Json(new { success = true, rareDiseaseList });

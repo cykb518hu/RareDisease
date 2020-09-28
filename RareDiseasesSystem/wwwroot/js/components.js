@@ -106,7 +106,7 @@
         data: function () {
             return {
                 importEMRDlg: false,
-                patientCardNo: "",
+                number: "", //number 可以是empiid 或者身份证号
                 patientEmpiId:"",
                 patientOverview: [],
                 patientVisitList: [],
@@ -124,7 +124,7 @@
                 searchedHPOListIndex: 1,
                 multipleSearchedHPOSelection: [],
 
-                normalDiseaseList: [],
+                //normalDiseaseList: [],
                 rareDiseaseList: [],
 
                 nlpEngine: "engine1",
@@ -189,14 +189,14 @@
             },
             onSearchPatient: function () {
                 this.patientVisitListIndex = 1;
-                this.requestPatientEMR();
+                this.requestPatientData();
                 this.patientEMRDetail = "";
                 this.patientEmpiId = "";
             },
-            requestPatientEMR: function () {
+            requestPatientData: function () {
                 var para = {};
                 para = {
-                    patientCardNo: this.patientCardNo
+                    number: this.number
                 };
                 this.loading = true;
                 var that = this;
@@ -213,7 +213,7 @@
                             if (data.patientOverview.length > 0) {
                                 that.patientEmpiId = data.patientOverview[0].iEMPINumber;
                             }
-                            that.patientLocalPaging();
+                            that.patientVisitPaging();
                         }
                         else {
                             console.log(data);
@@ -222,10 +222,10 @@
                     }
                 });
             },
-            patientLocalPaging: function () {
+            patientVisitPaging: function () {
                 this.patientVisitList = this.localPaging(this.patientVisitListIndex, this.patientVisitListCopy);
             },
-
+            //经过第一步查询，获取到用户empiid，后续操作用empiid 操作
             onImportPatientEMRText: function () {
                 var para = {};
                 para = {
@@ -233,7 +233,7 @@
                 };                
                 var that = this;
                 $.ajax({
-                    url: "/Home/ConvertPatientEMRtoText",
+                    url: "/Home/GetPatientEMRDetail",
                     type: "Get",
                     data: para,
                     dataType: 'json',
@@ -251,8 +251,10 @@
             onClearPatientEMR: function () {
                 this.patientEMRDetail = "";
             },
-
-            onAnalyzePatientEMR: function () {
+            //这个地方有两种情况
+            //1. 用户直接传一段文本，和病人没有关联，这个时候直接分析文本
+            //2. 如果empiid 不为空，说明是获取刚才查询病人的HPO 结果，这个情况根据empiid直接从数据库获取
+            onGetPatientHPOResult: function () {
                 if (this.patientEMRDetail === undefined || this.patientEMRDetail === "") {
                     alert('电子病历不能为空！');
                     return false;
@@ -273,7 +275,7 @@
                 this.loading = true;
                 var that = this;
                 $.ajax({
-                    url: "/Home/AnalyzePatientEMRRetreiveHPO",
+                    url: "/Home/GetPatientHPOResult",
                     type: "POST",
                     data: para,
                     dataType: 'json',
@@ -308,6 +310,7 @@
             onSearchHPODlg: function () {
                 this.searchHPODlg = true;
             },
+            //查询表征HPO 库，自定义添加HPO
             onSearchHPOList: function () {
                 this.searchedHPOListIndex = 1;
                 var para = {};
@@ -317,7 +320,7 @@
                 this.loading = true;
                 var that = this;
                 $.ajax({
-                    url: "/Home/SearchHPOList",
+                    url: "/Home/SearchStandardHPOList",
                     type: "Get",
                     data: para,
                     dataType: 'json',
@@ -325,7 +328,7 @@
                         if (data && data.success) {
                             that.searchedHPOListTotal = data.total;
                             that.searchedHPOListCopy = data.data;
-                            that.hpoLocalPaging();
+                            that.HPOLocalPaging();
                         }
                         else {
                             console.log(data);
@@ -334,7 +337,7 @@
                     }
                 });
             },
-            hpoLocalPaging: function () {
+            HPOLocalPaging: function () {
                 this.searchedHPOList = this.localPaging(this.searchedHPOListIndex, this.searchedHPOListCopy);
             },
             localPaging: function (current,list) {
@@ -384,7 +387,7 @@
                         
                 }
             },
-            onSubmitHPODataForAnalyze: function () {
+            onGetPatientRareDiseaseResult: function () {
                 if (this.rareAnalyzeEngine === undefined || this.rareAnalyzeEngine === "") {
                     alert('请选择罕见病分析引擎！');
                     return false;
@@ -402,13 +405,13 @@
                 this.loading = true;
                 var that = this;
                 $.ajax({
-                    url: "/Home/SubmitHPODataForAnalyze",
+                    url: "/Home/GetPatientRareDiseaseResult",
                     type: "POST",
                     data: para,
                     dataType: 'json',
                     success: function (data) {
                         if (data && data.success) {
-                            that.normalDiseaseList = data.normalDiseaseList;
+                            //that.normalDiseaseList = data.normalDiseaseList;
                             that.rareDiseaseList = data.rareDiseaseList;
                         }
                         else {

@@ -45,13 +45,18 @@ namespace RareDiseasesSystem.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     
-        public JsonResult SearchPatientData(string patientCardNo = "")
+        /// <summary>
+        /// number 可以是empiid 或者身份证号
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        public JsonResult SearchPatientData(string number = "")
         {
             try
             {
                 _logRepository.Add("查询患者就诊记录");
-                var patientOverview = _rdrDataRepository.GetPatientOverview(patientCardNo);
-                var patientVisitList = _rdrDataRepository.GetPatientVisitList(patientCardNo);
+                var patientOverview = _rdrDataRepository.GetPatientOverview(number);
+                var patientVisitList = _rdrDataRepository.GetPatientVisitList(number);
                 return Json(new { success = true, patientOverview, patientVisitList, total = patientVisitList.Count });
             }
             catch (Exception ex)
@@ -61,11 +66,11 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult ConvertPatientEMRtoText(string patientEmpiId = "")
+        public JsonResult GetPatientEMRDetail(string patientEmpiId = "")
         {
             try
             {
-                var data = _rdrDataRepository.GetPatientEMRText(patientEmpiId);
+                var data = _rdrDataRepository.GetPatientEMRDetail(patientEmpiId);
                 return Json(new { success = true, data });
             }
             catch (Exception ex)
@@ -75,12 +80,12 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult AnalyzePatientEMRRetreiveHPO(string nlpEngine, string patientEMRDetail = "", string patientEmpiId = "")
+        public JsonResult GetPatientHPOResult(string nlpEngine, string patientEMRDetail = "", string patientEmpiId = "")
         {
             try
             {
                 var hpoList = new List<HPODataModel>();
-                hpoList = _nLPSystemRepository.AnalyzePatientHPO(nlpEngine, patientEMRDetail, patientEmpiId);             
+                hpoList = _nLPSystemRepository.GetPatientHPOResult(nlpEngine, patientEMRDetail, patientEmpiId);             
                 _logRepository.Add("获取病人HPO", "", JsonConvert.SerializeObject(hpoList));
                 return Json(new { success = true, data = hpoList, });
             }
@@ -91,12 +96,12 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult SearchHPOList(string searchHPOText = "")
+        public JsonResult SearchStandardHPOList(string searchHPOText = "")
         {
             try
             {
                 _logRepository.Add("查询HPO", "", searchHPOText);
-                var searchedHPOList = _nLPSystemRepository.SearchHPOList(searchHPOText);
+                var searchedHPOList = _nLPSystemRepository.SearchStandardHPOList(searchHPOText);
                 return Json(new { success = true, data = searchedHPOList, total = searchedHPOList.Count });
 
             }
@@ -107,12 +112,12 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult SubmitHPODataForAnalyze(string rareAnalyzeEngine, string rareDataBaseEngine,List<HPODataModel> hpoList = null)
+        public JsonResult GetPatientRareDiseaseResult(string rareAnalyzeEngine, string rareDataBaseEngine,List<HPODataModel> hpoList = null)
         {
             try
             {
                 var rareDiseaseList = new List<RareDiseaseResponseModel>();
-                rareDiseaseList = _nLPSystemRepository.GetDiseaseListByHPO(hpoList, rareAnalyzeEngine, rareDataBaseEngine);
+                rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, rareAnalyzeEngine, rareDataBaseEngine);
           
                 _logRepository.Add("罕见病分析结果", "", JsonConvert.SerializeObject(rareDiseaseList));
                 var normalDiseaseList = new List<DiseaseModel>();

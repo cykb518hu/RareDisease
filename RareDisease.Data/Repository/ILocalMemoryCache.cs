@@ -24,6 +24,8 @@ namespace RareDisease.Data.Repository
         List<SeriesDataModel> GetCabinPatientAge();
 
         List<CabinPatientGenderTimeLine> GetCabinPatientGenderTimeLine();
+
+        List<ExamBaseDataModel> GetExamBaseDataList();
     }
 
     public class LocalMemoryCache : ILocalMemoryCache
@@ -80,6 +82,12 @@ namespace RareDisease.Data.Repository
         public List<CabinPatientGenderTimeLine> GetCabinPatientGenderTimeLine()
         {
             var result = GetList<List<CabinPatientGenderTimeLine>>("CabinPatientGenderTimeLine", "//App_Data//CabinPatientGenderTimeLine.json");
+            return result;
+        }
+
+        public List<ExamBaseDataModel> GetExamBaseDataList()
+        {
+            var result = GetList<List<ExamBaseDataModel>>("ExamBaseData", "//App_Data//ExamBaseData.json");
             return result;
         }
 

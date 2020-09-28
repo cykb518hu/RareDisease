@@ -13,11 +13,26 @@ namespace RareDisease.Data.Repository
     {
         List<PatientOverviewModel> GetPatientOverview(string number);
         List<PatientVisitInfoModel> GetPatientVisitList(string number);
-        string GetPatientEMRText(string patientEmpiId);
 
-        List<RareDiseaseDetailModel> SearchRareDiseaseList(string searchText);
+        string GetPatientEMRDetail(string patientEmpiId);
 
-        List<HPODataModel> GetAnalyzeHPOResult(string patientEmpiId);
+        /// <summary>
+        /// NLP 语义分析出来的HPO结果
+        /// </summary>
+        /// <param name="patientEmpiId"></param>
+        /// <returns></returns>
+        List<HPODataModel> GetPatientNlpResult(string patientEmpiId);
+
+        /// <summary>
+        /// 病人原始检验数据
+        /// </summary>
+        /// <param name="patientEmpiId"></param>
+        /// <returns></returns>
+        List<ExamBaseDataModel> GetPatientExamData(string patientEmpiId);
+
+
+        List<RareDiseaseDetailModel> SearchStandardRareDiseaseList(string searchText);
+
 
     }
 
@@ -87,7 +102,7 @@ namespace RareDisease.Data.Repository
             return patientVisitList;
         }
 
-        public string GetPatientEMRText(string patientEmpiId)
+        public string GetPatientEMRDetail(string patientEmpiId)
         {
             var result = string.Empty;
             if (_hostingEnvironment.IsProduction())
@@ -96,7 +111,7 @@ namespace RareDisease.Data.Repository
                 {
                     string sql = GetSqlText("home-patient-EMR-sql.txt");
                     var parameters = new List<SugarParameter>(){
-                    new SugarParameter("@number",patientEmpiId)
+                    new SugarParameter("@patientEmpiId",patientEmpiId)
                    };
                     //var result = dbgp.Ado.GetString(sql);
                     var entity = dbgp.SqlQueryable<PatientEMRModel>(sql).AddParameters(parameters).ToList();
@@ -113,7 +128,41 @@ namespace RareDisease.Data.Repository
             // return "";
         }
 
-        public List<RareDiseaseDetailModel> SearchRareDiseaseList(string searchText)
+
+        public List<HPODataModel> GetPatientNlpResult(string patientEmpiId)
+        {
+            //emr_chpo_heng
+            var result = new List<HPODataModel>();
+            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientEmpiId))
+            {
+                string sql = GetSqlText("home-get-hpo-result-sql.txt");
+                var parameters = new List<SugarParameter>(){
+                  new SugarParameter("@patientEmpiId",patientEmpiId)
+                };
+                result = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
+            }
+
+            return result;
+        }
+
+
+        public List<ExamBaseDataModel> GetPatientExamData(string patientEmpiId)
+        {
+            var result = new List<ExamBaseDataModel>();
+            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientEmpiId))
+            {
+                string sql = GetSqlText("home-get-exam-data-sql.txt");
+                var parameters = new List<SugarParameter>(){
+                  new SugarParameter("@patientEmpiId",patientEmpiId)
+                };
+                result = dbgp.SqlQueryable<ExamBaseDataModel>(sql).AddParameters(parameters).ToList();
+            }
+
+            return result;
+        }
+
+
+        public List<RareDiseaseDetailModel> SearchStandardRareDiseaseList(string searchText)
         {
             var result = new List<RareDiseaseDetailModel>();
             if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(searchText))
@@ -123,22 +172,6 @@ namespace RareDisease.Data.Repository
                   new SugarParameter("@DiseaseText",searchText)
                 };
                 result = dbgp.SqlQueryable<RareDiseaseDetailModel>(sql).AddParameters(parameters).ToList();
-            }
-          
-            return result;
-        }
-
-
-        public List<HPODataModel> GetAnalyzeHPOResult(string patientEmpiId)
-        {
-            var result = new List<HPODataModel>();
-            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientEmpiId))
-            {
-                string sql = GetSqlText("home-get-hpo-result-sql.txt");
-                var parameters = new List<SugarParameter>(){
-                  new SugarParameter("@number",patientEmpiId)
-                };
-                result = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
             }
 
             return result;

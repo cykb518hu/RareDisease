@@ -5,12 +5,9 @@
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>@ViewData["Title"] - RareDiseasesSystem</title>
+    <title>@ViewData["Title"]</title>
     <link rel="shortcut icon" href="~/images/favicon.ico" />
-
     <link rel="stylesheet" href="~/lib/element-ui/theme-chalk/index.css" />
-
-
     <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
     <link href="~/css/index.css" rel="stylesheet" asp-append-version="true" />
 </head>
@@ -29,7 +26,6 @@
                              :login-user="loginUser">
                 </v-user-menu>
             </span>
-
             <span class="menu" style="float:right;">
                 <el-menu v-bind:default-active="menuActiveIndex" mode="horizontal"
                          active-text-color="#fff">
@@ -39,29 +35,21 @@
                     <a href="/Cabin/Index"><el-menu-item index="3" class="menu-item" target="_blank">驾驶舱</el-menu-item></a>
                     <a href="/Log/Index"><el-menu-item index="4" class="menu-item">操作日志</el-menu-item></a>
                 </el-menu>
-
             </span>
-
         </div>
         <div class="container-fluid">
             @RenderBody()
         </div>
     </div>
-
     <div class="login-footer">
         <img src="~/images/login-bg-footer-logo.png">
         <div class="right">上海柯林布瑞信息技术有限公司 Copyright© @DateTime.Now.Year clinbrain All Rights Reserved </div>
     </div>
 
     <div id="component-template">
-
     </div>
 
-
-
-
     <script src="~/lib/jquery/dist/jquery.js"></script>
-
     <script type="text/javascript" src="~/lib/vue/vue.js"></script>
     <script type="text/javascript" src="~/lib/element-ui/index.js"></script>
     <script src="~/js/components.js" asp-append-version="true" ></script>
@@ -117,15 +105,8 @@
                 }
             });
         };
-
-
     </script>
 
-
-
     @RenderSection("Scripts", required: false)
-
-
-
 </body>
 </html>

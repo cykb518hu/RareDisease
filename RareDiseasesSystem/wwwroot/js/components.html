@@ -113,7 +113,7 @@
                                     </el-option>
                                 </el-select>
                             </template>
-                            <el-button type="primary" v-on:click="onAnalyzePatientEMR">解析</el-button>
+                            <el-button type="primary" v-on:click="onGetPatientHPOResult">解析</el-button>
                         </span>
                     </div>
                 </div>
@@ -173,6 +173,26 @@
                                         <el-link type="primary" v-on:click.stop
                                                  v-if="scope.row.editable"
                                                  v-on:click="onShowHpoMatchedText(scope.row)">原文</el-link>
+                              
+                                            <el-popover v-if="scope.row.hasExam"
+                                                        placement="right"
+                                                        width="800"
+                                                        trigger="click">
+                                                <el-table :data="scope.row.examData">
+                                                    <el-table-column prop="exam_code" label="检验指标代码"></el-table-column>
+                                                    <el-table-column prop="exam_name" label="检验指标"></el-table-column>
+                                                    <el-table-column prop="sample_code" label="样本代码"></el-table-column>
+                                                    <el-table-column prop="sample_name" label="样本名称"></el-table-column>
+                                                    <el-table-column prop="range" label="参考范围"></el-table-column>
+                                                    <el-table-column prop="value" label="检验值"></el-table-column>
+                                                    <el-table-column prop="examTimeStr" label="检验时间"></el-table-column>
+                                                </el-table>
+                                                <el-link slot="reference" type="primary">
+                                                    检验
+                                                </el-link>
+                                            </el-popover>
+                                 
+
                                         <el-link type="warning" v-on:click.stop
                                                  v-on:click="onDeletePatientHPOList(scope.row)">删除</el-link>
                                     </template>
@@ -201,7 +221,7 @@
                                     </el-option>
                                 </el-select>
                             </template>
-                            <el-button type="primary" v-on:click="onSubmitHPODataForAnalyze">提交所见</el-button>
+                            <el-button type="primary" v-on:click="onGetPatientRareDiseaseResult">提交所见</el-button>
                             <el-button type="info" disabled>基因分析</el-button>
                         </span>
                     </div>
@@ -269,7 +289,7 @@
                 <el-row :gutter="10">
                     <el-col :span="6">
                         <div>
-                            <el-input style="width:200px" v-model="patientCardNo"
+                            <el-input style="width:200px" v-model="number"
                                       placeholder="身份证号码/或者EMPI主索引"
                                       v-on:keyup.enter.native="onSearchPatient" ></el-input>
                         </div>
@@ -319,7 +339,7 @@
                     </el-table-column>
                 </el-table>
                 <el-pagination background style="float:right;"
-                               layout="total, prev, pager, next" v-on:current-change="patientLocalPaging"
+                               layout="total, prev, pager, next" v-on:current-change="patientVisitPaging"
                                v-bind:total="patientVisitListTotal"
                                v-bind:current-page.sync="patientVisitListIndex">
                 </el-pagination>
@@ -361,7 +381,7 @@
 
                     </el-table>
                 <el-pagination background style="float:right;"
-                               layout="total, prev, pager, next" v-on:current-change="hpoLocalPaging"
+                               layout="total, prev, pager, next" v-on:current-change="HPOLocalPaging"
                                v-bind:total="searchedHPOListTotal"
                                v-bind:current-page.sync="searchedHPOListIndex">
                 </el-pagination>

@@ -36,5 +36,12 @@ namespace RareDisease.Data.Model
 
         [JsonProperty("matched")]
         public string Matched { get; set; }
+
+
+        [JsonProperty("hasExam")]
+        public bool HasExam { get; set; }
+
+        [JsonProperty("examData")]
+        public List<ExamBaseDataModel> ExamData { get; set; }
     }
 }
