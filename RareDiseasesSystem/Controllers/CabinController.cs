@@ -160,19 +160,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var results = new List<SeriesDataModel>
-                {
-                    new SeriesDataModel
-                    {
-                        Name = "男",
-                        Value =200
-                    },
-                    new SeriesDataModel
-                    {
-                        Name = "女",
-                        Value = 250
-                    }
-                };
+                var results = _localMemoryCache.GetCabinPatientArea();
                 return new JsonResult(new { success = true, data = results });
             }
             catch (Exception ex)

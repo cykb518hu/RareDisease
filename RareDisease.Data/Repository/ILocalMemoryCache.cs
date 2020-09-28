@@ -23,6 +23,8 @@ namespace RareDisease.Data.Repository
         List<SeriesDataModel> GetCabinDiseaseRank();
         List<SeriesDataModel> GetCabinPatientAge();
 
+        List<SeriesDataModel> GetCabinPatientArea();
+
         List<CabinPatientGenderTimeLine> GetCabinPatientGenderTimeLine();
 
         List<ExamBaseDataModel> GetExamBaseDataList();
@@ -82,6 +84,11 @@ namespace RareDisease.Data.Repository
         public List<CabinPatientGenderTimeLine> GetCabinPatientGenderTimeLine()
         {
             var result = GetList<List<CabinPatientGenderTimeLine>>("CabinPatientGenderTimeLine", "//App_Data//CabinPatientGenderTimeLine.json");
+            return result;
+        }
+        public List<SeriesDataModel> GetCabinPatientArea()
+        {
+            var result = GetList<List<SeriesDataModel>>("CabinPatientArea", "//App_Data//CabinPatientArea.json");
             return result;
         }
 
