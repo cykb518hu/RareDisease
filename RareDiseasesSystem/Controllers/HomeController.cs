@@ -101,7 +101,7 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 _logRepository.Add("查询HPO", "", searchHPOText);
-                var searchedHPOList = _nLPSystemRepository.SearchStandardHPOList(searchHPOText);
+                var searchedHPOList = _rdrDataRepository.SearchStandardHPOList(searchHPOText);
                 return Json(new { success = true, data = searchedHPOList, total = searchedHPOList.Count });
 
             }

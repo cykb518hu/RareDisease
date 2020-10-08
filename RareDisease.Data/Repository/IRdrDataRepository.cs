@@ -33,6 +33,8 @@ namespace RareDisease.Data.Repository
 
         List<RareDiseaseDetailModel> SearchStandardRareDiseaseList(string searchText);
 
+        List<HPODataModel> SearchStandardHPOList(string searchHPOText);
+
 
     }
 
@@ -177,6 +179,37 @@ namespace RareDisease.Data.Repository
             return result;
         }
 
+        public List<HPODataModel> SearchStandardHPOList(string searchHPOText)
+        {
+            var searchedHPOList = new List<HPODataModel>();
+            if (_hostingEnvironment.IsProduction())
+            {
+                if (!string.IsNullOrWhiteSpace(searchHPOText))
+                {
+                    string sql = GetSqlText("raredetail-search-disease-sql.txt");
+                    var parameters = new List<SugarParameter>(){
+                      new SugarParameter("@DiseaseText",searchHPOText)
+                    };
+                    searchedHPOList = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
+                }
+            }
+            else
+            {
+                searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HpoId = "HP:0001337", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HpoId = "HP:0001300", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HpoId = "HP:0002067", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "强直", NameEnglish = "Rigidity", HpoId = "HP:0002063", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "姿势不稳", NameEnglish = "Postural instability", HpoId = "HP:0002172", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "核上性凝视麻痹", NameEnglish = "Supranuclear gaze palsy", HpoId = "HP:0000605", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "眼睑失用症", NameEnglish = "Eyelid apraxia", HpoId = "HP:0000658", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "肌张力障碍", NameEnglish = "Dystonia", HpoId = "HP:0001332", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "智能衰退", NameEnglish = "Mental deterioration", HpoId = "HP:0001268", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HpoId = "HP:0001260", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "曳行步态", NameEnglish = "Shuffling gait", HpoId = "HP:0002362", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HpoId = "HP:0000007", Certain = "阳性", IsSelf = "本人", Count = 1 });
+            }
+            return searchedHPOList;
+        }
 
         public string GetSqlText(string fileName)
         {
