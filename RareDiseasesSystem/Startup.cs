@@ -39,7 +39,8 @@ namespace RareDiseasesSystem
             services.AddMemoryCache();
             
             services.AddDbContext<RareDiseaseDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LogConnection")));
-            RareDiseaseGPDbContext.RDR_ConnectionString = Configuration.GetConnectionString("LogConnection");   //为数据库连接字符串赋值
+            services.AddDbContext<NLPDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("NLPConnection")));
+            RareDiseaseGPDbContext.NLP_ConnectionString = Configuration.GetConnectionString("NLPConnection");   //为数据库连接字符串赋值
             services.AddHttpContextAccessor();
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
             services.AddScoped<ILogRepository, LogRepository>();

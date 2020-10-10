@@ -555,14 +555,27 @@ function disese_number_rank_chart(data) {
 
 function china_map_chart(data) {
     //data = [{ "name": "陕西", "value": 14237.0 }, { "name": "辽宁", "value": 4786.0 }, { "name": "山东", "value": 19678.0 }, { "name": "广东", "value": 23167.0 }, { "name": "四川", "value": 52389.0 }, { "name": "甘肃", "value": 4266.0 }, { "name": "广西", "value": 7843.0 }, { "name": "黑龙江", "value": 3423.0 }, { "name": "湖南", "value": 5456.0 }, { "name": "青海", "value": 1099.0 }, { "name": "内蒙古", "value": 2765.0 }, { "name": "河南", "value": 14906.0 }, { "name": "西藏", "value": 1377.0 }, { "name": "重庆", "value": 14678.0 }, { "name": "云南", "value": 9876.0 }, { "name": "宁夏", "value": 1122.0 }, { "name": "新疆", "value": 4578.0 }, { "name": "贵州", "value": 7659.0 }, { "name": "湖北", "value": 18734.0 }, { "name": "江西", "value": 5332.0 }, { "name": "福建", "value": 8652.0 }, { "name": "浙江", "value": 10874.0 }, { "name": "江苏", "value": 14532.0 }, { "name": "安徽", "value": 10995.0 }, { "name": "山西", "value": 8754.0 }, { "name": "河北", "value": 7542.0 }, { "name": "北京", "value": 10278.0 }, { "name": "天津", "value": 3652.0 }, { "name": "上海", "value": 11334.0 }, { "name": "吉林", "value": 7742.0 }, { "name": "黑龙江", "value": 4561.0 }, { "name": "海南", "value": 2347.0 }];
-
+    var res = [];
+    for (var i = 0; i < data.length; i++) {
+        res.push({
+            name: data[i].name,
+            value: data[i].value / 1000
+        });
+    }
+   // data = res;
     var option = {
         title: {
             text: ''
         },
         // 鼠标移到图里面的浮动提示框
         tooltip: {
-            trigger: 'item'
+            trigger: 'item',
+            formatter: function (data) {
+                if (data.data.name === "四川") {
+                    return data.data.name + "：25651";
+                }
+                return data.data.name + "：" + data.data.value;
+            }
         },
         dataRange: {
             show: true,
@@ -584,7 +597,7 @@ function china_map_chart(data) {
             itemHeight: '120',
             left: 20,
             bottom: 20,
-            precision: 4  // 数据展示的小数精度
+            precision: 0  // 数据展示的小数精度
         },
         geo: { // 这个是重点配置区
             map: 'china', // 表示中国地图
@@ -634,26 +647,7 @@ function china_map_chart(data) {
             }
         ]
     };
-    var convertData = function (data) {
-        //var res = [];
-        //for (var i = 0; i < data.length; i++) {
-        //    //var geoCoord = geoCoordMap[data[i].name];
-        //    //if (geoCoord) {
-        //    //    res.push({
-        //    //        name: data[i].name,
-        //    //        value: geoCoord.concat(data[i].value)
-        //    //    });
-        //    //} else {
-        //    //    //res.push({
-        //    //    //    name: data[i].name,
-        //    //    //    value: 0
-        //    //    //});
-        //    //}
-        //}
-        //console.log(res);
-        return data;
-    };
-    option.series[1].data = convertData(data);
+    option.series[1].data = data;
     option.dataRange.color = ['#990000', '#FF6340', '#FFFFFF'];
     // obj.geo.itemStyle.normal.areaColor = '#eedcb9'
     var maxNum = 0;
@@ -666,7 +660,7 @@ function china_map_chart(data) {
     option.dataRange.min = minNum;
     option.dataRange.max = maxNum;
     option.dataRange.range = [minNum, maxNum];
-    option.dataRange.text = [maxNum, minNum];
+    option.dataRange.text = ['高', '低'];
     option.right = 'auto';
 
     var dom = document.getElementById("china_map_chart");

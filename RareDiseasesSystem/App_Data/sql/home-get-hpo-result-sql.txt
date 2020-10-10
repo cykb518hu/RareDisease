@@ -1,1 +1,5 @@
-﻿  select top 1 '12345678' as EMPINumber from OperationLog WHERE CreatedBy=@number
+﻿    select
+    name_en  as hporesult
+  from nlp.chpo2020 
+  where name_cn ='{0}' or name_en like '%{0}%' 
+  limit 1

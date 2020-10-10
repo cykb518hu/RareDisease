@@ -26,7 +26,6 @@ namespace RareDisease.Data.Model
         public string Address { get; set; }
     }
 
-
     public class PatientVisitInfoModel
     {
         [JsonProperty("visitTime")]

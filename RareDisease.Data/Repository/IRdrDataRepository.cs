@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using RareDisease.Data.Model;
 using SqlSugar;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace RareDisease.Data.Repository
 {
@@ -56,10 +59,21 @@ namespace RareDisease.Data.Repository
                 if (!string.IsNullOrWhiteSpace(number))
                 {
                     string sql = GetSqlText("home-patient-overview-sql.txt");
-                    var parameters = new List<SugarParameter>(){
-                  new SugarParameter("@number",number)
-                 };
-                    result = dbgp.SqlQueryable<PatientOverviewModel>(sql).AddParameters(parameters).ToList();
+                    sql = string.Format(sql, number);
+                    using (var reader = dbgp.Ado.GetDataReader(sql))
+                    {
+                        if (reader.Read())
+                        {
+                            var data = new PatientOverviewModel();
+                            data.EMPINumber = reader["empi"] == DBNull.Value ? "" : reader["empi"].ToString();
+                            data.Name = reader["name"] == DBNull.Value ? "" : reader["name"].ToString();
+                            data.Gender = reader["gender"] == DBNull.Value ? "" : reader["gender"].ToString();
+                            data.CardNo = reader["cardno"] == DBNull.Value ? "" : reader["cardno"].ToString();
+                            data.PhoneNumber = reader["tel"] == DBNull.Value ? "" : reader["tel"].ToString();
+                            data.Address = reader["address"] == DBNull.Value ? "" : reader["address"].ToString();
+                            result.Add(data);
+                        }
+                    }
                 }
             }
             else
@@ -78,10 +92,19 @@ namespace RareDisease.Data.Repository
                 if (!string.IsNullOrWhiteSpace(number))
                 {
                     string sql = GetSqlText("home-patient-visit-list-sql.txt");
-                    var parameters = new List<SugarParameter>(){
-                  new SugarParameter("@number",number)
-                };
-                    patientVisitList = dbgp.SqlQueryable<PatientVisitInfoModel>(sql).AddParameters(parameters).ToList();
+                    sql = string.Format(sql, number);
+                    using (var reader = dbgp.Ado.GetDataReader(sql))
+                    {
+                        while (reader.Read())
+                        {
+                            var data = new PatientVisitInfoModel();
+                            data.VisitTime = reader["visittime"] == DBNull.Value ? "" : reader["visittime"].ToString();
+                            data.VisitType = reader["visittype"] == DBNull.Value ? "" : reader["visittype"].ToString();
+                            data.DiagDesc = reader["diagdesc"] == DBNull.Value ? "" : reader["diagdesc"].ToString();
+                            data.Center = reader["center"] == DBNull.Value ? "" : reader["center"].ToString();
+                            patientVisitList.Add(data);
+                        }
+                    }
                 }  
             }
             else
@@ -112,13 +135,8 @@ namespace RareDisease.Data.Repository
                 if (!string.IsNullOrWhiteSpace(patientEmpiId))
                 {
                     string sql = GetSqlText("home-patient-EMR-sql.txt");
-                    var parameters = new List<SugarParameter>(){
-                    new SugarParameter("@patientEmpiId",patientEmpiId)
-                   };
-                    //var result = dbgp.Ado.GetString(sql);
-                    var entity = dbgp.SqlQueryable<PatientEMRModel>(sql).AddParameters(parameters).ToList();
-                    var list = entity.Select(x => x.Detail);
-                    result = string.Join(' ', entity);
+                    sql = string.Format(sql, patientEmpiId);
+                    result = dbgp.Ado.GetString(sql);
                 }
             }
             else
@@ -138,10 +156,40 @@ namespace RareDisease.Data.Repository
             if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientEmpiId))
             {
                 string sql = GetSqlText("home-get-hpo-result-sql.txt");
-                var parameters = new List<SugarParameter>(){
-                  new SugarParameter("@patientEmpiId",patientEmpiId)
-                };
-                result = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
+                sql = string.Format(sql, patientEmpiId);
+                var hpoStr = dbgp.Ado.GetString(sql);
+                var list = new List<HPODataModel>();
+                hpoStr = hpoStr.Replace(" ", "");
+                hpoStr = hpoStr.Substring(2, hpoStr.Length - 2);
+                hpoStr = hpoStr.Substring(0, hpoStr.Length - 2);
+                string[] hpoArray = hpoStr.Split(new string[] { "],[" }, StringSplitOptions.None);
+                var regex = new Regex("HP:");
+                foreach (var s in hpoArray)
+                {
+                    var single = s;
+                    single = single.Replace("[", "").Replace("]", "");
+                    var index = regex.Matches(single).Count;
+                    int startIndex = 0;
+                    if (list.LastOrDefault() != null)
+                    {
+                        startIndex = list.LastOrDefault().StartIndex;
+                    }
+                    for (int i = 0; i < index; i++)
+                    {
+                        var data = new HPODataModel();
+                        string[] subArrary = single.Split(',');
+                        var currentStartIndex = Convert.ToInt32(subArrary[0]);
+                        var currentEndIndex = Convert.ToInt32(subArrary[1]);
+                        var length = currentEndIndex - currentStartIndex;
+                        data.StartIndex = currentStartIndex + startIndex;
+                        data.EndIndex = data.StartIndex + length;
+                        data.Name = subArrary[2];
+                        data.HpoId = subArrary[3 + i];
+                        list.Add(data);
+
+                    }
+
+                }
             }
 
             return result;
@@ -186,11 +234,22 @@ namespace RareDisease.Data.Repository
             {
                 if (!string.IsNullOrWhiteSpace(searchHPOText))
                 {
-                    string sql = GetSqlText("raredetail-search-disease-sql.txt");
-                    var parameters = new List<SugarParameter>(){
-                      new SugarParameter("@DiseaseText",searchHPOText)
-                    };
-                    searchedHPOList = dbgp.SqlQueryable<HPODataModel>(sql).AddParameters(parameters).ToList();
+                    string sql = GetSqlText("search-standard-hpo-sql.txt");
+                    sql = string.Format(sql, searchHPOText);
+                    using (var reader = dbgp.Ado.GetDataReader(sql))
+                    {
+                        if (reader.Read())
+                        {
+                            var data = new HPODataModel();
+                            data.Name = reader["name_cn"] == DBNull.Value ? "" : reader["name_cn"].ToString();
+                            data.NameEnglish = reader["name_en"] == DBNull.Value ? "" : reader["name_en"].ToString();
+                            data.HpoId = reader["hpoid"] == DBNull.Value ? "" : reader["hpoid"].ToString();
+                            data.Certain = "阳性";
+                            data.IsSelf = "本人";
+                            data.Count = 1;
+                            searchedHPOList.Add(data);
+                        }
+                    }
                 }
             }
             else

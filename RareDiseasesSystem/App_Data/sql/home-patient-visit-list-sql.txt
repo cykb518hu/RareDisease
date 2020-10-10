@@ -1,3 +1,4 @@
-﻿  select '12345678' as EMPINumber,'成都市龙泉驿区大面镇银河路118号恒大绿洲' as address,
-  '511025196903220551' as cardNo, '小吴' as name,'女' as gender , '13550330299' as PhoneNumber
-  from DBO.OperationLog WHERE CreatedBy=@number
+﻿    select '2019-10-10' as visittime,'住院' as visittype,
+  '帕金森' as diagdesc, '华西医院' as center
+  from nlp.chpo2020 
+  where name_cn ='{0}' or name_en like '%{0}%' 

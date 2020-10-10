@@ -5,6 +5,13 @@ using System.Text;
 
 namespace RareDisease.Data.Model
 {
+    public class HPONLPDbModel
+    {
+        public string hpoid { get; set; }
+        public string name_en { get; set; }
+        public string name_cn { get; set; }
+
+    }
     public class HPODataModel
     {
         [JsonProperty("name")]
