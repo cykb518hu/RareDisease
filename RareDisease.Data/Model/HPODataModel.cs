@@ -12,6 +12,8 @@ namespace RareDisease.Data.Model
         public string name_cn { get; set; }
 
     }
+
+
     public class HPODataModel
     {
         [JsonProperty("name")]
@@ -21,13 +23,16 @@ namespace RareDisease.Data.Model
         public string NameEnglish { get; set; }
 
         [JsonProperty("hpoId")]
-        public string HpoId { get; set; }
+        public string HPOId { get; set; }
 
+        //目前NLP 不支持
         [JsonProperty("certain")]
-        public string Certain { get; set; }
+        public string Certain { get { return "阳性"; } }
 
+
+        //目前NLP 不支持
         [JsonProperty("isSelf")]
-        public string IsSelf { get; set; }
+        public string IsSelf { get { return "本人"; } }
 
         [JsonProperty("count")]
         public int Count { get; set; }
@@ -50,5 +55,17 @@ namespace RareDisease.Data.Model
 
         [JsonProperty("examData")]
         public List<ExamBaseDataModel> ExamData { get; set; }
+
+        [JsonProperty("indexList")]
+        public List<HPOMatchIndexModel> IndexList { get; set; }
+    }
+
+    public class HPOMatchIndexModel
+    {
+        [JsonProperty("startIndex")]
+        public int StartIndex { get; set; }
+
+        [JsonProperty("endIndex")]
+        public int EndIndex { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using RareDisease.Data.Model;
 using SqlSugar;
 using System;
@@ -31,7 +32,7 @@ namespace RareDisease.Data.Repository
         /// </summary>
         /// <param name="patientEmpiId"></param>
         /// <returns></returns>
-        List<ExamBaseDataModel> GetPatientExamData(string patientEmpiId);
+        List<HPODataModel> GetPatientExamDataResult(string patientEmpiId);
 
 
         List<RareDiseaseDetailModel> SearchStandardRareDiseaseList(string searchText);
@@ -44,10 +45,13 @@ namespace RareDisease.Data.Repository
     public class RdrDataRepository: RareDiseaseGPDbContext,IRdrDataRepository
     {
         private IHostingEnvironment _hostingEnvironment;
-
-        public RdrDataRepository(IHostingEnvironment hostingEnvironment)
+        private readonly ILogger<RdrDataRepository> _logger;
+        private readonly ILocalMemoryCache _localMemoryCache;
+        public RdrDataRepository(IHostingEnvironment hostingEnvironment, ILogger<RdrDataRepository> logger, ILocalMemoryCache localMemoryCache)
         {
             _hostingEnvironment = hostingEnvironment;
+            _logger = logger;
+            _localMemoryCache = localMemoryCache;
         }
 
         public List<PatientOverviewModel> GetPatientOverview(string number)
@@ -158,54 +162,146 @@ namespace RareDisease.Data.Repository
                 string sql = GetSqlText("home-get-hpo-result-sql.txt");
                 sql = string.Format(sql, patientEmpiId);
                 var hpoStr = dbgp.Ado.GetString(sql);
-                var list = new List<HPODataModel>();
-                hpoStr = hpoStr.Replace(" ", "");
+                hpoStr = hpoStr.Replace(" ", "").Replace("'", "");
                 hpoStr = hpoStr.Substring(2, hpoStr.Length - 2);
                 hpoStr = hpoStr.Substring(0, hpoStr.Length - 2);
                 string[] hpoArray = hpoStr.Split(new string[] { "],[" }, StringSplitOptions.None);
                 var regex = new Regex("HP:");
                 foreach (var s in hpoArray)
                 {
-                    var single = s;
-                    single = single.Replace("[", "").Replace("]", "");
-                    var index = regex.Matches(single).Count;
-                    int startIndex = 0;
-                    if (list.LastOrDefault() != null)
+                    try
                     {
-                        startIndex = list.LastOrDefault().StartIndex;
+                        var single = s;
+                        single = single.Replace("[", "").Replace("]", "");
+                        var index = regex.Matches(single).Count;
+                        int startIndex = 0;
+                        if (result.LastOrDefault() != null)
+                        {
+                            startIndex = result.LastOrDefault().StartIndex;
+                        }
+                        for (int i = 0; i < index; i++)
+                        {
+                            var data = new HPODataModel();
+                            string[] subArrary = single.Split(',');
+                            var currentStartIndex = Convert.ToInt32(subArrary[0]);
+                            var currentEndIndex = Convert.ToInt32(subArrary[1]);
+                            var length = currentEndIndex - currentStartIndex;
+                            data.StartIndex = currentStartIndex + startIndex;
+                            data.EndIndex = data.StartIndex + length;
+                            data.Name = subArrary[2];
+                            data.HPOId = subArrary[3 + i];
+                            data.Editable = true;
+                            data.IndexList = new List<HPOMatchIndexModel>();
+                            data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
+                            data.Count = data.IndexList.Count;
+                            var item = result.FirstOrDefault(x => x.HPOId == data.HPOId);
+                            if (item != null)
+                            {
+                                item.IndexList.AddRange(data.IndexList);
+                                item.Count = item.IndexList.Count;
+                            }
+                            else
+                            {
+                                result.Add(data);
+                            }
+                        }
                     }
-                    for (int i = 0; i < index; i++)
+                    catch (Exception ex)
                     {
-                        var data = new HPODataModel();
-                        string[] subArrary = single.Split(',');
-                        var currentStartIndex = Convert.ToInt32(subArrary[0]);
-                        var currentEndIndex = Convert.ToInt32(subArrary[1]);
-                        var length = currentEndIndex - currentStartIndex;
-                        data.StartIndex = currentStartIndex + startIndex;
-                        data.EndIndex = data.StartIndex + length;
-                        data.Name = subArrary[2];
-                        data.HpoId = subArrary[3 + i];
-                        list.Add(data);
-
+                        _logger.LogError("读取单个HPO出错：" + ex.ToString());
                     }
 
                 }
             }
-
+            else
+            {
+                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 1, Editable = true });
+                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Editable = true});
+                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Count = 1, Editable = true  });
+            }
             return result;
         }
 
 
-        public List<ExamBaseDataModel> GetPatientExamData(string patientEmpiId)
+        public List<HPODataModel> GetPatientExamDataResult(string patientEmpiId)
         {
-            var result = new List<ExamBaseDataModel>();
+            var result = new List<HPODataModel>();
             if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientEmpiId))
             {
+                //获取所有检验HPO规则
+                var examBase = _localMemoryCache.GetExamBaseDataList();
+                //获取所有检验数据
+                var examList= new List<ExamBaseDataModel>();
                 string sql = GetSqlText("home-get-exam-data-sql.txt");
-                var parameters = new List<SugarParameter>(){
-                  new SugarParameter("@patientEmpiId",patientEmpiId)
-                };
-                result = dbgp.SqlQueryable<ExamBaseDataModel>(sql).AddParameters(parameters).ToList();
+                sql = string.Format(sql, patientEmpiId);
+                using (var reader = dbgp.Ado.GetDataReader(sql))
+                {
+                    while (reader.Read())
+                    {
+                        var data = new ExamBaseDataModel();
+                        data.ExamCode = reader["exam_code"] == DBNull.Value ? "" : reader["exam_code"].ToString();
+                        data.ExamName = reader["exam_name"] == DBNull.Value ? "" : reader["exam_name"].ToString();
+                        data.SampleCode = reader["sample_code"] == DBNull.Value ? "" : reader["sample_code"].ToString();
+                        data.SampleName = reader["sample_name"] == DBNull.Value ? "" : reader["sample_name"].ToString();
+                        data.Range = reader["range"] == DBNull.Value ? "" : reader["range"].ToString();
+                        data.ExamValue = reader["value"] == DBNull.Value ? 0 : Convert.ToInt32(reader["value"]);
+                        data.ExamTimeStr = reader["examTimeStr"] == DBNull.Value ? "" : reader["examTimeStr"].ToString();
+                        examList.Add(data);
+                    }
+
+                }
+                //遍历每条规则，查看检验数据里面是否有符合规则的数据
+                foreach (var r in examBase)
+                {
+                    var list = new List<ExamBaseDataModel>();
+                    //区间命中
+                    if (r.Maxinum > 0 && r.Minimum > 0)
+                    {
+                        list = examList.Where(x => x.ExamValue > r.Minimum && x.ExamValue < r.Maxinum && x.ExamCode == r.ExamCode).ToList();
+                    }
+                    //低于最小值命中
+                    else if (r.Maxinum == 0 && r.Minimum > 0)
+                    {
+                        list = examList.Where(x => x.ExamValue < r.Minimum && x.ExamCode == r.ExamCode).ToList();
+                    }
+                    //大于最大值命中
+                    else if (r.Maxinum > 0 && r.Minimum == 0)
+                    {
+                        list = examList.Where(x => x.ExamValue > r.Maxinum && x.ExamCode == r.ExamCode).ToList();
+                    }
+                    if (list != null&&list.Any())
+                    {
+                        var hpoItem = new HPODataModel();
+                        hpoItem.HPOId = r.HPOId;
+                        hpoItem.Name = r.HPOName;
+                        hpoItem.NameEnglish = r.HPOEnglish;
+                        hpoItem.Count = 1;
+                        hpoItem.HasExam = true;
+                        hpoItem.ExamData = new List<ExamBaseDataModel>();
+                        hpoItem.ExamData.AddRange(list);
+                        result.Add(hpoItem);
+                    }
+                }
+
+            }
+            else
+            {
+                var hpoItem = new HPODataModel { Name = "高蛋白血症", NameEnglish = "Hyperproteinemia", HPOId = "HP:0002152", Count = 1};
+                var item = new ExamBaseDataModel();
+                item.HPOId = "HP:0002152";
+                item.HPOName = "高蛋白血症";
+                item.HPOEnglish = "Hyperproteinemia";
+                item.ExamCode = "2925";
+                item.ExamName = "总蛋白";
+                item.SampleCode = "LIS126";
+                item.SampleName = "血清";
+                item.Range = "60.0-83.0 g/L";
+                item.ExamValue = 121;
+                item.ExamTimeStr = "2019-12-12";
+                hpoItem.HasExam = true;
+                hpoItem.ExamData = new List<ExamBaseDataModel>();
+                hpoItem.ExamData.Add(item);
+                result.Add(hpoItem);
             }
 
             return result;
@@ -217,11 +313,20 @@ namespace RareDisease.Data.Repository
             var result = new List<RareDiseaseDetailModel>();
             if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(searchText))
             {
-                string sql = GetSqlText("raredetail-search-disease-sql.txt");
-                var parameters = new List<SugarParameter>(){
-                  new SugarParameter("@DiseaseText",searchText)
-                };
-                result = dbgp.SqlQueryable<RareDiseaseDetailModel>(sql).AddParameters(parameters).ToList();
+                string sql = GetSqlText("search-standard-disease-sql.txt");
+                sql = string.Format(sql, searchText);
+                using (var reader = dbgp.Ado.GetDataReader(sql))
+                {
+                    while (reader.Read())
+                    {
+                        var data = new RareDiseaseDetailModel();
+                        data.Source = reader["source"] == DBNull.Value ? "" : reader["source"].ToString();
+                        data.NameEnglish = reader["name_en"] == DBNull.Value ? "" : reader["name_en"].ToString();
+                        data.HPOId = reader["hpoid"] == DBNull.Value ? "" : reader["hpoid"].ToString();
+                        data.HPOText = reader["hpotext"] == DBNull.Value ? "" : reader["hpotext"].ToString();
+                        result.Add(data);
+                    }
+                }
             }
 
             return result;
@@ -243,9 +348,7 @@ namespace RareDisease.Data.Repository
                             var data = new HPODataModel();
                             data.Name = reader["name_cn"] == DBNull.Value ? "" : reader["name_cn"].ToString();
                             data.NameEnglish = reader["name_en"] == DBNull.Value ? "" : reader["name_en"].ToString();
-                            data.HpoId = reader["hpoid"] == DBNull.Value ? "" : reader["hpoid"].ToString();
-                            data.Certain = "阳性";
-                            data.IsSelf = "本人";
+                            data.HPOId = reader["hpoid"] == DBNull.Value ? "" : reader["hpoid"].ToString();
                             data.Count = 1;
                             searchedHPOList.Add(data);
                         }
@@ -254,18 +357,18 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HpoId = "HP:0001337", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HpoId = "HP:0001300", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HpoId = "HP:0002067", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "强直", NameEnglish = "Rigidity", HpoId = "HP:0002063", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "姿势不稳", NameEnglish = "Postural instability", HpoId = "HP:0002172", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "核上性凝视麻痹", NameEnglish = "Supranuclear gaze palsy", HpoId = "HP:0000605", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "眼睑失用症", NameEnglish = "Eyelid apraxia", HpoId = "HP:0000658", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "肌张力障碍", NameEnglish = "Dystonia", HpoId = "HP:0001332", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "智能衰退", NameEnglish = "Mental deterioration", HpoId = "HP:0001268", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HpoId = "HP:0001260", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "曳行步态", NameEnglish = "Shuffling gait", HpoId = "HP:0002362", Certain = "阳性", IsSelf = "本人", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HpoId = "HP:0000007", Certain = "阳性", IsSelf = "本人", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HPOId = "HP:0001337",  Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HPOId = "HP:0001300", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "强直", NameEnglish = "Rigidity", HPOId = "HP:0002063", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "姿势不稳", NameEnglish = "Postural instability", HPOId = "HP:0002172",Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "核上性凝视麻痹", NameEnglish = "Supranuclear gaze palsy", HPOId = "HP:0000605", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "眼睑失用症", NameEnglish = "Eyelid apraxia", HPOId = "HP:0000658", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "肌张力障碍", NameEnglish = "Dystonia", HPOId = "HP:0001332", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "智能衰退", NameEnglish = "Mental deterioration", HPOId = "HP:0001268", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "曳行步态", NameEnglish = "Shuffling gait", HPOId = "HP:0002362",  Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007",Count = 1 });
             }
             return searchedHPOList;
         }

@@ -53,7 +53,7 @@
     <None Update="App_Data\sql\home-patient-visit-list-sql.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="App_Data\sql\raredetail-search-disease-sql.txt">
+    <None Update="App_Data\sql\search-standard-disease-sql.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

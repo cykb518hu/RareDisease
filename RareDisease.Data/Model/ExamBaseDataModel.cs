@@ -35,11 +35,9 @@ namespace RareDisease.Data.Model
         [JsonProperty("exception")]
         public string Exception { get; set; }
 
-        [JsonProperty("examTime")]
-        public DateTime ExamTime { get; set; }
 
         [JsonProperty("examTimeStr")]
-        public string ExamTimeStr { get { return ExamTime.ToString("yyyy-MM-dd"); } }
+        public string ExamTimeStr { get; set; }
 
         [JsonProperty("value")]
         public float ExamValue { get; set; }

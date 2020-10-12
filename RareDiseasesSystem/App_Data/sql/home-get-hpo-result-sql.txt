@@ -1,5 +1,5 @@
 ﻿    select
     name_en  as hporesult
   from nlp.chpo2020 
-  where name_cn ='{0}' or name_en like '%{0}%' 
+  where name_cn ='{0}' or name_en like '%{0}%' or 1=1
   limit 1

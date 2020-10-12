@@ -1,0 +1,2 @@
+﻿  select  'OMIM' as source, 'Wilson disease' as name_en, 'HP:000007' as hpoid, '人智障啊' as hpotext
+  FROM nlp.chpo2020 where name_cn like '%{0}%' or name_en like '%{0}%' or 1=1

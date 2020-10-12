@@ -1,1 +1,0 @@
-﻿  select top 1 '12345678' as EMPINumber from OperationLog WHERE CreatedBy=@HPOText
