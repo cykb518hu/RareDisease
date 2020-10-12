@@ -40,13 +40,13 @@ namespace RareDisease.Data.Model
         public string ExamTimeStr { get; set; }
 
         [JsonProperty("value")]
-        public float ExamValue { get; set; }
+        public decimal ExamValue { get; set; }
 
         [JsonProperty("minimum")]
-        public float Minimum { get; set; }
+        public decimal Minimum { get; set; }
 
 
         [JsonProperty("maxinum")]
-        public float Maxinum { get; set; }
+        public decimal Maxinum { get; set; }
     }
 }

