@@ -24,7 +24,6 @@ $("#component-template").load("/js/components.html?r=" + Math.floor(), function 
         created: function () {
         },
         methods: {
-       
         }
     });
 });

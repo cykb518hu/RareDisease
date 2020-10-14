@@ -10,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RareDisease.Data.Repository
 {
@@ -54,6 +56,8 @@ namespace RareDisease.Data.Repository
             _localMemoryCache = localMemoryCache;
         }
 
+
+
         public List<PatientOverviewModel> GetPatientOverview(string number)
         {
             var result = new List<PatientOverviewModel>();
@@ -91,6 +95,7 @@ namespace RareDisease.Data.Repository
         public List<PatientVisitInfoModel> GetPatientVisitList(string number)
         {
             var patientVisitList = new List<PatientVisitInfoModel>();
+
             if (_hostingEnvironment.IsProduction())
             {
                 if (!string.IsNullOrWhiteSpace(number))
@@ -109,7 +114,7 @@ namespace RareDisease.Data.Repository
                             patientVisitList.Add(data);
                         }
                     }
-                }  
+                }
             }
             else
             {
@@ -127,7 +132,6 @@ namespace RareDisease.Data.Repository
                 patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2014-05-05", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
                 patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2024-01-01", VisitType = "住院", DiagDesc = "流行性感冒", Center = "华西医院" });
             }
-           
             return patientVisitList;
         }
 

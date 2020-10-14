@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RareDisease.Data.Repository
 {
@@ -42,8 +43,16 @@ namespace RareDisease.Data.Repository
             var hpoList = new List<HPODataModel>();
             if (!string.IsNullOrWhiteSpace(patientEmpiId))
             {
-                hpoList = _rdrDataRepository.GetPatientNlpResult(patientEmpiId);
-                hpoList.AddRange(_rdrDataRepository.GetPatientExamDataResult(patientEmpiId));
+                var backgroundTasks = new[]
+                {
+                    Task.Run(() => _rdrDataRepository.GetPatientNlpResult(patientEmpiId)),
+                    Task.Run(() =>_rdrDataRepository.GetPatientExamDataResult(patientEmpiId))
+                };
+                Task.WaitAll(backgroundTasks);
+                foreach (var task in backgroundTasks)
+                {
+                    hpoList.AddRange(task.Result);
+                }
             }
             else if (!string.IsNullOrWhiteSpace(patientEMRDetail))
             {

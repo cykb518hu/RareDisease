@@ -198,7 +198,12 @@
                 para = {
                     number: this.number
                 };
-                this.loading = true;
+                const loading = this.$loading({
+                    lock: true,
+                    text: '拼命加载中...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
                 var that = this;
                 $.ajax({
                     url: "/Home/SearchPatientData",
@@ -218,7 +223,7 @@
                         else {
                             console.log(data);
                         }
-                        that.loading = false;
+                        loading.close();
                     }
                 });
             },
@@ -230,7 +235,13 @@
                 var para = {};
                 para = {
                     patientEmpiId: this.patientEmpiId                 
-                };                
+                };    
+                const loading = this.$loading({
+                    lock: true,
+                    text: '拼命加载中...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
                 var that = this;
                 $.ajax({
                     url: "/Home/GetPatientEMRDetail",
@@ -244,6 +255,7 @@
                         else {
                             console.log(data);
                         }
+                        loading.close();
                     }
                 });
                 this.importEMRDlg = false;
@@ -272,7 +284,12 @@
                         nlpEngine: this.nlpEngine
                     };
                 }             
-                this.loading = true;
+                const loading = this.$loading({
+                    lock: true,
+                    text: '拼命加载中...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
                 var that = this;
                 $.ajax({
                     url: "/Home/GetPatientHPOResult",
@@ -286,7 +303,7 @@
                         else {
                             console.log(data);
                         }
-                        that.loading = false;
+                        loading.close();
                     }
                 });
             },
@@ -402,7 +419,12 @@
                     rareAnalyzeEngine: this.rareAnalyzeEngine,
                     rareDataBaseEngine:this.rareDataBaseEngine
                 };
-                this.loading = true;
+                const loading = this.$loading({
+                    lock: true,
+                    text: '拼命加载中...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
                 var that = this;
                 $.ajax({
                     url: "/Home/GetPatientRareDiseaseResult",
@@ -417,7 +439,7 @@
                         else {
                             console.log(data);
                         }
-                        that.loading = false;
+                        loading.close();
                     }
                 });
             }

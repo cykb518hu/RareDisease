@@ -44,7 +44,7 @@ namespace RareDiseasesSystem.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-    
+
         /// <summary>
         /// number 可以是empiid 或者身份证号
         /// </summary>
@@ -55,8 +55,10 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 _logRepository.Add("查询患者就诊记录");
-                var patientOverview = _rdrDataRepository.GetPatientOverview(number);
-                var patientVisitList = _rdrDataRepository.GetPatientVisitList(number);
+                var patientOverviewTask = Task.Run(() => _rdrDataRepository.GetPatientOverview(number));
+                var patientVisitListTask = Task.Run(() => _rdrDataRepository.GetPatientVisitList(number));
+                var patientVisitList = patientVisitListTask.Result;
+                var patientOverview = patientOverviewTask.Result;
                 return Json(new { success = true, patientOverview, patientVisitList, total = patientVisitList.Count });
             }
             catch (Exception ex)
