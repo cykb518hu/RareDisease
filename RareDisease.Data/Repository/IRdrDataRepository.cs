@@ -177,23 +177,17 @@ namespace RareDisease.Data.Repository
                     {
                         var single = s;
                         single = single.Replace("[", "").Replace("]", "");
+                        //查看有多少HPO
                         var index = regex.Matches(single).Count;
-                        int startIndex = 0;
-                        if (result.LastOrDefault() != null)
-                        {
-                            startIndex = result.LastOrDefault().StartIndex;
-                        }
                         for (int i = 0; i < index; i++)
                         {
                             var data = new HPODataModel();
                             string[] subArrary = single.Split(',');
-                            var currentStartIndex = Convert.ToInt32(subArrary[0]);
-                            var currentEndIndex = Convert.ToInt32(subArrary[1]);
-                            var length = currentEndIndex - currentStartIndex;
-                            data.StartIndex = currentStartIndex + startIndex;
-                            data.EndIndex = data.StartIndex + length;
+                            data.StartIndex = Convert.ToInt32(subArrary[0]);
+                            data.EndIndex = Convert.ToInt32(subArrary[1]);
                             data.Name = subArrary[2];
-                            data.HPOId = subArrary[3 + i];
+                            data.Positivie = Convert.ToInt32(subArrary[3]);
+                            data.HPOId = subArrary[4 + i];
                             data.Editable = true;
                             data.IndexList = new List<HPOMatchIndexModel>();
                             data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
@@ -219,9 +213,16 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 1, Editable = true });
+                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 2, Positivie = 0, Editable = true });
+                result[0].IndexList = new List<HPOMatchIndexModel>();
+                result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 26, EndIndex = 31 });
+                result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 36, EndIndex = 41 });
                 result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Editable = true});
+                result[1].IndexList = new List<HPOMatchIndexModel>();
+                result[1].IndexList.Add(new HPOMatchIndexModel { StartIndex = 386, EndIndex = 394 });
                 result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Count = 1, Editable = true  });
+                result[2].IndexList = new List<HPOMatchIndexModel>();
+                result[2].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
             }
             return result;
         }
@@ -275,15 +276,18 @@ namespace RareDisease.Data.Repository
                     }
                     if (list != null&&list.Any())
                     {
-                        var hpoItem = new HPODataModel();
-                        hpoItem.HPOId = r.HPOId;
-                        hpoItem.Name = r.HPOName;
-                        hpoItem.NameEnglish = r.HPOEnglish;
-                        hpoItem.Count = 1;
-                        hpoItem.HasExam = true;
-                        hpoItem.ExamData = new List<ExamBaseDataModel>();
-                        hpoItem.ExamData.AddRange(list);
-                        result.Add(hpoItem);
+                        if (list.Count >= r.MatchTime)
+                        {
+                            var hpoItem = new HPODataModel();
+                            hpoItem.HPOId = r.HPOId;
+                            hpoItem.Name = r.HPOName;
+                            hpoItem.NameEnglish = r.HPOEnglish;
+                            hpoItem.Count = 1;
+                            hpoItem.HasExam = true;
+                            hpoItem.ExamData = new List<ExamBaseDataModel>();
+                            hpoItem.ExamData.AddRange(list);
+                            result.Add(hpoItem);
+                        }
                     }
                 }
 
@@ -327,10 +331,21 @@ namespace RareDisease.Data.Repository
                         data.Source = reader["source"] == DBNull.Value ? "" : reader["source"].ToString();
                         data.NameEnglish = reader["name_en"] == DBNull.Value ? "" : reader["name_en"].ToString();
                         data.HPOId = reader["hpoid"] == DBNull.Value ? "" : reader["hpoid"].ToString();
-                        data.HPOText = reader["hpotext"] == DBNull.Value ? "" : reader["hpotext"].ToString();
+                        data.HPONameChinese = reader["hpo_name"] == DBNull.Value ? "" : reader["hpo_name"].ToString();
+                        data.HPONameEnglish = reader["hpo_name_en"] == DBNull.Value ? "" : reader["hpo_name_en"].ToString();
                         result.Add(data);
                     }
                 }
+            }
+            else
+            {
+                var data = new RareDiseaseDetailModel();
+                data.Source = "OMIM";
+                data.NameEnglish = "Wilson disease";
+                data.HPOId = "HP:000007";
+                data.HPONameChinese = "高蛋白血症";
+                data.HPONameEnglish = "Hyperproteinemia";
+                result.Add(data);
             }
 
             return result;

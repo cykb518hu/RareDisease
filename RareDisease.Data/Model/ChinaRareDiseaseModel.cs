@@ -12,17 +12,21 @@ namespace RareDisease.Data.Model
         [JsonProperty("source")]
         public string Source { get; set; }
 
+        [JsonProperty("name")]
+        public string NameChinese { get; set; }
+
         [JsonProperty("name_en")]
         public string NameEnglish { get; set; }
 
         [JsonProperty("HPOId")]
         public string HPOId { get; set; }
 
-        [JsonProperty("HPOText")]
-        public string HPOText { get; set; }
+        [JsonProperty("HPO_name")]
+        public string HPONameChinese { get; set; }
 
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonProperty("HPO_name_en")]
+        public string HPONameEnglish { get; set; }
+
 
         [JsonProperty("editable")]
         public bool Editable { get; set; }

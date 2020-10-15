@@ -38,20 +38,23 @@
                                              label="知识库" min-width="10%">
                             </el-table-column>
                             <el-table-column prop="name"
-                                             label="疾病中文名称" min-width="20%">
+                                             label="疾病中文" min-width="18%">
                             </el-table-column>
                             <el-table-column prop="name_en"
-                                             label="疾病英文名称" min-width="30%">
+                                             label="疾病英文" min-width="18%">
                             </el-table-column>
 
                             <el-table-column prop="HPOId"
                                              label="HPO" min-width="10%">
                             </el-table-column>
-                            <el-table-column prop="HPOText"
-                                             label="HPO术语名称" min-width="30%">
+                            <el-table-column prop="HPO_name"
+                                             label="HPO中文" min-width="18%">
+                            </el-table-column>
+                            <el-table-column prop="HPO_name_en"
+                                             label="HPO英文" min-width="18%">
                             </el-table-column>
                             <el-table-column min-width="8%">
-                                <template  v-if="scope.row.editable" slot-scope="scope">
+                                <template v-if="scope.row.editable" slot-scope="scope">
                                     <el-link type="primary"
                                              v-on:click="open121HpoDetail(scope.row)">详情</el-link>
                                 </template>

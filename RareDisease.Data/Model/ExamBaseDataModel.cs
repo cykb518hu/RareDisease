@@ -48,5 +48,8 @@ namespace RareDisease.Data.Model
 
         [JsonProperty("maxinum")]
         public decimal Maxinum { get; set; }
+
+        [JsonProperty("match_time")]
+        public int MatchTime { get; set; }
     }
 }

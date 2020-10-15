@@ -48,7 +48,7 @@ namespace RareDisease.Data.Repository
             if(!string.IsNullOrWhiteSpace(search))
             {
                 search = search.Trim().ToLower();
-                result = result.Where(x => x.Name.Trim().ToLower().Contains(search) || x.NameEnglish.Trim().ToLower().Contains(search)).ToList();
+                result = result.Where(x => x.NameChinese.Trim().ToLower().Contains(search) || x.NameEnglish.Trim().ToLower().Contains(search)).ToList();
                 result.ForEach(x => { x.Source = "2019名录"; x.Editable = true; });
             }
             return result;

@@ -40,7 +40,7 @@ namespace RareDiseasesSystem.Controllers
                 globalList.AddRange(chinaList);
 
                 int count = globalList.Count;
-                var data = globalList.Skip((pageIndex - 1) * 5).Take(pageSize).ToList();
+                var data = globalList.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
                 return Json(new { success = true, data, total = count });
             }
             catch (Exception ex)

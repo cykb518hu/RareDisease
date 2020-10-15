@@ -25,9 +25,12 @@ namespace RareDisease.Data.Model
         [JsonProperty("hpoId")]
         public string HPOId { get; set; }
 
+
+        [JsonProperty("positive")]
+        public int Positivie { get; set; } = 1;
         //目前NLP 不支持
         [JsonProperty("certain")]
-        public string Certain { get { return "阳性"; } }
+        public string Certain { get { return Positivie == 1 ? "阳性" : "阴性"; } }
 
 
         //目前NLP 不支持

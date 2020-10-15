@@ -1,4 +1,3 @@
 ﻿    select '2925' as exam_code,'总蛋白' as exam_name, 'LIS126' as sample_code, '血清' as sample_name ,'60.0-83.0 g/L' as range ,121 as value,'2020-01-01' as examTimeStr
   from nlp.chpo2020 
   where name_cn ='{0}' or name_en like '%{0}%' or 1=1
-  limit 1

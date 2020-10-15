@@ -32,19 +32,6 @@ namespace RareDisease.Data
 
         //}
     }
-
-    public class NLPDbContext : DbContext
-    {
-        public NLPDbContext()
-        {
-        }
-        public NLPDbContext(DbContextOptions<NLPDbContext> options)
-           : base(options)
-        {
-            
-        }
-    }
-
     public class RareDiseaseGPDbContext
     {
         public static string NLP_ConnectionString { get; set; }

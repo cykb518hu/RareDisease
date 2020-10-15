@@ -178,7 +178,9 @@
                         value: '整合库',
                         label: '整合库'
                     }
-                ]
+                ],
+                clickedHPOText: "" ,// 一个HPO 有多次文本匹配，记住上次点击的那一个
+                clickedHPOIndex:0
                 
             };
         },
@@ -315,13 +317,32 @@
                 }
             },
             onShowHpoMatchedText: function (subgroup) {
+                //如果有多次匹配，那么循环显示
+                var indexData;
+                if (this.clickedHPOText === subgroup.hpoId) {
+                    if (this.clickedHPOIndex < subgroup.indexList.length - 1) {
+                        this.clickedHPOIndex++;
+                    }
+                    else {
+                        this.clickedHPOIndex = 0;
+                    }
+                    indexData = subgroup.indexList[this.clickedHPOIndex];
+                }
+                else {
+                    this.clickedHPOIndex = 0;
+                    indexData = subgroup.indexList[0];
+                    this.clickedHPOText = subgroup.hpoId;
+                }
+                var startIndex = indexData.startIndex;
+                var endIndex = indexData.endIndex;
+
                 var text = $('#txt_patientEMR').val();
-                var textBeforePosition = text.substr(0, subgroup.startIndex);
+                var textBeforePosition = text.substr(0, startIndex);
                 $('#txt_patientEMR').blur();
                 $('#txt_patientEMR').val(textBeforePosition);
                 $('#txt_patientEMR').focus();
                 $('#txt_patientEMR').val(text);
-                $('#txt_patientEMR').selectRange(subgroup.startIndex, subgroup.endIndex); 
+                $('#txt_patientEMR').selectRange(startIndex, endIndex); 
 
             },
             onSearchHPODlg: function () {
