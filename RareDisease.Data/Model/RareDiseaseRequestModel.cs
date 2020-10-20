@@ -28,30 +28,42 @@ namespace RareDisease.Data.Model
         public string IPAddress { get; set; }
     }
 
-    public class RareDiseaseResponseModel
+    public class NlpRareDiseaseResponseModel
     {
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("likeness")]
-        public string Likeness { get; set; }
+        [JsonProperty("ratio")]
+        public double Ratio { get; set; }
 
-        [JsonProperty("hpoMatchedList")]
-        public List<RareDiseaseResponseHPODataModel> HPOMatchedList { get; set; }
+        [JsonProperty("Hpolist")]
+        public List<NLPRareDiseaseResponseHPODataModel> HPOMatchedList { get; set; }
+
     }
 
-    public class RareDiseaseResponseHPODataModel
+    public class NLPRareDiseaseResponseHPODataModel
     {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("nameEnglish")]
-        public string NameEnglish { get; set; }
-
         [JsonProperty("hpoId")]
+        //Id
         public string HpoId { get; set; }
 
-        [JsonProperty("matched")]
-        public string Matched { get; set; }
+        [JsonProperty("hpoName")]
+        public string HpoName { get; set; }
+
+        [JsonProperty("match")]
+        public int Match { get; set; }
+
+
+    }
+    public class RareDiseaseEngineRequestModel
+    {
+        [JsonProperty("analyzeEngine")]
+        public string AnalyzeEngine { get; set; }
+
+        [JsonProperty("dataBase")]
+        public string DataBase { get; set; }
+
+        [JsonProperty("HPOList")]
+        public string[] HPOList { get; set; }
     }
 }

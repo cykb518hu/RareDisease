@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RareDisease.Data.Model;
 using SqlSugar;
 using System;
@@ -17,24 +18,24 @@ namespace RareDisease.Data.Repository
 {
     public interface IRdrDataRepository
     {
-        List<PatientOverviewModel> GetPatientOverview(string number);
-        List<PatientVisitInfoModel> GetPatientVisitList(string number);
+        List<PatientOverviewModel> GetPatientOverview(string number,string numberType);
+        List<PatientVisitInfoModel> GetPatientVisitList(string number, string numberType);
 
-        string GetPatientEMRDetail(string patientEmpiId);
+        string GetPatientEMRDetail(string patientVisitIds);
 
         /// <summary>
         /// NLP 语义分析出来的HPO结果
         /// </summary>
         /// <param name="patientEmpiId"></param>
         /// <returns></returns>
-        List<HPODataModel> GetPatientNlpResult(string patientEmpiId);
+        List<HPODataModel> GetPatientNlpResult(string patientVisitIds);
 
         /// <summary>
         /// 病人原始检验数据
         /// </summary>
         /// <param name="patientEmpiId"></param>
         /// <returns></returns>
-        List<HPODataModel> GetPatientExamDataResult(string patientEmpiId);
+        List<HPODataModel> GetPatientExamDataResult(string patientVisitIds);
 
 
         List<RareDiseaseDetailModel> SearchStandardRareDiseaseList(string searchText);
@@ -58,15 +59,18 @@ namespace RareDisease.Data.Repository
 
 
 
-        public List<PatientOverviewModel> GetPatientOverview(string number)
+        public List<PatientOverviewModel> GetPatientOverview(string number, string numberType)
         {
             var result = new List<PatientOverviewModel>();
-
             if (_hostingEnvironment.IsProduction())
             {
                 if (!string.IsNullOrWhiteSpace(number))
                 {
-                    string sql = GetSqlText("home-patient-overview-sql.txt");
+                    string sql =GetSqlText("home-patient-overview-empi-sql.txt");
+                    if (numberType == "card")
+                    {
+                        sql = GetSqlText("home-patient-overview-card-sql.txt");
+                    }
                     sql = string.Format(sql, number);
                     using (var reader = dbgp.Ado.GetDataReader(sql))
                     {
@@ -92,7 +96,7 @@ namespace RareDisease.Data.Repository
             return result;
         }
 
-        public List<PatientVisitInfoModel> GetPatientVisitList(string number)
+        public List<PatientVisitInfoModel> GetPatientVisitList(string number, string numberType)
         {
             var patientVisitList = new List<PatientVisitInfoModel>();
 
@@ -100,13 +104,18 @@ namespace RareDisease.Data.Repository
             {
                 if (!string.IsNullOrWhiteSpace(number))
                 {
-                    string sql = GetSqlText("home-patient-visit-list-sql.txt");
+                    string sql = GetSqlText("home-patient-visit-list-empi-sql.txt");
+                    //if (numberType == "card")
+                    //{
+                    //    sql = GetSqlText("home-patient-visit-list-card-sql.txt");
+                    //}
                     sql = string.Format(sql, number);
                     using (var reader = dbgp.Ado.GetDataReader(sql))
                     {
                         while (reader.Read())
                         {
                             var data = new PatientVisitInfoModel();
+                            data.VisitId = reader["visitid"] == DBNull.Value ? 0 : Convert.ToInt32(reader["visitid"]);
                             data.VisitTime = reader["visittime"] == DBNull.Value ? "" : reader["visittime"].ToString();
                             data.VisitType = reader["visittype"] == DBNull.Value ? "" : reader["visittype"].ToString();
                             data.DiagDesc = reader["diagdesc"] == DBNull.Value ? "" : reader["diagdesc"].ToString();
@@ -135,17 +144,21 @@ namespace RareDisease.Data.Repository
             return patientVisitList;
         }
 
-        public string GetPatientEMRDetail(string patientEmpiId)
+        public string GetPatientEMRDetail(string patientVisitIds)
         {
             var result = string.Empty;
-            if (_hostingEnvironment.IsProduction())
+            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientVisitIds))
             {
-                if (!string.IsNullOrWhiteSpace(patientEmpiId))
+                string sql = GetSqlText("home-patient-EMR-sql.txt");
+                sql = string.Format(sql, patientVisitIds);
+                using (var reader = dbgp.Ado.GetDataReader(sql))
                 {
-                    string sql = GetSqlText("home-patient-EMR-sql.txt");
-                    sql = string.Format(sql, patientEmpiId);
-                    result = dbgp.Ado.GetString(sql);
+                    while (reader.Read())
+                    {
+                        result += reader["emr_text"] == DBNull.Value ? "" : reader["emr_text"].ToString() + "\r\n" + "\r\n";        
+                    }
                 }
+
             }
             else
             {
@@ -157,59 +170,91 @@ namespace RareDisease.Data.Repository
         }
 
 
-        public List<HPODataModel> GetPatientNlpResult(string patientEmpiId)
+        public List<HPODataModel> GetPatientNlpResult(string patientVisitIds)
         {
             //emr_chpo_heng
             var result = new List<HPODataModel>();
-            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientEmpiId))
+            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientVisitIds))
             {
                 string sql = GetSqlText("home-get-hpo-result-sql.txt");
-                sql = string.Format(sql, patientEmpiId);
-                var hpoStr = dbgp.Ado.GetString(sql);
-                hpoStr = hpoStr.Replace(" ", "").Replace("'", "");
-                hpoStr = hpoStr.Substring(2, hpoStr.Length - 2);
-                hpoStr = hpoStr.Substring(0, hpoStr.Length - 2);
-                string[] hpoArray = hpoStr.Split(new string[] { "],[" }, StringSplitOptions.None);
-                var regex = new Regex("HP:");
-                foreach (var s in hpoArray)
+                sql = string.Format(sql, patientVisitIds);
+                var HPOTextList = new List<PatientVisitHPOResultModel>();
+                using (var reader = dbgp.Ado.GetDataReader(sql))
                 {
-                    try
+                    while (reader.Read())
                     {
-                        var single = s;
-                        single = single.Replace("[", "").Replace("]", "");
-                        //查看有多少HPO
-                        var index = regex.Matches(single).Count;
-                        for (int i = 0; i < index; i++)
+                        var data = new PatientVisitHPOResultModel();
+                        data.HPOResult = reader["hpo_result_str"] == DBNull.Value ? "" : reader["hpo_result_str"].ToString();
+                        data.EMR = reader["emr_text"] == DBNull.Value ? "" : reader["emr_text"].ToString();
+
+                        //多次就诊，需要将上次开始index和这次病例文本长度相加
+                        var item = HPOTextList.LastOrDefault();
+                        if(item!=null)
                         {
-                            var data = new HPODataModel();
-                            string[] subArrary = single.Split(',');
-                            data.StartIndex = Convert.ToInt32(subArrary[0]);
-                            data.EndIndex = Convert.ToInt32(subArrary[1]);
-                            data.Name = subArrary[2];
-                            data.Positivie = Convert.ToInt32(subArrary[3]);
-                            data.HPOId = subArrary[4 + i];
-                            data.Editable = true;
-                            data.IndexList = new List<HPOMatchIndexModel>();
-                            data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
-                            data.Count = data.IndexList.Count;
-                            var item = result.FirstOrDefault(x => x.HPOId == data.HPOId);
-                            if (item != null)
+                            //2 行换行符
+                            data.StartIndex = item.StartIndex + data.EMR.Length + 2;
+                        }
+                       
+                        HPOTextList.Add(data);
+                    }
+                }
+                foreach (var visitItem in HPOTextList)
+                {
+                    var hpoStr = visitItem.HPOResult;
+                    hpoStr = hpoStr.Replace(" ", "").Replace("'", "");
+                    hpoStr = hpoStr.Substring(2, hpoStr.Length - 2);
+                    hpoStr = hpoStr.Substring(0, hpoStr.Length - 2);
+                    string[] hpoArray = hpoStr.Split(new string[] { "],[" }, StringSplitOptions.None);
+                    var regex = new Regex("HP:");
+                    foreach (var s in hpoArray)
+                    {
+                        try
+                        {
+                            var single = s;
+                            single = single.Replace("[", "").Replace("]", "");
+                            //查看有多少HPO
+                            var index = regex.Matches(single).Count;
+                            for (int i = 0; i < index; i++)
                             {
-                                item.IndexList.AddRange(data.IndexList);
-                                item.Count = item.IndexList.Count;
-                            }
-                            else
-                            {
-                                result.Add(data);
+                                try
+                                {
+                                    var data = new HPODataModel();
+                                    string[] subArrary = single.Split(',');
+                                    //需要叠加上次病历文本的长度
+                                    data.StartIndex = Convert.ToInt32(subArrary[0]) + visitItem.StartIndex;
+                                    data.EndIndex = Convert.ToInt32(subArrary[1]) + visitItem.StartIndex;
+                                    data.Name = subArrary[2];
+                                    data.Positivie = Convert.ToInt32(subArrary[3]);
+                                    data.HPOId = subArrary[4 + i];
+                                    data.Editable = true;
+                                    data.IndexList = new List<HPOMatchIndexModel>();
+                                    data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
+                                    data.Count = data.IndexList.Count;
+                                    var item = result.FirstOrDefault(x => x.HPOId == data.HPOId);
+                                    if (item != null)
+                                    {
+                                        item.IndexList.AddRange(data.IndexList);
+                                        item.IndexList = item.IndexList.OrderBy(x => x.StartIndex).ToList();
+                                        item.Count = item.IndexList.Count;
+                                    }
+                                    else
+                                    {
+                                        result.Add(data);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError("读取单个HPO出错：" + ex.ToString());
+                                }
                             }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError("读取单个HPO出错：" + ex.ToString());
-                    }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("读取单组HPO出错：" + ex.ToString());
+                        }
 
-                }
+                    }
+                }            
             }
             else
             {
@@ -228,17 +273,17 @@ namespace RareDisease.Data.Repository
         }
 
 
-        public List<HPODataModel> GetPatientExamDataResult(string patientEmpiId)
+        public List<HPODataModel> GetPatientExamDataResult(string patientVisitIds)
         {
             var result = new List<HPODataModel>();
-            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientEmpiId))
+            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientVisitIds))
             {
                 //获取所有检验HPO规则
                 var examBase = _localMemoryCache.GetExamBaseDataList();
                 //获取所有检验数据
                 var examList= new List<ExamBaseDataModel>();
                 string sql = GetSqlText("home-get-exam-data-sql.txt");
-                sql = string.Format(sql, patientEmpiId);
+                sql = string.Format(sql, patientVisitIds);
                 using (var reader = dbgp.Ado.GetDataReader(sql))
                 {
                     while (reader.Read())
@@ -258,23 +303,28 @@ namespace RareDisease.Data.Repository
                 //遍历每条规则，查看检验数据里面是否有符合规则的数据
                 foreach (var r in examBase)
                 {
+                    var subList = examList.Where(x => x.ExamCode == r.ExamCode && x.SampleCode.ToUpper() == r.SampleCode.ToUpper()).ToList();
+                    if(subList.Count==0)
+                    {
+                        continue;
+                    }
                     var list = new List<ExamBaseDataModel>();
                     //区间命中
                     if (r.Maxinum > 0 && r.Minimum > 0)
                     {
-                        list = examList.Where(x => x.ExamValue > r.Minimum && x.ExamValue < r.Maxinum && x.ExamCode == r.ExamCode).ToList();
+                        list = subList.Where(x => x.ExamValue > r.Minimum && x.ExamValue < r.Maxinum).ToList();
                     }
                     //低于最小值命中
                     else if (r.Maxinum == 0 && r.Minimum > 0)
                     {
-                        list = examList.Where(x => x.ExamValue < r.Minimum && x.ExamCode == r.ExamCode).ToList();
+                        list = subList.Where(x => x.ExamValue < r.Minimum ).ToList();
                     }
                     //大于最大值命中
                     else if (r.Maxinum > 0 && r.Minimum == 0)
                     {
-                        list = examList.Where(x => x.ExamValue > r.Maxinum && x.ExamCode == r.ExamCode).ToList();
+                        list = subList.Where(x => x.ExamValue > r.Maxinum).ToList();
                     }
-                    if (list != null&&list.Any())
+                    if (list != null && list.Any())
                     {
                         if (list.Count >= r.MatchTime)
                         {
@@ -362,7 +412,7 @@ namespace RareDisease.Data.Repository
                     sql = string.Format(sql, searchHPOText);
                     using (var reader = dbgp.Ado.GetDataReader(sql))
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
                             var data = new HPODataModel();
                             data.Name = reader["name_cn"] == DBNull.Value ? "" : reader["name_cn"].ToString();

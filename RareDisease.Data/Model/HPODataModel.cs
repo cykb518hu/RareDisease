@@ -71,4 +71,11 @@ namespace RareDisease.Data.Model
         [JsonProperty("endIndex")]
         public int EndIndex { get; set; }
     }
+
+    public class PatientVisitHPOResultModel
+    {
+        public string EMR { get; set; }
+        public string HPOResult { get; set; }
+        public int StartIndex { get; set; }
+    }
 }

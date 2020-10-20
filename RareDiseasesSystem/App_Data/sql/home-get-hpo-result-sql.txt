@@ -1,5 +1,4 @@
-﻿    select
-    name_en  as hporesult
+﻿    select  '患者李**，男性，67岁，主因“右侧肢体抖动、僵硬、动作不灵活7年，累及左侧5年”，来我院门诊就诊。患者7年前无明显诱因出现右手不自主抖动' as emr_text,
+    name_en  as hpo_result_str
   from nlp.chpo2020 
-  where name_cn ='{0}' or name_en like '%{0}%' or 1=1
-  limit 1
+  where visitid in({0})

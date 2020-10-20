@@ -39,6 +39,9 @@ namespace RareDisease.Data.Model
 
         [JsonProperty("center")]
         public string Center { get; set; }
+
+        [JsonProperty("visitid")]
+        public Int32 VisitId { get; set; }
     }
 
     public class PatientEMRModel

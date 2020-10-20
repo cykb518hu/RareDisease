@@ -173,9 +173,9 @@
                                 </el-table-column>
                                 <el-table-column min-width="15%">
                                     <template slot-scope="scope">
-                                        <el-link type="primary" v-on:click.stop
+                                        <el-link v-on:click.stop type="primary"
                                                  v-if="scope.row.editable"
-                                                 v-on:click="onShowHpoMatchedText(scope.row)">原文</el-link>
+                                                 v-on:click="onShowHpoMatchedText(scope.row)" >原文</el-link>
                               
                                             <el-popover v-if="scope.row.hasExam"
                                                         placement="right"
@@ -190,7 +190,7 @@
                                                     <el-table-column prop="value" label="检验值"></el-table-column>
                                                     <el-table-column prop="examTimeStr" label="检验时间"></el-table-column>
                                                 </el-table>
-                                                <el-link slot="reference" type="primary">
+                                                <el-link slot="reference" class="el-link-blue">
                                                     检验
                                                 </el-link>
                                             </el-popover>
@@ -248,10 +248,10 @@
                                             <el-popover  placement="right"
                                                         width="400"
                                                         trigger="click">
-                                                <el-table :data="scope.row.hpoMatchedList">
-                                                    <el-table-column  prop="name" label="所有表型"></el-table-column>
+                                                <el-table :data="scope.row.Hpolist">
+                                                    <el-table-column  prop="hpoName" label="所有表型"></el-table-column>
                                                     <el-table-column  prop="hpoId" label="id"></el-table-column>
-                                                    <el-table-column  prop="matched" label="是否匹配"></el-table-column>
+                                                    <el-table-column  prop="match"  :formatter="statusFormatter"  label="是否匹配"></el-table-column>
                                                 </el-table>
                                                 <el-link slot="reference" type="primary">
                                                     {{scope.row.name}}
@@ -259,7 +259,7 @@
                                             </el-popover>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="likeness"
+                                    <el-table-column prop="ratio"
                                                      label="相似度">
                                     </el-table-column>
                                 </el-table>
@@ -290,17 +290,26 @@
         <el-dialog title="患者病例" v-bind:visible.sync="importEMRDlg" top="5vh" class="patientEMR">
             <div style="min-height:480px;overflow-x:hidden;">
                 <el-row :gutter="10">
-                    <el-col :span="6">
+                    <el-col :span="10">
                         <div>
                             <el-input style="width:200px" v-model="number"
-                                      placeholder="身份证号码/或者EMPI主索引"
-                                      v-on:keyup.enter.native="onSearchPatient" ></el-input>
+                                      placeholder="EMPI主索引/身份证号码"
+                                      v-on:keyup.enter.native="onSearchPatient"></el-input>
+                            <template>
+                                <el-select v-model="numberType" >
+                                    <el-option v-for="item in numberTypeOptions"
+                                               :key="item.value"
+                                               :label="item.label"
+                                               :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
                         </div>
                     </el-col>
                     <el-col :span="6">
                         <el-button v-on:click="onSearchPatient" type="primary">搜索</el-button>
                     </el-col>
-                    <el-col :span="12" class="text-right">
+                    <el-col :span="8" class="text-right">
                         <el-button class="group-in" v-on:click="onImportPatientEMRText">导入患者病例</el-button>
                     </el-col>
                 </el-row>
@@ -327,12 +336,16 @@
                 </el-table>
                 <div></div>
                 <el-table v-bind:data="patientVisitList"
+                          v-on:selection-change="onPatientVisitSelectionChange"
                           style="width: 100%; margin-top:10px;">
+                    <el-table-column type="selection"
+                                     width="50">
+                    </el-table-column>
                     <el-table-column prop="visitTime"
-                                     label="就诊时间">
+                                     label="诊断时间">
                     </el-table-column>
                     <el-table-column prop="visitType"
-                                     label="就诊类别">
+                                     label="诊断类别">
                     </el-table-column>
                     <el-table-column prop="diagDesc"
                                      label="诊断">

@@ -107,13 +107,25 @@
             return {
                 importEMRDlg: false,
                 number: "", //number 可以是empiid 或者身份证号
-                patientEmpiId:"",
+
+                numberType: "empi",
+                numberTypeOptions: [
+                    {
+                        value: 'empi',
+                        label: 'EMPI主索引'
+                    },
+                    {
+                        value: 'card',
+                        label: '身份证号'
+                    }
+                ],
                 patientOverview: [],
                 patientVisitList: [],
                 patientVisitListCopy: [],
                 patientEMRDetail: "",
                 patientVisitListIndex: 1,
                 patientVisitListTotal: 0,
+                multiplePatientVisitSelection: [],
 
                 patientHPOList: [],
                 searchHPOText: "",
@@ -127,14 +139,14 @@
                 //normalDiseaseList: [],
                 rareDiseaseList: [],
 
-                nlpEngine: "engine1",
+                nlpEngine: "String_Search",
                 nlpEngineOptions: [
                     {
-                        value: 'engine1',
+                        value: 'String_Search',
                         label: 'String Search'
                     },
                     {
-                        value: 'engine2',
+                        value: 'Spacy',
                         label: 'Spacy'
                     }
                 ],
@@ -145,16 +157,29 @@
                     value: '隐性',
                         label: '隐性'
                 }],
-                rareAnalyzeEngine: "engine1",
+                rareAnalyzeEngine: "Jaccard",
                 rareAnalyzeEngineOptions: [
                     {
-                        value: 'engine1',
-                        label: '相似度1'
+                        value: 'Jaccard',
+                        label: 'Jaccard'
                     },
                     {
-                        value: 'engine2',
-                        label: '相似度2'
+                        value: 'Tanimoto',
+                        label: 'Tanimoto'
+                    },
+                    {
+                        value: 'Overlap',
+                        label: 'Overlap'
+                    },
+                    {
+                        value: 'Fager_McGowan',
+                        label: 'Fager & McGowan'
+                    },
+                    {
+                        value: 'Logo-likelihood_ratio',
+                        label: 'Logo-likelihood & ratio'
                     }
+
                 ],
                 rareDataBaseEngine: "eRAM",
                 rareDataBaseEngineOptions: [
@@ -193,12 +218,14 @@
                 this.patientVisitListIndex = 1;
                 this.requestPatientData();
                 this.patientEMRDetail = "";
-                this.patientEmpiId = "";
+                this.multiplePatientVisitSelection = [];
             },
             requestPatientData: function () {
                 var para = {};
                 para = {
-                    number: this.number
+                    number: this.number,
+                    numberType: this.numberType
+
                 };
                 const loading = this.$loading({
                     lock: true,
@@ -217,9 +244,6 @@
                             that.patientVisitListTotal = data.total;
                             that.patientVisitListCopy = data.patientVisitList; 
                             that.patientOverview = data.patientOverview;
-                            if (data.patientOverview.length > 0) {
-                                that.patientEmpiId = data.patientOverview[0].iEMPINumber;
-                            }
                             that.patientVisitPaging();
                         }
                         else {
@@ -232,11 +256,22 @@
             patientVisitPaging: function () {
                 this.patientVisitList = this.localPaging(this.patientVisitListIndex, this.patientVisitListCopy);
             },
-            //经过第一步查询，获取到用户empiid，后续操作用empiid 操作
+            onPatientVisitSelectionChange: function (val) {
+                this.multiplePatientVisitSelection = val;
+            },
+            //根据所选取的就诊记录，查询数据
             onImportPatientEMRText: function () {
+                var visitIds = this.multiplePatientVisitSelection.map(function (item) {
+                    return item.visitid;
+                });
+
+                if (visitIds.length === 0) {
+                    alert("请选择相应的就诊记录");
+                    return;
+                }
                 var para = {};
                 para = {
-                    patientEmpiId: this.patientEmpiId                 
+                    patientVisitIds: visitIds.toString()   
                 };    
                 const loading = this.$loading({
                     lock: true,
@@ -264,19 +299,23 @@
             },
             onClearPatientEMR: function () {
                 this.patientEMRDetail = "";
+                this.multiplePatientVisitSelection = [];
             },
             //这个地方有两种情况
             //1. 用户直接传一段文本，和病人没有关联，这个时候直接分析文本
-            //2. 如果empiid 不为空，说明是获取刚才查询病人的HPO 结果，这个情况根据empiid直接从数据库获取
+            //2. 如果就诊记录 不为空，说明是获取刚才查询病人的HPO 结果，这个情况根据就诊记录直接从数据库获取
             onGetPatientHPOResult: function () {
-                if (this.patientEMRDetail === undefined || this.patientEMRDetail === "") {
+                if (this.patientEMRDetail === undefined) {
                     alert('电子病历不能为空！');
                     return false;
                 }
+                var visitIds = this.multiplePatientVisitSelection.map(function (item) {
+                    return item.visitid;
+                });
                 var para = {};
-                if (this.patientEmpiId !== "") {
+                if (visitIds.length > 0) {
                     para = {
-                        patientEmpiId: this.patientEmpiId,
+                        patientVisitIds: visitIds.toString(),
                         nlpEngine: this.nlpEngine
                     };
                 }
@@ -463,6 +502,14 @@
                         loading.close();
                     }
                 });
+            },
+            statusFormatter(row, column) {
+                let status = row.match;
+                if (status === 0) {
+                    return '否';
+                } else {
+                    return '是';
+                }
             }
         }
     });

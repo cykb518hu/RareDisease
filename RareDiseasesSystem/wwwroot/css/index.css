@@ -696,3 +696,7 @@ el-upload input[type="file"] {
 .el-date-editor .el-range-input, .el-date-editor .el-range-separator {
     font-size: 12px;
 }
+
+.el-link.el-link-blue {
+    color:blue;
+}

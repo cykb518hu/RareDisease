@@ -41,6 +41,11 @@ namespace RareDiseasesSystem
             services.AddDbContext<RareDiseaseDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LogConnection")));
             RareDiseaseGPDbContext.NLP_ConnectionString = Configuration.GetConnectionString("NLPConnection");   //为数据库连接字符串赋值
             services.AddHttpContextAccessor();
+            services.AddHttpClient("nlp", c =>
+            {
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("NLPAddress:Address"));
+                c.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IRdrDataRepository, RdrDataRepository>();

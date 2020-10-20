@@ -14,7 +14,7 @@ using RareDiseasesSystem.Models;
 
 namespace RareDiseasesSystem.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -50,15 +50,21 @@ namespace RareDiseasesSystem.Controllers
         /// </summary>
         /// <param name="number"></param>
         /// <returns></returns>
-        public JsonResult SearchPatientData(string number = "")
+        public JsonResult SearchPatientData(string number,string numberType)
         {
             try
             {
                 _logRepository.Add("查询患者就诊记录");
-                var patientOverviewTask = Task.Run(() => _rdrDataRepository.GetPatientOverview(number));
-                var patientVisitListTask = Task.Run(() => _rdrDataRepository.GetPatientVisitList(number));
-                var patientVisitList = patientVisitListTask.Result;
-                var patientOverview = patientOverviewTask.Result;
+                // var patientOverviewTask = Task.Run(() => _rdrDataRepository.GetPatientOverview(number,numberType));
+                //var patientVisitListTask = Task.Run(() => _rdrDataRepository.GetPatientVisitList(number,numberType));
+                //var patientVisitList = patientVisitListTask.Result;
+                //var patientOverview = patientOverviewTask.Result;
+                var patientOverview = _rdrDataRepository.GetPatientOverview(number, numberType);              
+                if (patientOverview.Any())
+                {
+                    number = patientOverview.FirstOrDefault().EMPINumber;
+                }
+                var patientVisitList = _rdrDataRepository.GetPatientVisitList(number, numberType);
                 return Json(new { success = true, patientOverview, patientVisitList, total = patientVisitList.Count });
             }
             catch (Exception ex)
@@ -68,11 +74,11 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult GetPatientEMRDetail(string patientEmpiId = "")
+        public JsonResult GetPatientEMRDetail(string patientVisitIds)
         {
             try
             {
-                var data = _rdrDataRepository.GetPatientEMRDetail(patientEmpiId);
+                var data = _rdrDataRepository.GetPatientEMRDetail(patientVisitIds);
                 return Json(new { success = true, data });
             }
             catch (Exception ex)
@@ -82,12 +88,12 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult GetPatientHPOResult(string nlpEngine, string patientEMRDetail = "", string patientEmpiId = "")
+        public JsonResult GetPatientHPOResult(string nlpEngine, string patientEMRDetail = "", string patientVisitIds = "")
         {
             try
             {
                 var hpoList = new List<HPODataModel>();
-                hpoList = _nLPSystemRepository.GetPatientHPOResult(nlpEngine, patientEMRDetail, patientEmpiId);             
+                hpoList = _nLPSystemRepository.GetPatientHPOResult(nlpEngine, patientEMRDetail, patientVisitIds);             
                 _logRepository.Add("获取病人HPO", "", JsonConvert.SerializeObject(hpoList));
                 return Json(new { success = true, data = hpoList, });
             }
@@ -118,7 +124,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var rareDiseaseList = new List<RareDiseaseResponseModel>();
+                var rareDiseaseList = new List<NlpRareDiseaseResponseModel>();
                 rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, rareAnalyzeEngine, rareDataBaseEngine);
           
                 _logRepository.Add("罕见病分析结果", "", JsonConvert.SerializeObject(rareDiseaseList));
@@ -129,6 +135,29 @@ namespace RareDiseasesSystem.Controllers
             {
                 _logger.LogError("罕见病分析结果：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
+            }
+        }
+
+        public string GetNLPRareDiseaseResultMockUp(RareDiseaseEngineRequestModel data)
+        {
+            try
+            {
+                var item = new List<NlpRareDiseaseResponseModel>();
+                item.Add(new NlpRareDiseaseResponseModel { Name = "anemia", Ratio = 1, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
+                item[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP:01111", HpoName = "肿大", Match = 1 });
+                item[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001745", HpoName = "肺肿大", Match = 0 });
+
+                item.Add(new NlpRareDiseaseResponseModel { Name = "帕金森", Ratio = 0.9, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
+                item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001644", HpoName = "痴呆", Match = 1 });
+                item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001345", HpoName = "行动不便", Match = 0 });
+                var str = @"[{'name':'anemia','ratio':0.1,'Hpolist':[{'HpoId':'HP0001744','hpoName':'脾肿大','match':0}, {'HpoId':'HP0001745','hpoName':'肺肿大','match':1}]}, {'name':'帕金森','ratio':0.2,'Hpolist':[{'HpoId':'HP0001644','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1}]},{'name':'白化病','ratio':0.3,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                //return JsonConvert.SerializeObject(item);
+                return str;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("罕见病分析结果：" + ex.ToString());
+                return "";
             }
         }
     }
