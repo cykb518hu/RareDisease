@@ -73,7 +73,7 @@ namespace RareDisease.Data.Repository
         public List<NlpRareDiseaseResponseModel> GetPatientRareDiseaseResult(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine)
         {
             var rareDiseaseList = new List<NlpRareDiseaseResponseModel>();
-            if (_env.IsProduction() || 1 == 1)
+            if (_env.IsProduction())
             {
                 var requestData = new RareDiseaseEngineRequestModel();
                 requestData.AnalyzeEngine = rareAnalyzeEngine;
