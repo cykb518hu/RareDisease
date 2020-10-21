@@ -22,14 +22,16 @@ namespace RareDiseasesSystem
         private readonly ILogger<RareDiseaseDecisionController> _logger;
         private readonly ILogRepository _logRepository;
         private readonly INLPSystemRepository _nLPSystemRepository;
-        public RareDiseaseDecisionController(ILogger<RareDiseaseDecisionController> logger, ILogRepository logRepository, INLPSystemRepository nLPSystemRepository)
+        private readonly IRdrDataRepository _rdrDataRepository;
+        public RareDiseaseDecisionController(ILogger<RareDiseaseDecisionController> logger, ILogRepository logRepository, INLPSystemRepository nLPSystemRepository, IRdrDataRepository rdrDataRepository)
         {
             _logger = logger;
             _logRepository = logRepository;
             _nLPSystemRepository = nLPSystemRepository;
+            _rdrDataRepository = rdrDataRepository;
         }
         [HttpPost]
-        [EnableCors("any")]
+        [EnableCors("_any")]
         public JsonResult PostEMR([FromBody] RareDiseaseRequestModel request)
         {
             try
@@ -49,14 +51,25 @@ namespace RareDiseasesSystem
             }
         }
         [HttpPost]
-        [EnableCors("any")]
+        [EnableCors("_any")]
         public JsonResult PostNumber([FromBody] RareDiseaseRequestModel request)
         {
             try
             {
                 var ipAddress = HttpContext.Connection.RemoteIpAddress;
                 request.IPAddress = ipAddress.ToString();
-                var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, "", request.Number);
+                if(request.NumberType== "card")
+                {
+                    var patientOverview = _rdrDataRepository.GetPatientOverview(request.Number, request.NumberType);
+                    if (patientOverview.Any())
+                    {
+                        request.Number = patientOverview.FirstOrDefault().EMPINumber;
+                    }
+                }
+                var patientVisitList = _rdrDataRepository.GetPatientVisitList(request.Number);
+                var visitIdList = patientVisitList.Select(x => x.VisitId).ToList();
+                var patientVisitIds = string.Join(",", visitIdList);
+                var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, "", patientVisitIds);
                 var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
                 _logRepository.Add("罕见病分析结果:", "API", JsonConvert.SerializeObject(request)+ " " + JsonConvert.SerializeObject(rareDiseaseList));
 

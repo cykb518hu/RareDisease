@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RareDisease.Data.Model;
 using System;
@@ -15,9 +16,6 @@ namespace RareDisease.Data.Repository
     {
 
         List<HPODataModel> GetPatientHPOResult(string nlpEngine, string patientEMRDetail, string patientVisitIds);
-
-       
-
         List<NlpRareDiseaseResponseModel> GetPatientRareDiseaseResult(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine);
     }
 
@@ -29,14 +27,16 @@ namespace RareDisease.Data.Repository
         private readonly ILocalMemoryCache _localMemoryCache;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IConfiguration _config;
+        private readonly ILogger<NLPSystemRepository> _logger;
 
-        public NLPSystemRepository(IHostingEnvironment env, IRdrDataRepository rdrDataRepository, ILocalMemoryCache localMemoryCache, IHttpClientFactory clientFactory, IConfiguration config)
+        public NLPSystemRepository(IHostingEnvironment env, IRdrDataRepository rdrDataRepository, ILocalMemoryCache localMemoryCache, IHttpClientFactory clientFactory, IConfiguration config,ILogger<NLPSystemRepository> logger)
         {
             _env = env;
             _rdrDataRepository = rdrDataRepository;
             _localMemoryCache = localMemoryCache;
             _clientFactory = clientFactory;
             _config = config;
+            _logger = logger;
         }
         /// <summary>
         /// patientEmpiId can be empiid or cardNo
@@ -79,15 +79,43 @@ namespace RareDisease.Data.Repository
                 requestData.AnalyzeEngine = rareAnalyzeEngine;
                 requestData.DataBase = rareDataBaseEngine;
                 requestData.HPOList = hpoList.Select(x => x.HPOId).ToArray();
-                var requestBody = new StringContent(JsonConvert.SerializeObject(requestData),Encoding.UTF8, "application/json");
-                var api = _config.GetValue<string>("NLPAddress:DiseaseApi");
+
+
+                //var requestStr = rareAnalyzeEngine + "|" + rareDataBaseEngine + "|";
+                //foreach (var r in hpoList)
+                //{
+                //    requestStr += r.HPOId + ",";
+                //}
+                //requestStr = requestStr.Substring(0, requestStr.Length - 1);
+
+                var requestStr = JsonConvert.SerializeObject(requestData);
+                var data = string.Empty;
                 var client = _clientFactory.CreateClient("nlp");
-                var response = client.PostAsync(api, requestBody);
-                var data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                var api = _config.GetValue<string>("NLPAddress:DiseaseApi");
+                try
+                {
+
+                    var request = new HttpRequestMessage(HttpMethod.Post, api);
+                    var requestContent = string.Format("texts={0}", requestStr);
+                    request.Content = new StringContent(requestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
+                    var response = client.SendAsync(request);
+                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("调用NLP RareDisease API 出错:" + ex.ToString());
+                    var request = new HttpRequestMessage(HttpMethod.Post, api);
+                    requestStr = "'" + requestStr + "'";
+                    var requestContent = string.Format("texts={0}", requestStr);
+                    request.Content = new StringContent(requestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
+                    var response = client.SendAsync(request);
+                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                }
+
                 //字符串API 可能有引号在开始和结尾 
                 if (data.StartsWith("\""))
                 {
-                    data= data.TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"' });
+                    data = data.TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"' });
                 }
                 rareDiseaseList = JsonConvert.DeserializeObject<List<NlpRareDiseaseResponseModel>>(data);
             }

@@ -19,7 +19,7 @@ namespace RareDisease.Data.Repository
     public interface IRdrDataRepository
     {
         List<PatientOverviewModel> GetPatientOverview(string number,string numberType);
-        List<PatientVisitInfoModel> GetPatientVisitList(string number, string numberType);
+        List<PatientVisitInfoModel> GetPatientVisitList(string number);
 
         string GetPatientEMRDetail(string patientVisitIds);
 
@@ -96,7 +96,7 @@ namespace RareDisease.Data.Repository
             return result;
         }
 
-        public List<PatientVisitInfoModel> GetPatientVisitList(string number, string numberType)
+        public List<PatientVisitInfoModel> GetPatientVisitList(string number)
         {
             var patientVisitList = new List<PatientVisitInfoModel>();
 
@@ -105,10 +105,6 @@ namespace RareDisease.Data.Repository
                 if (!string.IsNullOrWhiteSpace(number))
                 {
                     string sql = GetSqlText("home-patient-visit-list-empi-sql.txt");
-                    //if (numberType == "card")
-                    //{
-                    //    sql = GetSqlText("home-patient-visit-list-card-sql.txt");
-                    //}
                     sql = string.Format(sql, number);
                     using (var reader = dbgp.Ado.GetDataReader(sql))
                     {

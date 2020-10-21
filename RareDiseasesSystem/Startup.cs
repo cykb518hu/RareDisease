@@ -18,6 +18,7 @@ namespace RareDiseasesSystem
 {
     public class Startup
     {
+        readonly string MyAllowSpecificOrigins = "_any";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -52,7 +53,7 @@ namespace RareDiseasesSystem
             services.AddScoped<INLPSystemRepository, NLPSystemRepository>();
             services.AddCors(options =>
             {
-                options.AddPolicy("any",
+                options.AddPolicy(MyAllowSpecificOrigins,
                     builder =>
                     {
                         builder.AllowAnyHeader()
@@ -77,7 +78,7 @@ namespace RareDiseasesSystem
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseAuthentication();
-            app.UseCors();
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

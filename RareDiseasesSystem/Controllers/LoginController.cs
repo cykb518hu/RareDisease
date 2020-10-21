@@ -17,6 +17,7 @@ using RareDiseasesSystem.Models;
 
 namespace RareDiseasesSystem.Controllers
 {
+    [EnableCors("_any")]
     public class LoginController : Controller
     {
         private readonly ILogger<LoginController> _logger;

@@ -10,6 +10,9 @@ namespace RareDisease.Data.Model
         [JsonProperty("number")]
         public string Number { get; set; }
 
+        [JsonProperty("numberType")]
+        public string NumberType { get; set; }
+
         [JsonProperty("emrDetail")]
         public string EMRDetail { get; set; }
 

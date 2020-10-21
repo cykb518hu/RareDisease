@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ using RareDiseasesSystem.Models;
 
 namespace RareDiseasesSystem.Controllers
 {
-    //[Authorize]
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -64,7 +65,7 @@ namespace RareDiseasesSystem.Controllers
                 {
                     number = patientOverview.FirstOrDefault().EMPINumber;
                 }
-                var patientVisitList = _rdrDataRepository.GetPatientVisitList(number, numberType);
+                var patientVisitList = _rdrDataRepository.GetPatientVisitList(number);
                 return Json(new { success = true, patientOverview, patientVisitList, total = patientVisitList.Count });
             }
             catch (Exception ex)
@@ -138,7 +139,7 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public string GetNLPRareDiseaseResultMockUp(RareDiseaseEngineRequestModel data)
+        public string GetNLPRareDiseaseResultMockUp(string texts)
         {
             try
             {
