@@ -78,39 +78,24 @@ namespace RareDisease.Data.Repository
                 var requestData = new RareDiseaseEngineRequestModel();
                 requestData.AnalyzeEngine = rareAnalyzeEngine;
                 requestData.DataBase = rareDataBaseEngine;
-                requestData.HPOList = hpoList.Select(x => x.HPOId).ToArray();
-
-
-                //var requestStr = rareAnalyzeEngine + "|" + rareDataBaseEngine + "|";
-                //foreach (var r in hpoList)
-                //{
-                //    requestStr += r.HPOId + ",";
-                //}
-                //requestStr = requestStr.Substring(0, requestStr.Length - 1);
+                var hpoStr = string.Empty;
+                hpoStr = string.Join(",", hpoList.Where(x => x.Certain == "阳性").Select(x => x.HPOId).ToList());
+                requestData.HPOList = hpoStr;
 
                 var requestStr = JsonConvert.SerializeObject(requestData);
                 var data = string.Empty;
                 var client = _clientFactory.CreateClient("nlp");
                 var api = _config.GetValue<string>("NLPAddress:DiseaseApi");
-                try
-                {
 
-                    var request = new HttpRequestMessage(HttpMethod.Post, api);
-                    var requestContent = string.Format("texts={0}", requestStr);
-                    request.Content = new StringContent(requestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
-                    var response = client.SendAsync(request);
-                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("调用NLP RareDisease API 出错:" + ex.ToString());
-                    var request = new HttpRequestMessage(HttpMethod.Post, api);
-                    requestStr = "'" + requestStr + "'";
-                    var requestContent = string.Format("texts={0}", requestStr);
-                    request.Content = new StringContent(requestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
-                    var response = client.SendAsync(request);
-                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
-                }
+                var request = new HttpRequestMessage(HttpMethod.Post, api);
+                var requestContent = string.Format("texts={0}", requestStr);
+
+                _logger.LogError("NLP request data：" + requestContent);
+                request.Content = new StringContent(requestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
+                var response = client.SendAsync(request);
+                data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+
+                _logger.LogError("NLP 返回数据：" + data);
 
                 //字符串API 可能有引号在开始和结尾 
                 if (data.StartsWith("\""))
@@ -121,11 +106,11 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                rareDiseaseList.Add(new NlpRareDiseaseResponseModel { Name = "anemia", Ratio = 1, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
+                rareDiseaseList.Add(new NlpRareDiseaseResponseModel { Name = "口面运动障碍", Ratio = 0.5, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
                 rareDiseaseList[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP:01111", HpoName = "肿大", Match = 1 });
                 rareDiseaseList[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001745", HpoName = "肺肿大", Match = 0 });
 
-                rareDiseaseList.Add(new NlpRareDiseaseResponseModel { Name = "帕金森", Ratio = 0.9, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
+                rareDiseaseList.Add(new NlpRareDiseaseResponseModel { Name = "帕金森病（青年型、早发型）", Ratio = 0.8, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
                 rareDiseaseList[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001644", HpoName = "痴呆", Match = 1 });
                 rareDiseaseList[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001345", HpoName = "行动不便", Match = 0 });
 

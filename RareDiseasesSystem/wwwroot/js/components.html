@@ -33,7 +33,7 @@
                     <div style="background-color:white">
                         <el-table v-bind:data="deseaseSearchedList"
                                   v-loading="loading"
-                                  style="width: 100%">
+                                  style="width: 100%;overflow:auto"   class="rare-desease-detail" >
                             <el-table-column prop="source"
                                              label="知识库" min-width="10%">
                             </el-table-column>
@@ -91,7 +91,7 @@
                     <div class="breadcrumbs">
                         <el-button type="primary" v-on:click.stop
                                    v-on:click="onPopImportEMRDlg()">
-                            患者病例
+                            患者病历
                         </el-button>
                         <span style="float: right;">
                             <el-button type="info" v-on:click="onClearPatientEMR">清空</el-button>
@@ -204,7 +204,7 @@
                         </template>
                     </div>
                     <div class="breadcrumbs" style="margin:5px">
-                        <el-button type="primary" v-on:click="onSearchHPODlg()">添加体征</el-button>
+                        <el-button type="primary" v-on:click="onSearchHPODlg()">添加HPO</el-button>
                         <span style="float: right;">
                             <template>
                                 <el-select v-model="rareAnalyzeEngine" placeholder="请选择罕见病分析引擎" style="width:180px">
@@ -241,7 +241,7 @@
                     <div class="panel-body padding0px">
                         <div>
                             <template>
-                                <el-table :data="rareDiseaseList">
+                                <el-table :data="rareDiseaseList" style="overflow:auto" class="showIndicator">
                                     <el-table-column prop="name"
                                                      label="罕见疾病名称">
                                         <template slot-scope="scope">
@@ -260,34 +260,17 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column prop="ratio"
-                                                     label="相似度">
+                                                     label="相似度" width="120">
                                     </el-table-column>
                                 </el-table>
                             </template>
                         </div>
                     </div>
                 </div>
-
-                <!-- Default panel contents -->
-                <!--<div class="panel-heading">普通疾病</div>
-                <div class="panel-body padding0px">
-                    <div>
-                        <template>
-                            <el-table :data="normalDiseaseList">
-                                <el-table-column prop="name"
-                                                 label="普通疾病名称">
-                                </el-table-column>
-                                <el-table-column prop="likeness"
-                                                 label="相似度">
-                                </el-table-column>
-                            </el-table>
-                        </template>
-                    </div>
-                </div>-->
             </div>
             
         </el-col>
-        <el-dialog title="患者病例" v-bind:visible.sync="importEMRDlg" top="5vh" class="patientEMR">
+        <el-dialog title="患者就诊" v-bind:visible.sync="importEMRDlg" top="5vh" class="patientEMR">
             <div style="min-height:480px;overflow-x:hidden;">
                 <el-row :gutter="10">
                     <el-col :span="10">
@@ -310,7 +293,7 @@
                         <el-button v-on:click="onSearchPatient" type="primary">搜索</el-button>
                     </el-col>
                     <el-col :span="8" class="text-right">
-                        <el-button class="group-in" v-on:click="onImportPatientEMRText">导入患者病例</el-button>
+                        <el-button class="group-in" v-on:click="onImportPatientEMRText">导入患者病历</el-button>
                     </el-col>
                 </el-row>
                 <el-table v-bind:data="patientOverview"
@@ -342,16 +325,16 @@
                                      width="50">
                     </el-table-column>
                     <el-table-column prop="visitTime"
-                                     label="诊断时间">
+                                     label="诊断时间" width="120">
                     </el-table-column>
                     <el-table-column prop="visitType"
-                                     label="诊断类别">
+                                     label="类别" width="100">
                     </el-table-column>
                     <el-table-column prop="diagDesc"
-                                     label="诊断">
+                                     label="病历">
                     </el-table-column>
                     <el-table-column prop="center"
-                                     label="机构">
+                                     label="机构" width="100">
                     </el-table-column>
                 </el-table>
                 <el-pagination background style="float:right;"

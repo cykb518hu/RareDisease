@@ -67,6 +67,6 @@ namespace RareDisease.Data.Model
         public string DataBase { get; set; }
 
         [JsonProperty("HPOList")]
-        public string[] HPOList { get; set; }
+        public string HPOList { get; set; }
     }
 }

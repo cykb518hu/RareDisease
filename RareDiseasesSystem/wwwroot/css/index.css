@@ -651,7 +651,9 @@ el-upload input[type="file"] {
 .showIndicator {
     height: calc(100vh - 173px)
 }
-
+.rare-desease-detail {
+    height: calc(100vh - 223px)
+}
 .panel-default > .panel-heading {
     color: #000;
     background-color: rgb(243,247,254);

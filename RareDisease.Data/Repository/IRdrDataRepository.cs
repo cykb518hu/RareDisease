@@ -123,19 +123,19 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-09-03", VisitType = "住院", DiagDesc = "多巴反应性肌张力障碍", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-08-03", VisitType = "门诊", DiagDesc = "震颤", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-04-13", VisitType = "住院", DiagDesc = "肝豆状核变性", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-07-22", VisitType = "住院", DiagDesc = "发烧", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-02-21", VisitType = "住院", DiagDesc = "铁沉积性疾病", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-11-13", VisitType = "门诊", DiagDesc = "流行性感冒", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-09-15", VisitType = "门诊", DiagDesc = "发烧", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-19-03", VisitType = "住院", DiagDesc = "多系统萎缩", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2016-02-12", VisitType = "住院", DiagDesc = "脊髓小脑性共济失调", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-09-21", VisitType = "住院", DiagDesc = "运动迟缓", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-01-03", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2014-05-05", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
-                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2024-01-01", VisitType = "住院", DiagDesc = "流行性感冒", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2020-09-03", VisitType = "现病史", DiagDesc = "患者李**，男性，67岁，主因“右侧肢体抖动、僵硬、动作不灵活7年，累及左侧5年”，来我院门诊就诊...", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-08-03", VisitType = "现病史", DiagDesc = "患者李**，男性，66岁，主因“右侧肢体抖动、僵硬、动作不灵活6年，累及左侧4年”，来我院门诊就诊...", Center = "华西医院" });
+                patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2017-04-13", VisitType = "现病史", DiagDesc = "患者李**，男性，65岁，以安静状态下明显，紧张、激动时加重，平静放松后减轻，睡眠后消失...", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-07-22", VisitType = "住院", DiagDesc = "发烧", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2019-02-21", VisitType = "住院", DiagDesc = "铁沉积性疾病", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-11-13", VisitType = "门诊", DiagDesc = "流行性感冒", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-09-15", VisitType = "门诊", DiagDesc = "发烧", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2018-19-03", VisitType = "住院", DiagDesc = "多系统萎缩", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2016-02-12", VisitType = "住院", DiagDesc = "脊髓小脑性共济失调", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-09-21", VisitType = "住院", DiagDesc = "运动迟缓", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2015-01-03", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2014-05-05", VisitType = "门诊", DiagDesc = "肌无力", Center = "华西医院" });
+                //patientVisitList.Add(new PatientVisitInfoModel { VisitTime = "2024-01-01", VisitType = "住院", DiagDesc = "流行性感冒", Center = "华西医院" });
             }
             return patientVisitList;
         }
@@ -254,11 +254,11 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 2, Positivie = 0, Editable = true });
+                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 2, Editable = true });
                 result[0].IndexList = new List<HPOMatchIndexModel>();
                 result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 26, EndIndex = 31 });
                 result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 36, EndIndex = 41 });
-                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Editable = true});
+                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Positivie = 0, Editable = true});
                 result[1].IndexList = new List<HPOMatchIndexModel>();
                 result[1].IndexList.Add(new HPOMatchIndexModel { StartIndex = 386, EndIndex = 394 });
                 result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Count = 1, Editable = true  });
@@ -387,11 +387,33 @@ namespace RareDisease.Data.Repository
             {
                 var data = new RareDiseaseDetailModel();
                 data.Source = "OMIM";
-                data.NameEnglish = "Wilson disease";
+                data.NameEnglish = "Wilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjda";
                 data.HPOId = "HP:000007";
                 data.HPONameChinese = "高蛋白血症";
                 data.HPONameEnglish = "Hyperproteinemia";
                 result.Add(data);
+                var data1 = new RareDiseaseDetailModel();
+                data1.Source = "OMIM";
+                data1.NameEnglish = "Wilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjd";
+                data1.HPOId = "HP:000007";
+                data1.HPONameChinese = "高蛋白血症2";
+                data1.HPONameEnglish = "Hyperproteinemia";
+                result.Add(data1);
+                var data2 = new RareDiseaseDetailModel();
+                data2.Source = "OMIM";
+                data2.NameEnglish = "WWilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjde";
+                data2.HPOId = "HP:000007";
+                data2.HPONameChinese = "高蛋白血症3";
+                data2.HPONameEnglish = "Hyperproteinemia";
+                result.Add(data2);
+
+                var data3 = new RareDiseaseDetailModel();
+                data3.Source = "OMIM";
+                data3.NameEnglish = "WWilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjde";
+                data3.HPOId = "HP:000007";
+                data3.HPONameChinese = "高蛋白血症4";
+                data3.HPONameEnglish = "Hyperproteinemia";
+                result.Add(data3);
             }
 
             return result;
