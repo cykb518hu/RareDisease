@@ -702,3 +702,11 @@ el-upload input[type="file"] {
 .el-link.el-link-blue {
     color:blue;
 }
+
+.el-popover__title {
+    font-size:14px;
+}
+.el-popover
+{
+    font-size:12px;
+}

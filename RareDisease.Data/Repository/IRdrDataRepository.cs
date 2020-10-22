@@ -188,7 +188,7 @@ namespace RareDisease.Data.Repository
                         if(item!=null)
                         {
                             //2 行换行符
-                            data.StartIndex = item.StartIndex + data.EMR.Length + 2;
+                            data.StartIndex = item.StartIndex + item.EMR.Length + 2;
                         }
                        
                         HPOTextList.Add(data);
@@ -225,16 +225,22 @@ namespace RareDisease.Data.Repository
                                     data.Editable = true;
                                     data.IndexList = new List<HPOMatchIndexModel>();
                                     data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
-                                    data.Count = data.IndexList.Count;
-                                    var item = result.FirstOrDefault(x => x.HPOId == data.HPOId);
+                                    var item = result.FirstOrDefault(x => x.HPOId == data.HPOId && x.Name == data.Name);
                                     if (item != null)
                                     {
                                         item.IndexList.AddRange(data.IndexList);
                                         item.IndexList = item.IndexList.OrderBy(x => x.StartIndex).ToList();
-                                        item.Count = item.IndexList.Count;
                                     }
                                     else
                                     {
+                                        var chpo2020Data = _localMemoryCache.GetCHPO2020StandardList().FirstOrDefault(x => x.HpoId == data.HPOId);
+                                        if(chpo2020Data==null)
+                                        {
+                                            chpo2020Data = new CHPO2020Model();
+                                            chpo2020Data.NameChinese = data.Name;
+                                            chpo2020Data.NameEnglish = data.NameEnglish;
+                                        }
+                                        data.CHPO2020Data = chpo2020Data;
                                         result.Add(data);
                                     }
                                 }
@@ -254,14 +260,15 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31, Count = 2, Editable = true });
+                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31,  Editable = true , CHPO2020Data=new CHPO2020Model { NameEnglish= "Bradykinesia", NameChinese= "运动迟缓" } });
+               
                 result[0].IndexList = new List<HPOMatchIndexModel>();
                 result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 26, EndIndex = 31 });
                 result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 36, EndIndex = 41 });
-                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394, Count = 1, Positivie = 0, Editable = true});
+                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394,Positivie = 0, Editable = true, CHPO2020Data = new CHPO2020Model { NameEnglish = "Autosomal recessive inheritance", NameChinese = "常染色体隐性遗传" } });
                 result[1].IndexList = new List<HPOMatchIndexModel>();
                 result[1].IndexList.Add(new HPOMatchIndexModel { StartIndex = 386, EndIndex = 394 });
-                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Count = 1, Editable = true  });
+                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true , CHPO2020Data = new CHPO2020Model { NameEnglish = "Dysarthria", NameChinese = "构音障碍" } });
                 result[2].IndexList = new List<HPOMatchIndexModel>();
                 result[2].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
             }
@@ -328,10 +335,16 @@ namespace RareDisease.Data.Repository
                             hpoItem.HPOId = r.HPOId;
                             hpoItem.Name = r.HPOName;
                             hpoItem.NameEnglish = r.HPOEnglish;
-                            hpoItem.Count = 1;
                             hpoItem.HasExam = true;
                             hpoItem.ExamData = new List<ExamBaseDataModel>();
                             hpoItem.ExamData.AddRange(list);
+                            var chpo2020Data = new CHPO2020Model();
+
+                            chpo2020Data = new CHPO2020Model();
+                            chpo2020Data.NameChinese = hpoItem.Name;
+                            chpo2020Data.NameEnglish = hpoItem.NameEnglish;
+
+                            hpoItem.CHPO2020Data = chpo2020Data;
                             result.Add(hpoItem);
                         }
                     }
@@ -340,7 +353,7 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                var hpoItem = new HPODataModel { Name = "高蛋白血症", NameEnglish = "Hyperproteinemia", HPOId = "HP:0002152", Count = 1};
+                var hpoItem = new HPODataModel { Name = "高蛋白血症", NameEnglish = "Hyperproteinemia", HPOId = "HP:0002152", CHPO2020Data = new CHPO2020Model { NameEnglish = "Hyperproteinemia", NameChinese = "高蛋白血症" } };
                 var item = new ExamBaseDataModel();
                 item.HPOId = "HP:0002152";
                 item.HPOName = "高蛋白血症";
@@ -436,7 +449,6 @@ namespace RareDisease.Data.Repository
                             data.Name = reader["name_cn"] == DBNull.Value ? "" : reader["name_cn"].ToString();
                             data.NameEnglish = reader["name_en"] == DBNull.Value ? "" : reader["name_en"].ToString();
                             data.HPOId = reader["hpoid"] == DBNull.Value ? "" : reader["hpoid"].ToString();
-                            data.Count = 1;
                             searchedHPOList.Add(data);
                         }
                     }
@@ -444,18 +456,22 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HPOId = "HP:0001337",  Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HPOId = "HP:0001300", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "强直", NameEnglish = "Rigidity", HPOId = "HP:0002063", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "姿势不稳", NameEnglish = "Postural instability", HPOId = "HP:0002172",Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "核上性凝视麻痹", NameEnglish = "Supranuclear gaze palsy", HPOId = "HP:0000605", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "眼睑失用症", NameEnglish = "Eyelid apraxia", HPOId = "HP:0000658", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "肌张力障碍", NameEnglish = "Dystonia", HPOId = "HP:0001332", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "智能衰退", NameEnglish = "Mental deterioration", HPOId = "HP:0001268", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "曳行步态", NameEnglish = "Shuffling gait", HPOId = "HP:0002362",  Count = 1 });
-                searchedHPOList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007",Count = 1 });
+                searchedHPOList.Add(new HPODataModel { Name = "震颤", NameEnglish = "Tremor", HPOId = "HP:0001337"});
+                searchedHPOList.Add(new HPODataModel { Name = "帕金森症", NameEnglish = "Parkinsonism", HPOId = "HP:0001300"});
+                searchedHPOList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067"});
+                searchedHPOList.Add(new HPODataModel { Name = "强直", NameEnglish = "Rigidity", HPOId = "HP:0002063"});
+                searchedHPOList.Add(new HPODataModel { Name = "姿势不稳", NameEnglish = "Postural instability", HPOId = "HP:0002172"});
+                searchedHPOList.Add(new HPODataModel { Name = "核上性凝视麻痹", NameEnglish = "Supranuclear gaze palsy", HPOId = "HP:0000605"});
+                searchedHPOList.Add(new HPODataModel { Name = "眼睑失用症", NameEnglish = "Eyelid apraxia", HPOId = "HP:0000658"});
+                searchedHPOList.Add(new HPODataModel { Name = "肌张力障碍", NameEnglish = "Dystonia", HPOId = "HP:0001332"});
+                searchedHPOList.Add(new HPODataModel { Name = "智能衰退", NameEnglish = "Mental deterioration", HPOId = "HP:0001268"});
+                searchedHPOList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260"});
+                searchedHPOList.Add(new HPODataModel { Name = "曳行步态", NameEnglish = "Shuffling gait", HPOId = "HP:0002362"});
+                searchedHPOList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007"});
+            }
+            foreach(var r in searchedHPOList)
+            {
+                r.CHPO2020Data = new CHPO2020Model { HpoId = r.HPOId, NameChinese = r.Name, NameEnglish = r.NameEnglish };
             }
             return searchedHPOList;
         }

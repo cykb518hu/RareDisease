@@ -5,14 +5,7 @@ using System.Text;
 
 namespace RareDisease.Data.Model
 {
-    public class HPONLPDbModel
-    {
-        public string hpoid { get; set; }
-        public string name_en { get; set; }
-        public string name_cn { get; set; }
-
-    }
-
+   
 
     public class HPODataModel
     {
@@ -38,7 +31,7 @@ namespace RareDisease.Data.Model
         public string IsSelf { get { return "本人"; } }
 
         [JsonProperty("count")]
-        public int Count { get; set; }
+        public int Count { get { return IndexList == null ? 1 : IndexList.Count; } }
 
         [JsonProperty("startIndex")]
         public int StartIndex { get; set; }
@@ -61,6 +54,9 @@ namespace RareDisease.Data.Model
 
         [JsonProperty("indexList")]
         public List<HPOMatchIndexModel> IndexList { get; set; }
+
+        [JsonProperty("chpo2020data")]
+        public CHPO2020Model CHPO2020Data { get; set; }
     }
 
     public class HPOMatchIndexModel
@@ -78,4 +74,19 @@ namespace RareDisease.Data.Model
         public string HPOResult { get; set; }
         public int StartIndex { get; set; }
     }
+
+
+    public class CHPO2020Model
+    {
+        [JsonProperty("hpoId")]
+        public string HpoId { get; set; }
+
+        [JsonProperty("name_en")]
+        public string NameEnglish { get; set; }
+
+        [JsonProperty("name_cn")]
+        public string NameChinese { get; set; }
+
+    }
+
 }

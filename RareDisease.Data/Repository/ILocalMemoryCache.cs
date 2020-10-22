@@ -28,6 +28,8 @@ namespace RareDisease.Data.Repository
         List<CabinPatientGenderTimeLine> GetCabinPatientGenderTimeLine();
 
         List<ExamBaseDataModel> GetExamBaseDataList();
+
+        List<CHPO2020Model> GetCHPO2020StandardList();
     }
 
     public class LocalMemoryCache : ILocalMemoryCache
@@ -97,7 +99,11 @@ namespace RareDisease.Data.Repository
             var result = GetList<List<ExamBaseDataModel>>("ExamBaseData", "//App_Data//ExamBaseData.json");
             return result;
         }
-
+        public List<CHPO2020Model> GetCHPO2020StandardList()
+        {
+            var result = GetList<List<CHPO2020Model>>("HPO2020Model", "//App_Data//Chpo_2020.json");
+            return result;
+        }
         public T GetList<T>(string key, string filePath)
         {
             T result = default(T);

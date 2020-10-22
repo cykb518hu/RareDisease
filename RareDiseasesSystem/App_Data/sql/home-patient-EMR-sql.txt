@@ -1,3 +1,3 @@
-﻿    select '患者李**，男性，67岁，主因“右侧肢体抖动、僵硬、动作不灵活7年，累及左侧5年”，来我院门诊就诊。患者7年前无明显诱因出现右手不自主抖动' as emr_text
+﻿    select str as emr_text
   from nlp.chpo2020 
   where visitid in({0})

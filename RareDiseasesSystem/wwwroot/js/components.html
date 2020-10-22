@@ -135,20 +135,23 @@
                                       class="showIndicator" style="overflow:auto">
                                 <el-table-column label="表征术语"
                                                  min-width="34%"  prop="name">
-                                    <!--<template slot-scope="scope">
-                                        <el-popover placement="top-start"
-                                                    width="300"
-                                                    trigger="click"
-                                                    :content="scope.row.nameEnglish">
-                                            <el-link slot="reference" type="primary">
-                                                {{scope.row.name}}
-                                            </el-link>
-                                        </el-popover>
-                                    </template>-->
                                 </el-table-column>
                                 <el-table-column prop="hpoId"
                                                  label="Id"
                                                  min-width="17%">
+
+                                    <template slot-scope="scope">
+                                        <el-popover placement="top-start"
+                                                    width="300"
+                                                    title="HPO下位词"
+                                                    trigger="click">
+                                            <p>{{scope.row.chpo2020data.name_cn}} : {{scope.row.chpo2020data.name_en}}</p>
+
+                                            <el-link slot="reference" type="primary">
+                                                {{scope.row.hpoId}}
+                                            </el-link>
+                                        </el-popover>
+                                    </template>
                                 </el-table-column>
                                 <el-table-column 
                                                  label="确定程度"

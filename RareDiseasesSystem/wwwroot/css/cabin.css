@@ -83,14 +83,6 @@ img {
     box-sizing: border-box;
 }
 
-*,
-body {
-    padding: 0px;
-    margin: 0px;
-    color: #222;
-    font-family: "微软雅黑";
-    /*overflow-y:hidden;*/
-}
 
 .overflow-hidden {
     overflow: hidden;
@@ -113,7 +105,6 @@ body {
 body {
     padding: 0px;
     margin: 0px;
-    color: #222;
     font-family: "微软雅黑";
 }
 /*@font-face {
@@ -870,7 +861,7 @@ a:hover {
 }
 
 .row-margin {
-    margin-top: 10px;
+    /*margin-top: 10px;*/
 }
 
 .project-box {

@@ -1,138 +1,133 @@
-﻿var main;
-$("#component-template").load("/js/components.html?r=" + new Date().getTime(), function (response) {
-    $("#component-template").html(response);
-    main = new Vue({
-        'el': '#mainArea',
-        data: {
-            loginUser: loginUser,
-            menuActiveIndex: menuActiveIndex, //顶部导航
-            currenttime: "",
-            cixiData: []
-        },
-        methods: {
-            getCurrentTime: function () {
-                dt = new Date();
-                var y = dt.getFullYear();
-                var mt = dt.getMonth() + 1;
-                var day = dt.getDate();
-                var h = dt.getHours();//获取时
-                var m = dt.getMinutes();//获取分
-                var s = dt.getSeconds();//获取秒
-                //document.getElementById("currenttime").innerHTML = y + "年" + mt + "月" + day + "日 " + h + "时" + m + "分" + s + "秒";
-                var pm = "pm";
-                if (parseInt(h) < 13) {
-                    pm = "am";
-                }
-
-                var mtext = m < 10 ? "0" + m.toString() : m.toString();
-
-                document.getElementById("currenttime").innerHTML = `<strong>${h}:${mtext}</strong>&nbsp;&nbsp;${pm}&nbsp;&nbsp;${y}-${mt}-${day}`;
-            },
-            change: function () {
-
-            },
-            play: function () {
-                setInterval(this.change, 2000);//每两秒执行一次插入删除操作
-            },
-            //科研磁贴
-            getCixiChart: function () {
-                var that = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/Cabin/GetRareDiseaseOverView",
-                    contentType: "application/json"
-                }).done(function (response) {
-                    if (response.success) {
-                        that.cixiData = response.data;
-                    }
-                });
-            },
-            //患者趋势
-            getAgeDistributionChartData: function () {
-                var that = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/Cabin/GetDiseaseTimeLineDistribution",
-                    contentType: "application/json"
-                }).done(function (response) {
-                    if (response.success) {
-                        age_line_chart(response.data);
-                    }
-                });
-            },
-            //患者年龄段占比
-            getDiseasePatienAgeData: function () {
-                var that = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/Cabin/GetDiseasePatientAge",
-                    contentType: "application/json"
-                }).done(function (response) {
-                    if (response.success) {
-                        age_pie_chart(response.data);
-                    }
-                });
-            },
-            //患者性别占比
-            getGetDiseasePatienSexData: function () {
-                var that = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/Cabin/GetDiseasePatientGender",
-                    contentType: "application/json"
-                }).done(function (response) {
-                    if (response.success) {
-                        sex_pie_chart(response.data);
-                    }
-                });
-            },
-
-            //病种数据量排名
-            getDiseasePatientRankData: function () {
-                var that = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/Cabin/GetDiseasePatientRank",
-                    contentType: "application/json"
-                }).done(function (response) {
-                    if (response.success) {
-                        disese_number_rank_chart(response.data);
-                    }
-                });
-            },
-            //患者地域分布
-            getPatientDomainDistributeData: function () {
-                var that = this;
-                $.ajax({
-                    type: "POST",
-                    url: "/Cabin/GetPatientAreaDistribution",
-                    contentType: "application/json"
-                }).done(function (response) {
-                    if (response.success) {
-                        china_map_chart(response.data);
-                    }
-                });
+﻿new Vue({
+    'el': '#app',
+    data: {
+        currenttime: "",
+        cixiData: []
+    },
+    methods: {
+        getCurrentTime: function () {
+            dt = new Date();
+            var y = dt.getFullYear();
+            var mt = dt.getMonth() + 1;
+            var day = dt.getDate();
+            var h = dt.getHours();//获取时
+            var m = dt.getMinutes();//获取分
+            var s = dt.getSeconds();//获取秒
+            //document.getElementById("currenttime").innerHTML = y + "年" + mt + "月" + day + "日 " + h + "时" + m + "分" + s + "秒";
+            var pm = "pm";
+            if (parseInt(h) < 13) {
+                pm = "am";
             }
 
+            var mtext = m < 10 ? "0" + m.toString() : m.toString();
+
+            document.getElementById("currenttime").innerHTML = `<strong>${h}:${mtext}</strong>&nbsp;&nbsp;${pm}&nbsp;&nbsp;${y}-${mt}-${day}`;
+        },
+        change: function () {
 
         },
-        mounted: function () {
-            this.getCixiChart(); // 病种磁贴
+        play: function () {
+            setInterval(this.change, 2000);//每两秒执行一次插入删除操作
         },
-        created: function () {
-            var t = null;
-            this.$nextTick(() => {
-                t = setInterval(this.getCurrentTime, 1000);
-                this.getAgeDistributionChartData();//患者趋势
-                this.getDiseasePatienAgeData();//患者年龄段占比
-                this.getGetDiseasePatienSexData();// 患者性别占比
-                this.getPatientDomainDistributeData(); //患者地域分布
-                this.getDiseasePatientRankData();//罕见病排名
+        //科研磁贴
+        getCixiChart: function () {
+            var that = this;
+            $.ajax({
+                type: "POST",
+                url: "/Cabin/GetRareDiseaseOverView",
+                contentType: "application/json"
+            }).done(function (response) {
+                if (response.success) {
+                    that.cixiData = response.data;
+                }
             });
-            this.play();
+        },
+        //患者趋势
+        getAgeDistributionChartData: function () {
+            var that = this;
+            $.ajax({
+                type: "POST",
+                url: "/Cabin/GetDiseaseTimeLineDistribution",
+                contentType: "application/json"
+            }).done(function (response) {
+                if (response.success) {
+                    age_line_chart(response.data);
+                }
+            });
+        },
+        //患者年龄段占比
+        getDiseasePatienAgeData: function () {
+            var that = this;
+            $.ajax({
+                type: "POST",
+                url: "/Cabin/GetDiseasePatientAge",
+                contentType: "application/json"
+            }).done(function (response) {
+                if (response.success) {
+                    age_pie_chart(response.data);
+                }
+            });
+        },
+        //患者性别占比
+        getGetDiseasePatienSexData: function () {
+            var that = this;
+            $.ajax({
+                type: "POST",
+                url: "/Cabin/GetDiseasePatientGender",
+                contentType: "application/json"
+            }).done(function (response) {
+                if (response.success) {
+                    sex_pie_chart(response.data);
+                }
+            });
+        },
+
+        //病种数据量排名
+        getDiseasePatientRankData: function () {
+            var that = this;
+            $.ajax({
+                type: "POST",
+                url: "/Cabin/GetDiseasePatientRank",
+                contentType: "application/json"
+            }).done(function (response) {
+                if (response.success) {
+                    disese_number_rank_chart(response.data);
+                }
+            });
+        },
+        //患者地域分布
+        getPatientDomainDistributeData: function () {
+            var that = this;
+            $.ajax({
+                type: "POST",
+                url: "/Cabin/GetPatientAreaDistribution",
+                contentType: "application/json"
+            }).done(function (response) {
+                if (response.success) {
+                    china_map_chart(response.data);
+                }
+            });
         }
-    });
+
+      
+    },
+    mounted: function () {
+        this.getCixiChart(); // 病种磁贴
+    },
+    created: function () {
+        var t = null;
+        this.$nextTick(() => {
+            t = setInterval(this.getCurrentTime, 1000);
+            this.getAgeDistributionChartData();//患者趋势
+            this.getDiseasePatienAgeData();//患者年龄段占比
+            this.getGetDiseasePatienSexData();// 患者性别占比
+            this.getPatientDomainDistributeData(); //患者地域分布
+            this.getDiseasePatientRankData();//罕见病排名
+        });
+        this.play();
+    }
 });
+
 
 var titleStyle = {
     color: '#fff',

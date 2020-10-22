@@ -170,11 +170,7 @@
                     {
                         value: 'Overlap',
                         label: 'Overlap'
-                    },
-                    {
-                        value: 'Fager_McGowan',
-                        label: 'Fager & McGowan'
-                    },
+                    },             
                     {
                         value: 'Logolikelihood',
                         label: 'Logo-likelihood & ratio'
@@ -489,7 +485,7 @@
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
                 var that = this;
-                if (false) {
+                if (true) {
                     var hpoStr = "";
                     for (var i = 0; i < this.patientHPOList.length; i++) {
                         if (this.patientHPOList[i].certain === "阳性") {

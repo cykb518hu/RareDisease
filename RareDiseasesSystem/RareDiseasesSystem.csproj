@@ -38,12 +38,6 @@
     <None Update="App_Data\sql\home-patient-overview-empi-sql.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="App_Data\sql\home-patient-visit-list-card-sql.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="App_Data\sql\search-standard-hpo-sql - Copy.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="App_Data\sql\search-standard-hpo-sql.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
