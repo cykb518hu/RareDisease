@@ -44,7 +44,7 @@
                 <el-menu v-bind:default-active="menuActiveIndex" mode="horizontal"
                          active-text-color="#fff">
                     <a href="/Home/Index"> <el-menu-item index="0" class="menu-item">罕见病决策系统</el-menu-item></a>
-                    <a href="https://www.clinbrain.net:6900/index.html" target="_blank"><el-menu-item index="1" class="menu-item">HPO术语系统</el-menu-item></a>
+                    <a href="http://10.239.3.13:8084" target="_blank"><el-menu-item index="1" class="menu-item">HPO术语系统</el-menu-item></a>
                     <a href="/RareDisease/Search"><el-menu-item index="2" class="menu-item">罕见病详情</el-menu-item></a>
                     <a href="/Cabin/Index"><el-menu-item index="3" class="menu-item" target="_blank">驾驶舱</el-menu-item></a>
                     <a href="/Log/Index"><el-menu-item index="4" class="menu-item">操作日志</el-menu-item></a>
@@ -191,7 +191,7 @@
         // 回退按钮导致菜单选中失效
         var navList = [
             { index: "0", path: "Home/Index", name: "表征疾病" },
-            { index: "1", path: "xx", name: "HPO术语详情" },
+            { index: "1", path: "http://10.239.3.13:8084", name: "HPO术语详情" },
             { index: "2", path: "RareDisease/Search", name: "罕见病详情" },
             { index: "3", path: "/Cabin/Index", name: "驾驶舱" },
             { index: "4", path: "Log/Index", name: "日志管理" }
