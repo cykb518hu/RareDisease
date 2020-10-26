@@ -485,7 +485,7 @@
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
                 var that = this;
-                if (true) {
+                if (false) {
                     var hpoStr = "";
                     for (var i = 0; i < this.patientHPOList.length; i++) {
                         if (this.patientHPOList[i].certain === "阳性") {

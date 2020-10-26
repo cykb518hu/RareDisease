@@ -1,3 +1,5 @@
 ﻿    select str as emr_text
   from nlp.chpo2020 
   where visitid in({0})
+
+    order by visitid desc

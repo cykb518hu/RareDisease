@@ -144,7 +144,7 @@
                                         <el-popover placement="top-start"
                                                     width="300"
                                                     title="HPO下位词"
-                                                    trigger="click">
+                                                    trigger="hover">
                                             <p>{{scope.row.chpo2020data.name_cn}} : {{scope.row.chpo2020data.name_en}}</p>
 
                                             <el-link slot="reference" type="primary">
@@ -248,10 +248,10 @@
                                     <el-table-column prop="name"
                                                      label="罕见疾病名称">
                                         <template slot-scope="scope">
-                                            <el-popover  placement="right"
+                                            <el-popover  placement="left"
                                                         width="400"
                                                         trigger="click">
-                                                <el-table :data="scope.row.Hpolist">
+                                                <el-table :data="scope.row.Hpolist" style="overflow:auto" height="400">
                                                     <el-table-column  prop="hpoName" label="所有表型"></el-table-column>
                                                     <el-table-column  prop="hpoId" label="id"></el-table-column>
                                                     <el-table-column  prop="match"  :formatter="statusFormatter"  label="是否匹配"></el-table-column>

@@ -2,3 +2,4 @@
     name_en  as hpo_result_str
   from nlp.chpo2020 
   where visitid in({0})
+  order by visitid desc

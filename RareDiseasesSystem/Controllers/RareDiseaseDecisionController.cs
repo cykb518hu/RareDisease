@@ -30,32 +30,43 @@ namespace RareDiseasesSystem
             _nLPSystemRepository = nLPSystemRepository;
             _rdrDataRepository = rdrDataRepository;
         }
-        [HttpPost]
         [EnableCors("_any")]
-        public JsonResult PostEMR([FromBody] RareDiseaseRequestModel request)
+        public JsonResult GetRareDiseaseByEMR(string emrDetail, string nlpEngine,string analyzeEngine,string database,string appName)
         {
             try
             {
+                var request = new RareDiseaseRequestModel();
+                request.EMRDetail = emrDetail;
+                request.NlpEngine = nlpEngine;
+                request.RareAnalyzeEngine = analyzeEngine;
+                request.RareDataBaseEngine = database;
+                request.AppName = appName;
                 var ipAddress = HttpContext.Connection.RemoteIpAddress;
                 request.IPAddress = ipAddress.ToString();
                 var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, request.EMRDetail, "");
                 var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
-                _logRepository.Add("罕见病分析结果:", "API", JsonConvert.SerializeObject(request) + " " + JsonConvert.SerializeObject(rareDiseaseList));
+                _logRepository.Add(appName+ "：调用接口 GetRareDiseaseByEMR", "API", JsonConvert.SerializeObject(request) + " " + JsonConvert.SerializeObject(rareDiseaseList));
 
-                return Json(new { success = true, rareDiseaseList });
+                return Json(new { result = "ok", Response= rareDiseaseList });
             }
             catch (Exception ex)
             {
-                _logger.LogError("API 罕见病分析：" + ex.ToString());
-                return Json(new { success = false, msg = ex.ToString() });
+                _logger.LogError("API GetRareDiseaseByEMR：" + ex.ToString());
+                return Json(new { result = "ok", Response = new { errorCode = "500", errorText =ex.ToString()} });
             }
         }
-        [HttpPost]
         [EnableCors("_any")]
-        public JsonResult PostNumber([FromBody] RareDiseaseRequestModel request)
+        public JsonResult GetRareDiseaseByNumber(string number, string numberType, string nlpEngine, string analyzeEngine, string database, string appName)
         {
             try
             {
+                var request = new RareDiseaseRequestModel();
+                request.Number = number;
+                request.NumberType = numberType;
+                request.NlpEngine = nlpEngine;
+                request.RareAnalyzeEngine = analyzeEngine;
+                request.RareDataBaseEngine = database;
+                request.AppName = appName;
                 var ipAddress = HttpContext.Connection.RemoteIpAddress;
                 request.IPAddress = ipAddress.ToString();
                 if(request.NumberType== "card")
@@ -71,14 +82,14 @@ namespace RareDiseasesSystem
                 var patientVisitIds = string.Join(",", visitIdList);
                 var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, "", patientVisitIds);
                 var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
-                _logRepository.Add("罕见病分析结果:", "API", JsonConvert.SerializeObject(request)+ " " + JsonConvert.SerializeObject(rareDiseaseList));
+                _logRepository.Add(appName + "：调用接口 GetRareDiseaseByEMR", "API", JsonConvert.SerializeObject(request)+ " " + JsonConvert.SerializeObject(rareDiseaseList));
 
-                return Json(new { success = true, rareDiseaseList });
+                return Json(new { result = "ok", Response = rareDiseaseList });
             }
             catch (Exception ex)
             {
-                _logger.LogError("API 罕见病分析：" + ex.ToString());
-                return Json(new { success = false, msg = ex.ToString() });
+                _logger.LogError("API GetRareDiseaseByNumber：" + ex.ToString());
+                return Json(new { result = "ok", Response = new { errorCode = "500", errorText = ex.ToString() } });
             }
         }
 

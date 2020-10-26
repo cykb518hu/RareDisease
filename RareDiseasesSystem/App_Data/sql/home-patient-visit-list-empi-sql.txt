@@ -1,4 +1,4 @@
 ﻿    select '2019-10-10' as visittime,'住院' as visittype,
   '帕金森' as diagdesc, '华西医院' as center, visitid
   from nlp.chpo2020 
-  where name_cn ='{0}' or name_en like '%{0}%' 
+  where name_cn ='{0}' or name_en like '%{0}%' or 1=1 order by visitid desc
