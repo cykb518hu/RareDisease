@@ -15,7 +15,7 @@ using RareDiseasesSystem.Models;
 
 namespace RareDiseasesSystem.Controllers
 {
-    [Authorize]
+   // [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -152,7 +152,7 @@ namespace RareDiseasesSystem.Controllers
                 item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001644", HpoName = "痴呆", Match = 1 });
                 item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001345", HpoName = "行动不便", Match = 0 });
                 var str = @"[{'name':'anemia','ratio':0.1,'Hpolist':[{'HpoId':'HP0001744','hpoName':'脾肿大','match':0}, {'HpoId':'HP0001745','hpoName':'肺肿大','match':1}]}, {'name':'帕金森','ratio':0.2,'Hpolist':[{'HpoId':'HP0001644','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1}]},{'name':'白化病','ratio':0.3,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
-                return JsonConvert.SerializeObject(item);
+                return str;// JsonConvert.SerializeObject(item);
                 //return str;
             }
             catch (Exception ex)

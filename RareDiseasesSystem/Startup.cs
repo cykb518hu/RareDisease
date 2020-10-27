@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -46,6 +47,10 @@ namespace RareDiseasesSystem
             {
                 c.BaseAddress = new Uri(Configuration.GetValue<string>("NLPAddress:Address"));
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueCountLimit = int.MaxValue;
             });
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
             services.AddScoped<ILogRepository, LogRepository>();

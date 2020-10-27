@@ -82,21 +82,35 @@ namespace RareDisease.Data.Repository
                 hpoStr = string.Join(",", hpoList.Where(x => x.Certain == "阳性").Select(x => x.HPOId).ToList());
                 requestData.HPOList = hpoStr;
 
-                var requestStr = JsonConvert.SerializeObject(requestData);
                 var data = string.Empty;
+                var requestStr = JsonConvert.SerializeObject(requestData);
+                _logger.LogError("NLP request data：" + requestStr);
+
                 var client = _clientFactory.CreateClient("nlp");
                 var api = _config.GetValue<string>("NLPAddress:DiseaseApi");
 
-                var request = new HttpRequestMessage(HttpMethod.Post, api);
-                var requestContent = string.Format("texts={0}", requestStr);
+                try
+                {
+                    string boundary = DateTime.Now.Ticks.ToString("X");
+                    var formData = new MultipartFormDataContent(boundary);
+                    formData.Add(new StringContent(requestStr), "texts");
+                    var response = client.PostAsync(api, formData);
+                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                    _logger.LogError("NLP 返回数据：" + data);
+                }
+                catch(Exception ex)
+                {
+                    _logger.LogError("GetPatientRareDiseaseResult错误：" + ex.ToString());
 
-                _logger.LogError("NLP request data：" + requestContent);
-                request.Content = new StringContent(requestContent, Encoding.UTF8, "application/x-www-form-urlencoded");
-                var response = client.SendAsync(request);
-                data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                    string boundary = DateTime.Now.Ticks.ToString("X");
+                    var formData = new MultipartFormDataContent(boundary);
+                    formData.Add(new StringContent(requestStr), "\"texts\"");
+                    var response = client.PostAsync(api, formData);
+                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                    _logger.LogError("NLP 返回数据：" + data);
+                }
 
-                _logger.LogError("NLP 返回数据：" + data);
-
+               
                 //字符串API 可能有引号在开始和结尾 
                 if (data.StartsWith("\""))
                 {
@@ -204,8 +218,13 @@ namespace RareDisease.Data.Repository
 
 
             }
-            rareDiseaseList.ForEach(x => x.Ratio = Math.Round(x.Ratio, 4));
+            foreach (var x in rareDiseaseList)
+            {
+                x.Ratio = Math.Round(x.Ratio, 4);
+                x.HPOMatchedList = x.HPOMatchedList.OrderByDescending(y => y.Match).ToList();
+            }
             rareDiseaseList = rareDiseaseList.OrderByDescending(x => x.Ratio).ToList();
+            
             return rareDiseaseList;
         }
 
