@@ -143,10 +143,9 @@
                                     <template slot-scope="scope">
                                         <el-popover placement="top-start"
                                                     width="300"
-                                                    title="HPO下位词"
+                                                    title="HPO term"
                                                     trigger="hover">
-                                            <p>{{scope.row.chpo2020data.name_cn}} : {{scope.row.chpo2020data.name_en}}</p>
-
+                                            <p>{{scope.row.chpoName}} : {{scope.row.nameEnglish}}</p>
                                             <el-link slot="reference" type="primary">
                                                 {{scope.row.hpoId}}
                                             </el-link>
@@ -322,6 +321,7 @@
                 </el-table>
                 <div></div>
                 <el-table v-bind:data="patientVisitList"
+                            ref="multipleTable"
                           v-on:selection-change="onPatientVisitSelectionChange"
                           style="width: 100%; margin-top:10px;">
                     <el-table-column type="selection"

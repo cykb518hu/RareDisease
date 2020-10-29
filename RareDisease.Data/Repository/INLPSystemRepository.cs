@@ -14,7 +14,6 @@ namespace RareDisease.Data.Repository
 {
     public interface INLPSystemRepository
     {
-
         List<HPODataModel> GetPatientHPOResult(string nlpEngine, string patientEMRDetail, string patientVisitIds);
         List<NlpRareDiseaseResponseModel> GetPatientRareDiseaseResult(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine);
     }
@@ -48,32 +47,110 @@ namespace RareDisease.Data.Repository
         public List<HPODataModel> GetPatientHPOResult(string nlpEngine, string patientEMRDetail, string patientVisitIds)
         {
             var hpoList = new List<HPODataModel>();
+            //首先获取检验数据HPO
             if (!string.IsNullOrWhiteSpace(patientVisitIds))
             {
-                var backgroundTasks = new[]
-                {
-                    Task.Run(() => _rdrDataRepository.GetPatientNlpResult(patientVisitIds)),
-                    Task.Run(() =>_rdrDataRepository.GetPatientExamDataResult(patientVisitIds))
-                };
-                Task.WaitAll(backgroundTasks);
-                foreach (var task in backgroundTasks)
-                {
-                    hpoList.AddRange(task.Result);
-                }
+                hpoList.AddRange(_rdrDataRepository.GetPatientExamDataResult(patientVisitIds));
             }
-            else if (!string.IsNullOrWhiteSpace(patientEMRDetail))
+            if (!string.IsNullOrWhiteSpace(patientEMRDetail))
             {
-                // to do interface to get hpo list by emr text
+                //如果API 启用，就调用API 否则取数据库跑出来的结果
+                //替换换行符，因为NLP接口解析报错
+                patientEMRDetail = patientEMRDetail.Replace("\n", "n");
+                if (_config.GetValue<bool>("NLPAddress:HPOApiEnable"))
+                {
+                    try
+                    {
+                        var clientName = "HPOStringMatchHost";
+                        var api = _config.GetValue<string>("NLPAddress:HPOStringMatchApi");
+                        if (nlpEngine.Equals("Spacy"))
+                        {
+                            clientName = "HPOSpacyMatchHost";
+                            api = _config.GetValue<string>("NLPAddress:HPOSpacyMatchApi");
+                        }
+                   
+                        var client = _clientFactory.CreateClient(clientName);
+                        string boundary = DateTime.Now.Ticks.ToString("X");
+                        var formData = new MultipartFormDataContent(boundary);
+
+                        patientEMRDetail = "{\"text\":\"" + patientEMRDetail + "\"}";
+                        _logger.LogError($"GetPatientHPOResult request，HPO engine:{nlpEngine},api:{api} 请求数据：" + patientEMRDetail);
+
+                        formData.Add(new StringContent(patientEMRDetail), "texts");
+                        var response = client.PostAsync(api, formData);
+                        var result = response.Result.Content.ReadAsStringAsync().Result.ToString();
+
+                        _logger.LogError($"GetPatientHPOResult result，HPO engine:{nlpEngine},api:{api} 返回数据：" + result);
+
+                        var hpoEngineList = JsonConvert.DeserializeObject<List<HPOAPIEngineResultModel>>(result);
+
+                        var subList = new List<HPODataModel>();
+                        foreach (var r in hpoEngineList)
+                        {
+                            foreach (var hpo in r.Similarchpoid)
+                            {
+                                var data = new HPODataModel();
+                                if (nlpEngine.Equals("Spacy"))
+                                {
+                                    data.Name = r.Emrword + ":" + r.Similarchpoterm;
+                                }
+                                else
+                                {
+                                    data.Name = r.Emrword;
+                                }
+                                    
+                                data.Positivie = r.Positivie;
+                                data.StartIndex = r.Start;
+                                data.EndIndex = r.End;
+                                data.HPOId = hpo;
+                                data.Editable = true;
+                                data.IndexList = new List<HPOMatchIndexModel>();
+                                data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
+                                var item = subList.FirstOrDefault(x => x.HPOId == data.HPOId && x.Name == data.Name);
+                                if (item != null)
+                                {
+                                    item.IndexList.AddRange(data.IndexList);
+                                }
+                                else
+                                {
+                                    subList.Add(data);
+                                }
+                            }
+                        }
+                        var chpoList = from T1 in _localMemoryCache.GetCHPO2020StandardList()
+                                       join T2 in subList.Select(x => x.HPOId) on T1.HpoId equals T2
+                                       select new CHPO2020Model { NameChinese = T1.NameChinese, HpoId = T1.HpoId, NameEnglish = T1.NameEnglish };
+
+                        foreach (var r in subList)
+                        {
+                            r.IndexList = r.IndexList.OrderBy(x => x.StartIndex).ToList();
+                            var chpo2020Data = chpoList.FirstOrDefault(x => x.HpoId == r.HPOId);
+                            if (chpo2020Data != null)
+                            {
+                                r.CHPOName = chpo2020Data.NameChinese;
+                                r.NameEnglish = chpo2020Data.NameEnglish;
+                            }
+                        }
+                        hpoList.AddRange(subList);
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError("NLPSystemRepository GetPatientHPOResult报错：" + ex.ToString());
+                    }
+                }
+                else
+                {
+                    hpoList.AddRange(_rdrDataRepository.GetPatientNlpResult(patientVisitIds));
+                }
             }
             return hpoList;
         }
 
   
-
         public List<NlpRareDiseaseResponseModel> GetPatientRareDiseaseResult(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine)
         {
             var rareDiseaseList = new List<NlpRareDiseaseResponseModel>();
-            if (_env.IsProduction())
+            if (_config.GetValue<bool>("NLPAddress:DiseaseApiEnable"))
             {
                 var requestData = new RareDiseaseEngineRequestModel();
                 requestData.AnalyzeEngine = rareAnalyzeEngine;
@@ -84,38 +161,17 @@ namespace RareDisease.Data.Repository
 
                 var data = string.Empty;
                 var requestStr = JsonConvert.SerializeObject(requestData);
-                _logger.LogError("NLP request data：" + requestStr);
+                _logger.LogError("GetPatientRareDiseaseResult NLP request data：" + requestStr);
 
-                var client = _clientFactory.CreateClient("nlp");
+                var client = _clientFactory.CreateClient("DiseaseHost");
                 var api = _config.GetValue<string>("NLPAddress:DiseaseApi");
+                string boundary = DateTime.Now.Ticks.ToString("X");
+                var formData = new MultipartFormDataContent(boundary);
+                formData.Add(new StringContent(requestStr), "texts");
+                var response = client.PostAsync(api, formData);
+                data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                _logger.LogError("GetPatientRareDiseaseResult 返回数据：" + data);
 
-                try
-                {
-                    string boundary = DateTime.Now.Ticks.ToString("X");
-                    var formData = new MultipartFormDataContent(boundary);
-                    formData.Add(new StringContent(requestStr), "texts");
-                    var response = client.PostAsync(api, formData);
-                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
-                    _logger.LogError("NLP 返回数据：" + data);
-                }
-                catch(Exception ex)
-                {
-                    _logger.LogError("GetPatientRareDiseaseResult错误：" + ex.ToString());
-
-                    string boundary = DateTime.Now.Ticks.ToString("X");
-                    var formData = new MultipartFormDataContent(boundary);
-                    formData.Add(new StringContent(requestStr), "\"texts\"");
-                    var response = client.PostAsync(api, formData);
-                    data = response.Result.Content.ReadAsStringAsync().Result.ToString();
-                    _logger.LogError("NLP 返回数据：" + data);
-                }
-
-               
-                //字符串API 可能有引号在开始和结尾 
-                if (data.StartsWith("\""))
-                {
-                    data = data.TrimStart(new char[] { '\"' }).TrimEnd(new char[] { '\"' });
-                }
                 rareDiseaseList = JsonConvert.DeserializeObject<List<NlpRareDiseaseResponseModel>>(data);
             }
             else

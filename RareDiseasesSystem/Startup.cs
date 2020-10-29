@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -43,10 +45,18 @@ namespace RareDiseasesSystem
             services.AddDbContext<RareDiseaseDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LogConnection")));
             RareDiseaseGPDbContext.NLP_ConnectionString = Configuration.GetConnectionString("NLPConnection");   //为数据库连接字符串赋值
             services.AddHttpContextAccessor();
-            services.AddHttpClient("nlp", c =>
+
+            services.AddHttpClient("DiseaseHost", c =>
             {
-                c.BaseAddress = new Uri(Configuration.GetValue<string>("NLPAddress:Address"));
-                c.DefaultRequestHeaders.Add("Accept", "application/json");
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("NLPAddress:DiseaseHost"));
+            });
+            services.AddHttpClient("HPOStringMatchHost", c =>
+            {
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("NLPAddress:HPOStringMatchHost"));
+            });
+            services.AddHttpClient("HPOSpacyMatchHost", c =>
+            {
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("NLPAddress:HPOSpacyMatchHost"));
             });
             services.Configure<FormOptions>(options =>
             {

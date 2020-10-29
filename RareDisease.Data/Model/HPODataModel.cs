@@ -15,16 +15,17 @@ namespace RareDisease.Data.Model
         [JsonProperty("nameEnglish")]
         public string NameEnglish { get; set; }
 
+        [JsonProperty("chpoName")]
+        public string CHPOName { get; set; }
+
         [JsonProperty("hpoId")]
         public string HPOId { get; set; }
 
-
-        [JsonProperty("positive")]
+        [JsonIgnore]
         public int Positivie { get; set; } = 1;
-        //目前NLP 不支持
+
         [JsonProperty("certain")]
         public string Certain { get { return Positivie == 1 ? "阳性" : "阴性"; } }
-
 
         //目前NLP 不支持
         [JsonProperty("isSelf")]
@@ -33,17 +34,14 @@ namespace RareDisease.Data.Model
         [JsonProperty("count")]
         public int Count { get { return IndexList == null ? 1 : IndexList.Count; } }
 
-        [JsonProperty("startIndex")]
+        [JsonIgnore]
         public int StartIndex { get; set; }
 
-        [JsonProperty("endIndex")]
+        [JsonIgnore]
         public int EndIndex { get; set; }
 
         [JsonProperty("editable")]
         public bool Editable { get; set; }
-
-        [JsonProperty("matched")]
-        public string Matched { get; set; }
 
 
         [JsonProperty("hasExam")]
@@ -55,8 +53,7 @@ namespace RareDisease.Data.Model
         [JsonProperty("indexList")]
         public List<HPOMatchIndexModel> IndexList { get; set; }
 
-        [JsonProperty("chpo2020data")]
-        public CHPO2020Model CHPO2020Data { get; set; }
+        
     }
 
     public class HPOMatchIndexModel
@@ -68,6 +65,9 @@ namespace RareDisease.Data.Model
         public int EndIndex { get; set; }
     }
 
+    /// <summary>
+    /// 记录每次就诊病历的长度 用于计算start end index
+    /// </summary>
     public class PatientVisitHPOResultModel
     {
         public string EMR { get; set; }
@@ -76,6 +76,9 @@ namespace RareDisease.Data.Model
     }
 
 
+    /// <summary>
+    /// 用户CHPO 库
+    /// </summary>
     public class CHPO2020Model
     {
         [JsonProperty("hpoId")]
@@ -87,6 +90,30 @@ namespace RareDisease.Data.Model
         [JsonProperty("name_cn")]
         public string NameChinese { get; set; }
 
+    }
+
+    /// <summary>
+    /// 电子病历spicy 算法的结果
+    /// </summary>
+    public class HPOAPIEngineResultModel
+    {
+        [JsonProperty("emrword")]
+        public string Emrword { get; set; }
+
+        [JsonProperty("similarchpoterm")]
+        public string Similarchpoterm { get; set; }
+
+        [JsonProperty("similarchpoid")]
+        public List<string> Similarchpoid { get; set; }
+
+        [JsonProperty("start")]
+        public int Start { get; set; }
+
+        [JsonProperty("end")]
+        public int End { get; set; }
+
+        [JsonProperty("positive")]
+        public int Positivie { get; set; } = 1;
     }
 
 }

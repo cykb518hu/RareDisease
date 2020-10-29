@@ -15,7 +15,8 @@ using RareDiseasesSystem.Models;
 
 namespace RareDiseasesSystem.Controllers
 {
-   // [Authorize]
+  
+ 
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -56,10 +57,6 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 _logRepository.Add("查询患者就诊记录");
-                // var patientOverviewTask = Task.Run(() => _rdrDataRepository.GetPatientOverview(number,numberType));
-                //var patientVisitListTask = Task.Run(() => _rdrDataRepository.GetPatientVisitList(number,numberType));
-                //var patientVisitList = patientVisitListTask.Result;
-                //var patientOverview = patientOverviewTask.Result;
                 var patientOverview = _rdrDataRepository.GetPatientOverview(number, numberType);              
                 if (patientOverview.Any())
                 {
@@ -151,8 +148,27 @@ namespace RareDiseasesSystem.Controllers
                 item.Add(new NlpRareDiseaseResponseModel { Name = "anemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsa", Ratio = 0.9, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
                 item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001644", HpoName = "痴呆", Match = 1 });
                 item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001345", HpoName = "行动不便", Match = 0 });
-                var str = @"[{'name':'anemia','ratio':0.1,'Hpolist':[{'HpoId':'HP0001744','hpoName':'脾肿大','match':0}, {'HpoId':'HP0001745','hpoName':'肺肿大','match':1}]}, {'name':'帕金森','ratio':0.2,'Hpolist':[{'HpoId':'HP0001644','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1}]},{'name':'白化病','ratio':0.3,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                var str = "[{'name':'帕金森','ratio':0.2,'Hpolist':[{'HpoId':'HP0001644','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1}]},{'name':'白化病','ratio':0.3,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                var str1 = "[{\"name\":\"anemia11\",\"ratio\":0.2,\"Hpolist\":[{\"hpoId\":\"HP0001744\",\"hpoName\":\"\\u6d88\\u5316\\u7cfb\\u7edf\\u5f62\\u6001\\u5f02\\u5e38\",\"match\":1}, {\"hpoId\":\"HP0001744\",\"hpoName\":\"\\u6d88\\u5316\\u7cfb\\u7edf\\u5f62\\u6001\\u5f02\\u5e38\",\"match\":0}]},{\"name\":\"anemia\",\"ratio\":0.1,\"Hpolist\":[{\"hpoId\":\"HP0001744\",\"hpoName\":\"\\u6d88\\u5316\\u7cfb\\u7edf\\u5f62\\u6001\\u5f02\\u5e38\",\"match\":0}, {\"hpoId\":\"HP0001744\",\"hpoName\":\"\\u6d88\\u5316\\u7cfb\\u7edf\\u5f62\\u6001\\u5f02\\u5e38\",\"match\":0}]} ]";
+
                 return str;// JsonConvert.SerializeObject(item);
+                //return str;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("罕见病分析结果：" + ex.ToString());
+                return "";
+            }
+        }
+        public string GetNLHPOMockUp(string texts)
+        {
+            try
+            {
+
+                var str = "[ {'ratio': 1, 'emrword': '腹泻', 'similarchpoterm': '腹泻', 'similarchpoid': \"['hp:00101', 'hp:00102']\",'start': 0, 'end': 2 }, {'ratio': 1,'emrword': '腹泻','similarchpoterm': '腹泻CHPO','similarchpoid': \"['hp:00103','hp:00104']\",'start': 0, 'end': 2 }]";
+                var str1 = "[ {'ratio': 1, 'emrword': '腹泻', 'similarchpoterm': '腹泻', 'similarchpoid': ['hp:00101', 'hp:00102'],'start': 0, 'end': 2 }, {'ratio': 1,'emrword': '腹泻','similarchpoterm': '腹泻CHPO','similarchpoid': ['hp:00103','hp:00104'],'start': 0, 'end': 2 }]";
+
+                return str1;// JsonConvert.SerializeObject(item);
                 //return str;
             }
             catch (Exception ex)

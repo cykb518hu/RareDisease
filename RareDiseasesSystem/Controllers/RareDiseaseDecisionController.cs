@@ -78,11 +78,12 @@ namespace RareDiseasesSystem
                     }
                 }
                 var patientVisitList = _rdrDataRepository.GetPatientVisitList(request.Number);
-                var visitIdList = patientVisitList.Select(x => x.VisitId).ToList();
-                var patientVisitIds = string.Join(",", visitIdList);
-                var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, "", patientVisitIds);
+
+                var patientVisitIds = string.Join(",", patientVisitList.Select(x => x.VisitId));
+                var emrDetail= string.Join(",", patientVisitList.Select(x=>x.DiagDesc));
+                var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, emrDetail, patientVisitIds);
                 var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
-                _logRepository.Add(appName + "：调用接口 GetRareDiseaseByEMR", "API", JsonConvert.SerializeObject(request)+ " " + JsonConvert.SerializeObject(rareDiseaseList));
+                _logRepository.Add(appName + "：调用接口 GetRareDiseaseByNumber", "API", JsonConvert.SerializeObject(request)+ " " + JsonConvert.SerializeObject(rareDiseaseList));
 
                 return Json(new { result = "ok", Response = rareDiseaseList });
             }

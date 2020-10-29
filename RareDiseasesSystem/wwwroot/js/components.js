@@ -301,6 +301,7 @@
                 this.patientEMRDetail = "";
                 this.patientHPOList = [];
                 this.rareDiseaseList = [];
+                this.$refs.multipleTable.clearSelection();
             },
             //这个地方有两种情况
             //1. 用户直接传一段文本，和病人没有关联，这个时候直接分析文本
@@ -315,19 +316,12 @@
                 var visitIds = this.multiplePatientVisitSelection.map(function (item) {
                     return item.visitid;
                 });
-                var para = {};
-                if (visitIds.length > 0) {
-                    para = {
-                        patientVisitIds: visitIds.toString(),
-                        nlpEngine: this.nlpEngine
-                    };
-                }
-                else {
-                    para = {
-                        patientEMRDetail: this.patientEMRDetail,
-                        nlpEngine: this.nlpEngine
-                    };
-                }             
+                var para = {}; 
+                para = {
+                    patientEMRDetail: this.patientEMRDetail,
+                    patientVisitIds: visitIds.toString(),
+                    nlpEngine: this.nlpEngine
+                };
                 const loading = this.$loading({
                     lock: true,
                     text: '拼命加载中...',
@@ -335,7 +329,6 @@
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
                 var that = this;
-              
                 $.ajax({
                     url: "/Home/GetPatientHPOResult",
                     type: "POST",
@@ -485,63 +478,28 @@
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
                 var that = this;
-                if (false) {
-                    var hpoStr = "";
-                    for (var i = 0; i < this.patientHPOList.length; i++) {
-                        if (this.patientHPOList[i].certain === "阳性") {
-                            hpoStr += this.patientHPOList[i].hpoId + ",";
+                var para = {};
+                para = {
+                    hpoList: this.patientHPOList,
+                    rareAnalyzeEngine: this.rareAnalyzeEngine,
+                    rareDataBaseEngine: this.rareDataBaseEngine
+                };
+                $.ajax({
+                    url: "/Home/GetPatientRareDiseaseResult",
+                    type: "POST",
+                    data: para,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data && data.success) {
+                            //that.normalDiseaseList = data.normalDiseaseList;
+                            that.rareDiseaseList = data.rareDiseaseList;
                         }
-                    }
-                    hpoStr = hpoStr.substring(0, hpoStr.length - 1);
-                    var requestStr = '{"analyzeEngine":"' + this.rareAnalyzeEngine + '","dataBase":"' + this.rareDataBaseEngine + '","HPOList":"' + hpoStr + '"}';
-                    var formData = new FormData();
-                    formData.append("texts", requestStr);
-
-                    try {
-                        $.ajax({
-                            // url: "http://10.239.3.14:7601/similarity",
-                            url: "/Home/GetNLPRareDiseaseResultMockUp",
-                            type: "POST",
-                            data: formData,
-                            contentType: false,
-                            processData: false,
-                            success: function (data) {
-                                that.rareDiseaseList = JSON.parse(data);
-                               
-                            }
-                        });
-                    }
-                    catch (err) {
-                        console.log(err);
-                    }
-                    finally {
+                        else {
+                            console.log(data);
+                        }
                         loading.close();
                     }
-                }
-                else {
-                    var para = {};
-                    para = {
-                        hpoList: this.patientHPOList,
-                        rareAnalyzeEngine: this.rareAnalyzeEngine,
-                        rareDataBaseEngine: this.rareDataBaseEngine
-                    };              
-                    $.ajax({
-                        url: "/Home/GetPatientRareDiseaseResult",
-                        type: "POST",
-                        data: para,
-                        dataType: 'json',
-                        success: function (data) {
-                            if (data && data.success) {
-                                //that.normalDiseaseList = data.normalDiseaseList;
-                                that.rareDiseaseList = data.rareDiseaseList;
-                            }
-                            else {
-                                console.log(data);
-                            }
-                            loading.close();
-                        }
-                    });
-                }
+                });
             },
             statusFormatter(row, column) {
                 let status = row.match;

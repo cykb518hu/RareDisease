@@ -20,7 +20,6 @@ namespace RareDisease.Data.Repository
     {
         List<PatientOverviewModel> GetPatientOverview(string number,string numberType);
         List<PatientVisitInfoModel> GetPatientVisitList(string number);
-
         string GetPatientEMRDetail(string patientVisitIds);
 
         /// <summary>
@@ -151,15 +150,15 @@ namespace RareDisease.Data.Repository
                 {
                     while (reader.Read())
                     {
-                        result += reader["emr_text"] == DBNull.Value ? "" : reader["emr_text"].ToString() + "\r\n" + "\r\n";        
+                        result += reader["emr_text"] == DBNull.Value ? "" : reader["emr_text"].ToString() + "\n\n";
                     }
                 }
 
             }
             else
             {
-                result = @"患者李**，男性，67岁，主因“右侧肢体抖动、僵硬、动作不灵活7年，累及左侧5年”，来我院门诊就诊。患者7年前无明显诱因出现右手不自主抖动，以安静状态下明显，紧张、激动时加重，平静放松后减轻，睡眠后消失；伴右侧肢体活动不灵活、僵硬，如写字慢、越写越小。症状逐渐加重，波及右下肢。5年前左侧肢体亦出现上述症状，切菜、系扣等动作慢。走路慢，小碎步，起床迈步转身费力，呈弯腰驼背姿势，症状缓慢加重。5年前开始口服美多巴，上述症状明显改善。但2年前因逐渐出现药效减退，患者自行将药量逐渐增加250mg 4id。约半年前开始出现服药2-3小时后肢体不自主扭动表现，且一天之中上述症状波动明显。发病以来便秘明显，睡眠差。发病以来否认站立头晕、吞咽困难、饮水呛咳、平衡障碍。既往：无构音障碍、CO中毒史、脑炎病史、重金属中毒史、农药中毒史、脑出血脑梗塞病史，家族中有类似疾病患者，可能有常染色体隐性遗传，无长期大量应用D2受体阻滞剂、多巴胺耗竭剂病史。专科查体：体温：36.5℃，呼吸：18次/分，脉搏：76次/分。神志清楚，面具脸，流涎较多、颜面躯干皮脂分泌增多。平卧血压120/ 80 mmHg，立位血压120/ 80mmHg。颅神经检查：双眼各向活动无障碍，无复视。面部感觉对称正常，咬肌、颞肌有力，张口下颌不偏。双侧闭目有力、示齿口角无偏斜。伸舌居中。躯体深浅感觉对称正常。慌张步态，行走时躯干前屈，双上臂无伴随动作。四肢肌力V级，四肢肌张力高，呈齿轮样强直，右侧重于右侧。肌肉无明显萎缩。双侧肢体3~5Hz粗大搓丸样静止性震颤，小写征明显。指鼻试验、跟膝胫试验稳准。肱二头肌、膝腱反射无明显亢进，双侧Hoffmann征、Babinski征阴性。颈部僵硬。双侧Kernig’ s sign (-) 。辅助检查：头颅MRI平扫未见明显异常。";
-
+                result = @"患者李**，男性，67岁，主因“右侧肢体抖动、僵硬、动作不灵活7年，累及左侧5年”，来我院门诊就诊。患者7年前无明显诱因出现右手不自主抖动，以安静状态下明显，紧张、激动时加重，平静放松后减轻，睡眠后消失；伴右侧肢体活动不灵活、僵硬，如写字慢、越写越小。症状逐渐加重，波及右下肢。5年前左侧肢体亦出现上述症状，切菜、系扣等动作慢。走路慢，小碎步，起床迈步转身费力，呈弯腰驼背姿势，症状缓慢加重。5年前开始口服美多巴，上述症状明显改善。但2年前因逐渐出现药效减退，患者自行将药量逐渐增加250mg 4id。约半年前开始出现服药2-3小时后肢体不自主扭动表现，且一天之中上述症状波动明显。发病以来便秘明显，睡眠差。发病以来否认站立头晕、吞咽困难、饮水呛咳、平衡障碍。既往：无构音障碍、CO中毒史、脑炎病史、重金属中毒史、农药中毒史、脑出血脑梗塞病史，家族中有类似疾病患者，可能有常染色体隐性遗传，无长期大量应用D2受体阻滞剂、多巴胺耗竭剂病史。专科查体：体温：36.5℃，呼吸：18次/分，脉搏：76次/分。神志清楚，面具脸，流涎较多、颜面躯干皮脂分泌增多。平卧血压120/ 80 mmHg，立位血压120/ 80mmHg。颅神经检查：双眼各向活动无障碍，无复视。面部感觉对称正常，咬肌、颞肌有力，张口下颌不偏。双侧闭目有力、示齿口角无偏斜。伸舌居中。躯体深浅感觉对称正常。慌张步态，行走时躯干前屈，双上臂无伴随动作。四肢肌力V级，四肢肌张力高，呈齿轮样强直，右侧重于右侧。肌肉无明显萎缩。双侧肢体3~5Hz粗大搓丸样静止性震颤，小写征明显。指鼻试验、跟膝胫试验稳准。肱二头肌、膝腱反射无明显亢进，双侧Hoffmann征、Babinski征阴性。颈部僵硬。双侧Kernig’ s sign (-) 。辅助检查：头颅MRI平扫未见明显异常。" + "\n\n";
+                result += result;
             }
             return result;
             // return "";
@@ -234,13 +233,11 @@ namespace RareDisease.Data.Repository
                                     else
                                     {
                                         var chpo2020Data = _localMemoryCache.GetCHPO2020StandardList().FirstOrDefault(x => x.HpoId == data.HPOId);
-                                        if(chpo2020Data==null)
+                                        if (chpo2020Data != null)
                                         {
-                                            chpo2020Data = new CHPO2020Model();
-                                            chpo2020Data.NameChinese = data.Name;
-                                            chpo2020Data.NameEnglish = data.NameEnglish;
+                                            data.CHPOName = chpo2020Data.NameChinese;
+                                            data.NameEnglish = chpo2020Data.NameEnglish;
                                         }
-                                        data.CHPO2020Data = chpo2020Data;
                                         result.Add(data);
                                     }
                                 }
@@ -260,15 +257,15 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31,  Editable = true , CHPO2020Data=new CHPO2020Model { NameEnglish= "Bradykinesia", NameChinese= "运动迟缓" } });
+                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31,  Editable = true  });
                
                 result[0].IndexList = new List<HPOMatchIndexModel>();
                 result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 26, EndIndex = 31 });
                 result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 36, EndIndex = 41 });
-                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394,Positivie = 0, Editable = true, CHPO2020Data = new CHPO2020Model { NameEnglish = "Autosomal recessive inheritance", NameChinese = "常染色体隐性遗传" } });
+                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394,Positivie = 0, Editable = true,  CHPOName= "常染色体隐性遗传" });
                 result[1].IndexList = new List<HPOMatchIndexModel>();
                 result[1].IndexList.Add(new HPOMatchIndexModel { StartIndex = 386, EndIndex = 394 });
-                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true , CHPO2020Data = new CHPO2020Model { NameEnglish = "Dysarthria", NameChinese = "构音障碍" } });
+                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true});
                 result[2].IndexList = new List<HPOMatchIndexModel>();
                 result[2].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
             }
@@ -334,17 +331,11 @@ namespace RareDisease.Data.Repository
                             var hpoItem = new HPODataModel();
                             hpoItem.HPOId = r.HPOId;
                             hpoItem.Name = r.HPOName;
+                            hpoItem.CHPOName = r.HPOName;
                             hpoItem.NameEnglish = r.HPOEnglish;
                             hpoItem.HasExam = true;
                             hpoItem.ExamData = new List<ExamBaseDataModel>();
                             hpoItem.ExamData.AddRange(list);
-                            var chpo2020Data = new CHPO2020Model();
-
-                            chpo2020Data = new CHPO2020Model();
-                            chpo2020Data.NameChinese = hpoItem.Name;
-                            chpo2020Data.NameEnglish = hpoItem.NameEnglish;
-
-                            hpoItem.CHPO2020Data = chpo2020Data;
                             result.Add(hpoItem);
                         }
                     }
@@ -353,7 +344,7 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                var hpoItem = new HPODataModel { Name = "高蛋白血症", NameEnglish = "Hyperproteinemia", HPOId = "HP:0002152", CHPO2020Data = new CHPO2020Model { NameEnglish = "Hyperproteinemia", NameChinese = "高蛋白血症" } };
+                var hpoItem = new HPODataModel { Name = "高蛋白血症", NameEnglish = "Hyperproteinemia", HPOId = "HP:0002152"};
                 var item = new ExamBaseDataModel();
                 item.HPOId = "HP:0002152";
                 item.HPOName = "高蛋白血症";
@@ -471,7 +462,7 @@ namespace RareDisease.Data.Repository
             }
             foreach(var r in searchedHPOList)
             {
-                r.CHPO2020Data = new CHPO2020Model { HpoId = r.HPOId, NameChinese = r.Name, NameEnglish = r.NameEnglish };
+                r.CHPOName = r.Name;
             }
             return searchedHPOList;
         }
