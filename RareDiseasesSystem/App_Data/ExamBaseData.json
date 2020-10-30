@@ -53,8 +53,8 @@
 		"exam_name": "×Üµ°°×",
 		"sample_code": "LIS126",
 		"sample_name": "ÑªÇå",
-		"range": "60.0-83.0 g/L",
-		"exception": ">83",
+		"range": "60.0-85.0 g/L",
+		"exception": ">85",
 		"minimum": "0",
 		"maxinum": "83",
 		"match_time": "1"

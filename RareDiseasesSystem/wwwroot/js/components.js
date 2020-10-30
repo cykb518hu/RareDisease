@@ -316,9 +316,10 @@
                 var visitIds = this.multiplePatientVisitSelection.map(function (item) {
                     return item.visitid;
                 });
-                var para = {}; 
+                var para = {};
+                
                 para = {
-                    patientEMRDetail: this.patientEMRDetail,
+                    patientEMRDetail:encodeURI(this.patientEMRDetail),
                     patientVisitIds: visitIds.toString(),
                     nlpEngine: this.nlpEngine
                 };

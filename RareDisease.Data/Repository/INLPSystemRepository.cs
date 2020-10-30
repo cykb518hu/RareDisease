@@ -55,8 +55,6 @@ namespace RareDisease.Data.Repository
             if (!string.IsNullOrWhiteSpace(patientEMRDetail))
             {
                 //如果API 启用，就调用API 否则取数据库跑出来的结果
-                //替换换行符，因为NLP接口解析报错
-                patientEMRDetail = patientEMRDetail.Replace("\n", "n");
                 if (_config.GetValue<bool>("NLPAddress:HPOApiEnable"))
                 {
                     try
@@ -67,8 +65,7 @@ namespace RareDisease.Data.Repository
                         {
                             clientName = "HPOSpacyMatchHost";
                             api = _config.GetValue<string>("NLPAddress:HPOSpacyMatchApi");
-                        }
-                   
+                        }                   
                         var client = _clientFactory.CreateClient(clientName);
                         string boundary = DateTime.Now.Ticks.ToString("X");
                         var formData = new MultipartFormDataContent(boundary);
