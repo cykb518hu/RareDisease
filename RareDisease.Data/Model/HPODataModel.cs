@@ -32,7 +32,22 @@ namespace RareDisease.Data.Model
         public string IsSelf { get { return "本人"; } }
 
         [JsonProperty("count")]
-        public int Count { get { return IndexList == null ? 1 : IndexList.Count; } }
+        public int Count
+        {
+            get
+            {
+                var result = 1;
+                if (IndexList != null)
+                {
+                    result = IndexList.Count;
+                }
+                if (HasExam)
+                {
+                    result = ExamData.Count;
+                }
+                return result;
+            }
+        }
 
         [JsonIgnore]
         public int StartIndex { get; set; }

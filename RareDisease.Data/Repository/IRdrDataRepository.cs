@@ -268,6 +268,10 @@ namespace RareDisease.Data.Repository
                 result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true});
                 result[2].IndexList = new List<HPOMatchIndexModel>();
                 result[2].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
+
+                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true });
+                result[3].IndexList = new List<HPOMatchIndexModel>();
+                result[3].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
             }
             return result;
         }
@@ -358,6 +362,7 @@ namespace RareDisease.Data.Repository
                 item.ExamTimeStr = "2019-12-12";
                 hpoItem.HasExam = true;
                 hpoItem.ExamData = new List<ExamBaseDataModel>();
+                hpoItem.ExamData.Add(item);
                 hpoItem.ExamData.Add(item);
                 result.Add(hpoItem);
             }

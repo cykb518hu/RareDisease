@@ -643,7 +643,7 @@ el-upload input[type="file"] {
 }
 
 
-.el-textarea__inner {
+#txt_patientEMR {
     height: calc(100vh - 220px);
     padding: 5px;
 }
@@ -702,9 +702,13 @@ el-upload input[type="file"] {
 .el-link.el-link-blue {
     color:blue;
 }
+    .el-link.el-link-blue:hover {
+        color: blue;
+    }
+
 
 .el-popover__title {
-    font-size:14px;
+    font-size:12px;
 }
 .el-popover
 {

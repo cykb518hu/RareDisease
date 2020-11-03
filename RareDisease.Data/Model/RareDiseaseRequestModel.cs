@@ -5,6 +5,9 @@ using System.Text;
 
 namespace RareDisease.Data.Model
 {
+    /// <summary>
+    /// 临床系统调用罕见病接口model
+    /// </summary>
     public class RareDiseaseRequestModel
     {
         [JsonProperty("number")]
@@ -29,6 +32,18 @@ namespace RareDisease.Data.Model
         public string AppName { get; set; }
 
         public string IPAddress { get; set; }
+    }
+    //请求闫树妹接口Model
+    public class RareDiseaseEngineRequestModel
+    {
+        [JsonProperty("analyzeEngine")]
+        public string AnalyzeEngine { get; set; }
+
+        [JsonProperty("dataBase")]
+        public string DataBase { get; set; }
+
+        [JsonProperty("HPOList")]
+        public string HPOList { get; set; }
     }
 
     public class NlpRareDiseaseResponseModel
@@ -56,17 +71,11 @@ namespace RareDisease.Data.Model
         [JsonProperty("match")]
         public int Match { get; set; }
 
+        [JsonProperty("source")]
+        public string Source { get; set; }
+
 
     }
-    public class RareDiseaseEngineRequestModel
-    {
-        [JsonProperty("analyzeEngine")]
-        public string AnalyzeEngine { get; set; }
 
-        [JsonProperty("dataBase")]
-        public string DataBase { get; set; }
-
-        [JsonProperty("HPOList")]
-        public string HPOList { get; set; }
-    }
+ 
 }

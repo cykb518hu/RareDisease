@@ -16,6 +16,7 @@ namespace RareDisease.Data.Repository
     {
         List<HPODataModel> GetPatientHPOResult(string nlpEngine, string patientEMRDetail, string patientVisitIds);
         List<NlpRareDiseaseResponseModel> GetPatientRareDiseaseResult(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine);
+        Task<List<NlpRareDiseaseResponseModel>> GetRareDiseaseResult(string hpoStr, string rareAnalyzeEngine, string rareDataBaseEngine);
     }
 
     public class NLPSystemRepository : INLPSystemRepository
@@ -103,7 +104,7 @@ namespace RareDisease.Data.Repository
                                 data.Editable = true;
                                 data.IndexList = new List<HPOMatchIndexModel>();
                                 data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
-                                var item = subList.FirstOrDefault(x => x.HPOId == data.HPOId && x.Name == data.Name);
+                                var item = subList.FirstOrDefault(x => x.HPOId == data.HPOId && x.Name == data.Name && x.Positivie == data.Positivie);
                                 if (item != null)
                                 {
                                     item.IndexList.AddRange(data.IndexList);
@@ -143,8 +144,17 @@ namespace RareDisease.Data.Repository
             return hpoList;
         }
 
-  
+
         public List<NlpRareDiseaseResponseModel> GetPatientRareDiseaseResult(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine)
+        {
+            var hpoSubList = hpoList.Where(x => x.Certain == "阳性").Select(x => x.HPOId).ToList();
+            hpoSubList = hpoSubList.Where((x, i) => hpoSubList.FindIndex(z => z == x) == i).ToList();
+            var hpoStr = string.Join(",", hpoSubList);
+            var rareDiseaseList = GetRareDiseaseResult(hpoStr, rareAnalyzeEngine, rareDataBaseEngine).Result;
+            return rareDiseaseList;
+        }
+
+        public async Task<List<NlpRareDiseaseResponseModel>> GetRareDiseaseResult(string hpoStr, string rareAnalyzeEngine, string rareDataBaseEngine)
         {
             var rareDiseaseList = new List<NlpRareDiseaseResponseModel>();
             if (_config.GetValue<bool>("NLPAddress:DiseaseApiEnable"))
@@ -152,10 +162,7 @@ namespace RareDisease.Data.Repository
                 var requestData = new RareDiseaseEngineRequestModel();
                 requestData.AnalyzeEngine = rareAnalyzeEngine;
                 requestData.DataBase = rareDataBaseEngine;
-                var hpoStr = string.Empty;
-                hpoStr = string.Join(",", hpoList.Where(x => x.Certain == "阳性").Select(x => x.HPOId).ToList());
                 requestData.HPOList = hpoStr;
-
                 var data = string.Empty;
                 var requestStr = JsonConvert.SerializeObject(requestData);
                 _logger.LogError("GetPatientRareDiseaseResult NLP request data：" + requestStr);
@@ -166,13 +173,14 @@ namespace RareDisease.Data.Repository
                 var formData = new MultipartFormDataContent(boundary);
                 formData.Add(new StringContent(requestStr), "texts");
                 var response = client.PostAsync(api, formData);
-                data = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                data = await response.Result.Content.ReadAsStringAsync();
                 _logger.LogError("GetPatientRareDiseaseResult 返回数据：" + data);
 
                 rareDiseaseList = JsonConvert.DeserializeObject<List<NlpRareDiseaseResponseModel>>(data);
             }
             else
             {
+                #region
                 rareDiseaseList.Add(new NlpRareDiseaseResponseModel { Name = "口面运动障碍", Ratio = 0.5123213, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
                 rareDiseaseList[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP:01111", HpoName = "肿大", Match = 1 });
                 rareDiseaseList[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001745", HpoName = "肺肿大", Match = 0 });
@@ -268,18 +276,20 @@ namespace RareDisease.Data.Repository
                 rareDiseaseList.Add(new NlpRareDiseaseResponseModel { Name = "帕金森病（青年型、早发型）", Ratio = 0.8, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
                 rareDiseaseList[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001644", HpoName = "痴呆", Match = 1 });
                 rareDiseaseList[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001345", HpoName = "行动不便", Match = 0 });
-
+                #endregion
 
             }
             foreach (var x in rareDiseaseList)
             {
                 x.Ratio = Math.Round(x.Ratio, 4);
-                x.HPOMatchedList = x.HPOMatchedList.OrderByDescending(y => y.Match).ToList();
+                x.HPOMatchedList.ForEach(y => y.Source = y.Match == 1 ? "" : hpoStr.Contains(y.HpoId) ? "当前病例" : "知识库");
+                x.HPOMatchedList = x.HPOMatchedList.OrderByDescending(y => y.Match).ThenBy(y => y.Source).ToList();
             }
             rareDiseaseList = rareDiseaseList.OrderByDescending(x => x.Ratio).ToList();
-            
-            return rareDiseaseList;
+
+            return  rareDiseaseList;
         }
+
 
     }
 }

@@ -143,19 +143,19 @@
                 nlpEngineOptions: [
                     {
                         value: 'String_Search',
-                        label: 'String Search'
+                        label: '术语集搜索(约8万条)'
                     },
                     {
                         value: 'Spacy',
-                        label: 'Spacy'
+                        label: '深度学习实体识别(约72万条)'
                     }
                 ],
                 certainOptions: [{
                     value: '阳性',
                     label: '阳性'
                 }, {
-                    value: '隐性',
-                        label: '隐性'
+                    value: '阴性',
+                        label: '阴性'
                 }],
                 rareAnalyzeEngine: "Jaccard",
                 rareAnalyzeEngineOptions: [
@@ -172,8 +172,8 @@
                         label: 'Overlap'
                     },             
                     {
-                        value: 'Logolikelihood',
-                        label: 'Logo-likelihood & ratio'
+                        value: 'Loglikelihood',
+                        label: 'Log-likelihood & ratio'
                     }
 
                 ],
@@ -240,7 +240,7 @@
                     success: function (data) {
                         if (data && data.success) {
                             that.patientVisitListTotal = data.total;
-                            that.patientVisitListCopy = data.patientVisitList; 
+                            that.patientVisitListCopy = data.patientVisitList;
                             that.patientOverview = data.patientOverview;
                             that.patientVisitPaging();
                         }
@@ -271,8 +271,8 @@
                 this.patientHPOList = [];
                 var para = {};
                 para = {
-                    patientVisitIds: visitIds.toString()   
-                };    
+                    patientVisitIds: visitIds.toString()
+                };
                 const loading = this.$loading({
                     lock: true,
                     text: '拼命加载中...',
@@ -307,7 +307,7 @@
             //1. 用户直接传一段文本，和病人没有关联，这个时候直接分析文本
             //2. 如果就诊记录 不为空，说明是获取刚才查询病人的HPO 结果，这个情况根据就诊记录直接从数据库获取
             onGetPatientHPOResult: function () {
-                if (this.patientEMRDetail === undefined) {
+                if (this.patientEMRDetail === undefined || this.patientEMRDetail === "") {
                     alert('电子病历不能为空！');
                     return false;
                 }
@@ -317,9 +317,9 @@
                     return item.visitid;
                 });
                 var para = {};
-                
+
                 para = {
-                    patientEMRDetail:encodeURI(this.patientEMRDetail),
+                    patientEMRDetail: encodeURI(this.patientEMRDetail),
                     patientVisitIds: visitIds.toString(),
                     nlpEngine: this.nlpEngine
                 };
@@ -353,6 +353,23 @@
                     }
                 }
             },
+            onDeleteHPOTerm: function (subgroup) {
+                var para = {};
+                para = {
+                    hpoId: subgroup.hpoId,
+                    hpoTerm: subgroup.name
+                };
+                var that = this;
+                $.ajax({
+                    url: "/Home/DeleteHPOTerm",
+                    type: "POST",
+                    data: para,
+                    dataType: 'json',
+                    success: function (data) {
+                        that.onDeletePatientHPOList(subgroup);
+                    }
+                });
+            },
             onShowHpoMatchedText: function (subgroup) {
                 //如果有多次匹配，那么循环显示
                 var indexData;
@@ -379,7 +396,7 @@
                 $('#txt_patientEMR').val(textBeforePosition);
                 $('#txt_patientEMR').focus();
                 $('#txt_patientEMR').val(text);
-                $('#txt_patientEMR').selectRange(startIndex, endIndex); 
+                $('#txt_patientEMR').selectRange(startIndex, endIndex);
 
             },
             onSearchHPODlg: function () {
@@ -415,7 +432,7 @@
             HPOLocalPaging: function () {
                 this.searchedHPOList = this.localPaging(this.searchedHPOListIndex, this.searchedHPOListCopy);
             },
-            localPaging: function (current,list) {
+            localPaging: function (current, list) {
                 var size = 10;
                 var tablePush = [];
                 for (var i = 0; i < list.length; i++) {
@@ -451,15 +468,15 @@
                             if (that.patientHPOList[i].name === item.name) {
                                 exist = true;
                                 break;
-                            }     
+                            }
                         }
                         if (!exist) {
                             that.patientHPOList.push(item);
                         }
-                        
+
                     });
                     this.searchHPODlg = false;
-                        
+
                 }
             },
             onGetPatientRareDiseaseResult: function () {
@@ -480,13 +497,14 @@
                 });
                 var that = this;
                 var para = {};
+                var hpoStr = this.GetHpoStr();
                 para = {
-                    hpoList: this.patientHPOList,
+                    hpoStr: hpoStr,
                     rareAnalyzeEngine: this.rareAnalyzeEngine,
                     rareDataBaseEngine: this.rareDataBaseEngine
                 };
                 $.ajax({
-                    url: "/Home/GetPatientRareDiseaseResult",
+                    url: "/RareDisease/GetPatientRareDiseaseResult",
                     type: "POST",
                     data: para,
                     dataType: 'json',
@@ -502,6 +520,10 @@
                     }
                 });
             },
+            onRedirectToDiseaseCaculate: function () {
+                sessionStorage["diseaseCaculate-hpoStr"] = this.GetHpoStr();
+                window.location.href = "/home/DiseaseCaculate";
+            },
             statusFormatter(row, column) {
                 let status = row.match;
                 if (status === 0) {
@@ -509,12 +531,28 @@
                 } else {
                     return '是';
                 }
+            },
+            rowClass(row, index) {
+                if (row.row.match === 1) {
+                    return { "background-color": "springgreen" };
+                }
+            },
+            GetHpoStr: function () {
+                var hpoStr = "";
+                for (var i = 0; i < this.patientHPOList.length; i++) {
+                    if (this.patientHPOList[i].certain === "阳性" && hpoStr.indexOf(this.patientHPOList[i].hpoId) < 0) {
+                        hpoStr += this.patientHPOList[i].hpoId + ",";
+                    }
+                }
+                hpoStr = hpoStr.substring(0, hpoStr.length - 1);
+                return hpoStr;
             }
+        },
+        mounted: function () {
+            sessionStorage["diseaseCaculate-hpoStr"] = "";
         }
     });
 })();
-
-
 
 (function () {
     Vue.component("v-operation-log", {
@@ -561,6 +599,84 @@
         },
         mounted: function () {
             this.onSearch();
+        }
+    });
+
+})();
+
+
+(function () {
+    Vue.component("v-disease-caculate", {
+        data: function () {
+            return {
+                HPOStr: "",
+                dataBaseEngine:"eRAM",
+                dataBaseEngineOptions: [
+                    {
+                        value: 'eRAM',
+                        label: 'eRAM'
+                    },
+                    {
+                        value: 'OMIM',
+                        label: 'OMIM'
+                    },
+                    //for nlp engine
+                    {
+                        value: 'ORPHA',
+                        label: 'ORPHANET'
+                    },
+                    {
+                        value: 'DECIPHER',
+                        label: 'DECIPHER'
+                    },
+                    //for nlp engine
+                    {
+                        value: 'all',
+                        label: '整合库'
+                    }
+                ]
+            };
+        },
+        template: "#v-disease-caculate",
+        methods: {
+            onGetDiseaseCaculateResult: function () {
+                if (this.HPOStr === undefined || this.HPOStr === "") {
+                    alert('请输入HPO！');
+                    return false;
+                }
+                const loading = this.$loading({
+                    lock: true,
+                    text: '拼命加载中...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
+                var that = this;
+                var para = {};
+                para = {
+                    hpoStr: this.HPOStr,
+                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Loglikelihood",
+                    rareDataBaseEngine: this.dataBaseEngine
+                };
+                $.ajax({
+                    url: "/RareDisease/GetDiseaseCaculateResult",
+                    type: "POST",
+                    data: para,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data && data.success) {
+                        }
+                        else {
+                            console.log(data);
+                        }
+                        loading.close();
+                    }
+                });
+            }
+        },
+        mounted: function () {
+            if (sessionStorage["diseaseCaculate-hpoStr"] !== "") {
+                this.HPOStr = sessionStorage["diseaseCaculate-hpoStr"];
+            }
         }
     });
 

@@ -33,7 +33,7 @@
                     <div style="background-color:white">
                         <el-table v-bind:data="deseaseSearchedList"
                                   v-loading="loading"
-                                  style="width: 100%;overflow:auto"   class="rare-desease-detail" >
+                                  style="width: 100%;overflow:auto" class="rare-desease-detail">
                             <el-table-column prop="source"
                                              label="知识库" min-width="10%">
                             </el-table-column>
@@ -75,12 +75,14 @@
             </div>
         </el-col>
         <el-col :span="12" class="paddinglr5px">
-            <div id="iframeDiv"  ></div>
+            <div id="iframeDiv"></div>
             <!--<iframe style="width:100%;height: calc(100vh - 1000px)" :src="iframeSrc"></iframe>-->
         </el-col>
     </div>
 </template>
 
+
+<!--罕见病决策模块-->
 <template id="v-disease-cdss">
     <div>
         <el-col :span="8" class="paddinglr5px">
@@ -104,8 +106,8 @@
                                   v-model="patientEMRDetail">
                         </el-input>
                     </div>
-                    <div class="breadcrumbs" style="margin:5px 0">
-                  
+                    <div class="breadcrumbs" style="margin:5px">
+
                         <span style="float: right;">
                             <template>
                                 <el-select v-model="nlpEngine" placeholder="请选择NLP分析引擎" style="width:300px">
@@ -134,10 +136,10 @@
                             <el-table :data="patientHPOList"
                                       class="showIndicator" style="overflow:auto">
                                 <el-table-column label="表征术语"
-                                                 min-width="34%"  prop="name">
+                                                 min-width="34%" prop="name">
                                 </el-table-column>
                                 <el-table-column prop="hpoId"
-                                                 label="Id"
+                                                 label="术语Id"
                                                  min-width="17%">
 
                                     <template slot-scope="scope">
@@ -146,14 +148,17 @@
                                                     title="HPO term"
                                                     trigger="hover">
                                             <p>{{scope.row.chpoName}} : {{scope.row.nameEnglish}}</p>
+                                            <div style="text-align: right; margin: 0">
+                                                <el-button type="primary" size="mini" v-if="scope.row.editable"
+                                                           v-on:click="onDeleteHPOTerm(scope.row)">删除</el-button>
+                                            </div>
                                             <el-link slot="reference" type="primary">
                                                 {{scope.row.hpoId}}
                                             </el-link>
                                         </el-popover>
                                     </template>
                                 </el-table-column>
-                                <el-table-column 
-                                                 label="确定程度"
+                                <el-table-column label="确定程度"
                                                  min-width="18%">
                                     <template slot-scope="scope">
                                         <el-select v-model="scope.row.certain" placeholder="请选择">
@@ -165,10 +170,10 @@
                                         </el-select>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="isSelf"
+                                <!-- 暂时不支持本人 <el-table-column prop="isSelf"
                                                  label="是否本人"
                                                  min-width="8%">
-                                </el-table-column>
+                                </el-table-column>-->
                                 <el-table-column prop="count"
                                                  label="命中次数"
                                                  min-width="8%">
@@ -177,26 +182,26 @@
                                     <template slot-scope="scope">
                                         <el-link v-on:click.stop type="primary"
                                                  v-if="scope.row.editable"
-                                                 v-on:click="onShowHpoMatchedText(scope.row)" >原文</el-link>
-                              
-                                            <el-popover v-if="scope.row.hasExam"
-                                                        placement="right"
-                                                        width="800"
-                                                        trigger="click">
-                                                <el-table :data="scope.row.examData">
-                                                    <el-table-column prop="exam_code" label="检验指标代码"></el-table-column>
-                                                    <el-table-column prop="exam_name" label="检验指标"></el-table-column>
-                                                    <el-table-column prop="sample_code" label="样本代码"></el-table-column>
-                                                    <el-table-column prop="sample_name" label="样本名称"></el-table-column>
-                                                    <el-table-column prop="range" label="参考范围"></el-table-column>
-                                                    <el-table-column prop="value" label="检验值"></el-table-column>
-                                                    <el-table-column prop="examTimeStr" label="检验时间"></el-table-column>
-                                                </el-table>
-                                                <el-link slot="reference" class="el-link-blue">
-                                                    检验
-                                                </el-link>
-                                            </el-popover>
-                                 
+                                                 v-on:click="onShowHpoMatchedText(scope.row)">原文</el-link>
+
+                                        <el-popover v-if="scope.row.hasExam"
+                                                    placement="right"
+                                                    width="800"
+                                                    trigger="click">
+                                            <el-table :data="scope.row.examData">
+                                                <el-table-column prop="exam_code" label="检验指标代码"></el-table-column>
+                                                <el-table-column prop="exam_name" label="检验指标"></el-table-column>
+                                                <el-table-column prop="sample_code" label="样本代码"></el-table-column>
+                                                <el-table-column prop="sample_name" label="样本名称"></el-table-column>
+                                                <el-table-column prop="range" label="参考范围"></el-table-column>
+                                                <el-table-column prop="value" label="检验值"></el-table-column>
+                                                <el-table-column prop="examTimeStr" label="检验时间"></el-table-column>
+                                            </el-table>
+                                            <el-link slot="reference" class="el-link-blue">
+                                                检验
+                                            </el-link>
+                                        </el-popover>
+
 
                                         <el-link type="warning" v-on:click.stop
                                                  v-on:click="onDeletePatientHPOList(scope.row)">删除</el-link>
@@ -209,7 +214,7 @@
                         <el-button type="primary" v-on:click="onSearchHPODlg()">添加HPO</el-button>
                         <span style="float: right;">
                             <template>
-                                <el-select v-model="rareAnalyzeEngine" placeholder="请选择罕见病分析引擎" style="width:180px">
+                                <el-select v-model="rareAnalyzeEngine" placeholder="相似度算法选择" style="width:180px">
                                     <el-option v-for="item in rareAnalyzeEngineOptions"
                                                :key="item.value"
                                                :label="item.label"
@@ -218,7 +223,7 @@
                                 </el-select>
                             </template>
                             <template>
-                                <el-select v-model="rareDataBaseEngine" placeholder="请选择罕见病数据库" style="width:100px">
+                                <el-select v-model="rareDataBaseEngine" placeholder="匹配知识库选择" style="width:100px">
                                     <el-option v-for="item in rareDataBaseEngineOptions"
                                                :key="item.value"
                                                :label="item.label"
@@ -235,42 +240,45 @@
         </el-col>
         <el-col :span="6" class="paddinglr5px">
 
-            <div class="panel panel-default" style="margin-bottom:10px">
-
-                <div class="panel panel-default">
-                    <!-- Default panel contents -->
-                    <div class="panel-heading">罕见疾病</div>
-                    <div class="panel-body padding0px">
-                        <div>
-                            <template>
-                                <el-table :data="rareDiseaseList" style="overflow:auto" class="showIndicator">
-                                    <el-table-column prop="name"
-                                                     label="罕见疾病名称">
-                                        <template slot-scope="scope">
-                                            <el-popover  placement="left"
-                                                        width="400"
-                                                        trigger="click">
-                                                <el-table :data="scope.row.Hpolist" style="overflow:auto" height="400">
-                                                    <el-table-column  prop="hpoName" label="所有表型"></el-table-column>
-                                                    <el-table-column  prop="hpoId" label="id"></el-table-column>
-                                                    <el-table-column  prop="match"  :formatter="statusFormatter"  label="是否匹配"></el-table-column>
-                                                </el-table>
-                                                <el-link slot="reference" type="primary">
-                                                    {{scope.row.name}}
-                                                </el-link>
-                                            </el-popover>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column prop="ratio"
-                                                     label="相似度" width="120">
-                                    </el-table-column>
-                                </el-table>
-                            </template>
-                        </div>
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">罕见疾病</div>
+                <div class="panel-body padding0px">
+                    <div>
+                        <template>
+                            <el-table :data="rareDiseaseList" style="overflow:auto" class="showIndicator">
+                                <el-table-column prop="name"
+                                                 label="罕见疾病名称">
+                                    <template slot-scope="scope">
+                                        <el-popover placement="left"
+                                                    width="400"
+                                                    trigger="click">
+                                            <el-table :data="scope.row.Hpolist" style="overflow:auto" height="400" :row-style="rowClass">
+                                                <el-table-column prop="hpoName" label="所有表型"></el-table-column>
+                                                <el-table-column prop="hpoId" label="id"></el-table-column>
+                                                <el-table-column prop="match" :formatter="statusFormatter" label="是否匹配"></el-table-column>
+                                                <el-table-column prop="source" label="来源"></el-table-column>
+                                            </el-table>
+                                            <el-link slot="reference" type="primary">
+                                                {{scope.row.name}}
+                                            </el-link>
+                                        </el-popover>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="ratio"
+                                                 label="相似度" width="120">
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                    <div class="breadcrumbs" style="margin:5px">
+                        <span style="float: right;">
+                            <el-button type="primary" v-if="rareDiseaseList.length>1" v-on:click="onRedirectToDiseaseCaculate">更多详情</el-button>
+                        </span>
                     </div>
                 </div>
             </div>
-            
+
         </el-col>
         <el-dialog title="患者就诊" v-bind:visible.sync="importEMRDlg" top="5vh" class="patientEMR">
             <div style="min-height:480px;overflow-x:hidden;">
@@ -281,7 +289,7 @@
                                       placeholder="EMPI主索引/身份证号码"
                                       v-on:keyup.enter.native="onSearchPatient"></el-input>
                             <template>
-                                <el-select v-model="numberType" >
+                                <el-select v-model="numberType">
                                     <el-option v-for="item in numberTypeOptions"
                                                :key="item.value"
                                                :label="item.label"
@@ -321,7 +329,7 @@
                 </el-table>
                 <div></div>
                 <el-table v-bind:data="patientVisitList"
-                            ref="multipleTable"
+                          ref="multipleTable"
                           v-on:selection-change="onPatientVisitSelectionChange"
                           style="width: 100%; margin-top:10px;">
                     <el-table-column type="selection"
@@ -364,24 +372,24 @@
                         <el-button class="group-in" v-on:click="onSearchedHPOSelectionIn">添加</el-button>
                     </el-col>
                 </el-row>
-                    <el-table v-bind:data="searchedHPOList"
-                              v-on:selection-change="onSearchedHPOSelectionChange"
-                              style="width: 100%; margin-top:10px;">
-                        <el-table-column type="selection"
-                                         width="50">
-                        </el-table-column>
-                        <el-table-column prop="name"
-                                         label="表征术语">
-                        </el-table-column>
+                <el-table v-bind:data="searchedHPOList"
+                          v-on:selection-change="onSearchedHPOSelectionChange"
+                          style="width: 100%; margin-top:10px;">
+                    <el-table-column type="selection"
+                                     width="50">
+                    </el-table-column>
+                    <el-table-column prop="name"
+                                     label="表征术语">
+                    </el-table-column>
 
-                        <el-table-column prop="nameEnglish"
-                                         label="英文名">
-                        </el-table-column>
-                        <el-table-column prop="hpoId"
-                                         label="Id">
-                        </el-table-column>
+                    <el-table-column prop="nameEnglish"
+                                     label="英文名">
+                    </el-table-column>
+                    <el-table-column prop="hpoId"
+                                     label="Id">
+                    </el-table-column>
 
-                    </el-table>
+                </el-table>
                 <el-pagination background style="float:right;"
                                layout="total, prev, pager, next" v-on:current-change="HPOLocalPaging"
                                v-bind:total="searchedHPOListTotal"
@@ -416,7 +424,7 @@
                         <el-button v-on:click="onSearch" type="primary">搜索</el-button>
                     </el-col>
                     <el-col :span="12" class="text-right">
-                   
+
                     </el-col>
                 </el-row>
 
@@ -445,5 +453,51 @@
             </div>
         </div>
     </el-col>
+</template>
+
+
+<!--罕见病计算模块-->
+<template id="v-disease-caculate">
+    <div class="paddinglr5px">
+
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">初始数据</div>
+                <div class="panel-body padding0px">
+
+                    <div class="breadcrumbs" style="margin:5px">
+                        <el-row>
+                            <el-col v-bind:span="16">
+                                <el-input id="txt_HPOStr" type="textarea" width="500"
+                                          :rows="3"
+                                          placeholder="HPO ID HP:12345;HP:54321"
+                                          v-model="HPOStr">
+                                </el-input>
+                            </el-col>
+                            <el-col v-bind:span="6">
+
+                                <template>
+                                    <span style="color: black; margin-left: 20px;">匹配知识库选择:</span>
+                                    <el-select v-model="dataBaseEngine" placeholder="匹配知识库选择" style="width:100px">
+                                        <el-option v-for="item in dataBaseEngineOptions"
+                                                   :key="item.value"
+                                                   :label="item.label"
+                                                   :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                              
+
+                            </el-col>
+                            <el-col v-bind:span="2">
+                                <span style="float:right">
+                                <el-button type="primary" v-on:click="onGetDiseaseCaculateResult">计算</el-button>
+                                </span>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </div>
+            </div>
+    </div>
 </template>
 

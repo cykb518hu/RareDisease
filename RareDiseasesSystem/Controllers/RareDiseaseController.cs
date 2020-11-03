@@ -5,24 +5,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RareDisease.Data.Model;
 using RareDisease.Data.Repository;
 
 namespace RareDiseasesSystem.Controllers
 {
-    [Authorize]
+
     public class RareDiseaseController : Controller
     {
         private readonly ILogger<RareDiseaseController> _logger;
         private ILocalMemoryCache _localMemoryCache;
         private readonly ILogRepository _logRepository;
         private readonly IRdrDataRepository _rdrDataRepository;
-        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger,ILogRepository logRepository, IRdrDataRepository rdrDataRepository)
+        private readonly INLPSystemRepository _nLPSystemRepository;
+        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger,ILogRepository logRepository, IRdrDataRepository rdrDataRepository, INLPSystemRepository nLPSystemRepository)
         {
             _localMemoryCache = localMemoryCache;
             _logger = logger;
             _logRepository = logRepository;
             _rdrDataRepository = rdrDataRepository;
+            _nLPSystemRepository = nLPSystemRepository;
         }
         public IActionResult Search()
         {
@@ -49,6 +52,152 @@ namespace RareDiseasesSystem.Controllers
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }
+
+
+        public async Task<JsonResult> GetPatientRareDiseaseResult(string rareAnalyzeEngine, string rareDataBaseEngine, string hpoStr)
+        {
+            try
+            {
+                var rareDiseaseList = new List<NlpRareDiseaseResponseModel>();
+                rareDiseaseList = await _nLPSystemRepository.GetRareDiseaseResult(hpoStr, rareAnalyzeEngine, rareDataBaseEngine);
+
+                _logRepository.Add("罕见病分析结果", "", JsonConvert.SerializeObject(rareDiseaseList));
+                return Json(new { success = true, rareDiseaseList });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("罕见病分析结果：" + ex.ToString());
+                return Json(new { success = false, msg = ex.ToString() });
+            }
+        }
+
+        public async Task<JsonResult> GetDiseaseCaculateResult(string rareAnalyzeEngine, string rareDataBaseEngine, string hpoStr)
+        {
+            try
+            {
+                var hpoCount = hpoStr.Split(",").Count();
+                var engineList = rareAnalyzeEngine.Split(",");
+
+                var diseaseCaluateBar = new DiseaseCaluateBarModel();
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "命中HPO", Value = new List<int>() });
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "疾病HPO", Value = new List<int>() });
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "提交HPO", Value = new List<int>() });
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "命中算法", Value = new List<int>() });
+
+                List<NlpRareDiseaseResponseModel> allList = new List<NlpRareDiseaseResponseModel>();
+
+                var diseaseList = new List<DiseaseCaculateSingleModel>();
+                foreach(var engine in engineList)
+                {
+                    var list = await _nLPSystemRepository.GetRareDiseaseResult(hpoStr, engine, rareDataBaseEngine);
+                    foreach(var data in list)
+                    {
+                        diseaseList.Add(new DiseaseCaculateSingleModel { Souce = engine, Disease = data.Name, Score = data.Ratio });
+                    }
+                    allList.AddRange(list);
+
+                }
+                var overviewList = new List<DiseaseCaculateOverviewModel>();
+                foreach (var disease in diseaseList.GroupBy(x => x.Disease))
+                {
+                    var overview = new DiseaseCaculateOverviewModel();
+                    overview.Disease = disease.Key;
+                    overview.SupportMethod = string.Join(",", disease.ToList().Select(x => x.Souce));
+                    overview.Score = Math.Round(disease.Sum(x => x.Score) / disease.Count(), 4);
+                    overviewList.Add(overview);
+                }
+                overviewList = overviewList.OrderByDescending(x => x.Score).ToList();
+
+                for (int i = 0; i < 10 && i < overviewList.Count; i++)
+                {
+                    overviewList[i].Rank = i + 1;
+                    diseaseCaluateBar.Disease.Add(overviewList[i].Disease);
+                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "提交HPO").Value.Add(hpoCount);
+                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "命中算法").Value.Add(overviewList[i].SupportMethod.Split(",").Count());
+                    var diseaseHPOCount = 0;
+                    var matchedHPOCount = 0;
+                    foreach (var data in allList)
+                    {
+                        if (data.Name == overviewList[i].Disease)
+                        {
+                            diseaseHPOCount = data.HPOMatchedList.Where(x => x.Match == 1 || x.Source == "知识库").Count();
+                            if (data.HPOMatchedList.Where(x => x.Match == 1).Count() > matchedHPOCount)
+                            {
+                                matchedHPOCount = data.HPOMatchedList.Where(x => x.Match == 1).Count();
+                            }
+                        }
+                    }
+                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "疾病HPO").Value.Add(diseaseHPOCount);
+                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "命中HPO").Value.Add(matchedHPOCount);
+                }
+
+               
+                return Json(new { success = true, overviewList });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("罕见病分析结果：" + ex.ToString());
+                return Json(new { success = false, msg = ex.ToString() });
+            }
+        }
+
+        public string GetNLPRareDiseaseResultMockUp(string texts)
+        {
+            try
+            {
+                var item = new List<NlpRareDiseaseResponseModel>();
+                item.Add(new NlpRareDiseaseResponseModel { Name = "anemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsa", Ratio = 1, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
+                item[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP:01111", HpoName = "肿大", Match = 1 });
+                item[0].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001745", HpoName = "肺肿大", Match = 0 });
+
+                item.Add(new NlpRareDiseaseResponseModel { Name = "anemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsa", Ratio = 0.9, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
+                item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001644", HpoName = "痴呆", Match = 1 });
+                item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001345", HpoName = "行动不便", Match = 0 });
+                var str = "";
+                if (texts.Contains("Jaccard"))
+                {
+                    str = "[{'name':'帕金森','ratio':0.8,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病1','ratio':0.777,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                }
+                if (texts.Contains("Tanimoto"))
+                {
+                    str = "[{'name':'帕金森','ratio':0.5,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病2','ratio':0.999,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                }
+                if (texts.Contains("Overlap"))
+                {
+                    str = "[{'name':'帕金森Overlap','ratio':0.1,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病Overlap','ratio':0.01,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                }
+                if (texts.Contains("Loglikelihood"))
+                {
+                    str = "[{'name':'帕金森Loglikelihood','ratio':0.4,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病Loglikelihood','ratio':0.23,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                }
+                return str;// JsonConvert.SerializeObject(item);
+                //return str;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("罕见病分析结果：" + ex.ToString());
+                return "";
+            }
+        }
+        public string GetNLHPOMockUp(string texts)
+        {
+            try
+            {
+
+                var str = "[ {'ratio': 1, 'emrword': '腹泻', 'similarchpoterm': '腹泻', 'similarchpoid': \"['hp:00101', 'hp:00102']\",'start': 0, 'end': 2 }, {'ratio': 1,'emrword': '腹泻','similarchpoterm': '腹泻CHPO','similarchpoid': \"['hp:00103','hp:00104']\",'start': 0, 'end': 2 }]";
+                var str1 = "[ {'positive':0,'ratio': 1, 'emrword': '腹泻', 'similarchpoterm': '腹泻', 'similarchpoid': ['hp:00101', 'hp:00102'],'start': 0, 'end': 2 }, {'ratio': 1,'emrword': '腹泻','similarchpoterm': '腹泻','similarchpoid': ['hp:00101','hp:00102'],'start': 4, 'end': 6 }]";
+
+                return str1;// JsonConvert.SerializeObject(item);
+                //return str;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("罕见病分析结果：" + ex.ToString());
+                return "";
+            }
+        }
+
+
 
     }
 }

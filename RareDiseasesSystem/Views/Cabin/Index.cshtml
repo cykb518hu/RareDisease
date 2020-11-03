@@ -44,10 +44,11 @@
                 <el-menu v-bind:default-active="menuActiveIndex" mode="horizontal"
                          active-text-color="#fff">
                     <a href="/Home/Index"> <el-menu-item index="0" class="menu-item">罕见病决策系统</el-menu-item></a>
-                    <a href="http://10.239.3.13:8084" target="_blank"><el-menu-item index="1" class="menu-item">HPO术语系统</el-menu-item></a>
-                    <a href="/RareDisease/Search"><el-menu-item index="2" class="menu-item">罕见病详情</el-menu-item></a>
-                    <a href="/Cabin/Index"><el-menu-item index="3" class="menu-item" target="_blank">驾驶舱</el-menu-item></a>
-                    <a href="/Log/Index"><el-menu-item index="4" class="menu-item">操作日志</el-menu-item></a>
+                    <a href="/Home/DiseaseCaculate"> <el-menu-item index="1" class="menu-item">罕见病计算</el-menu-item></a>
+                    <a href="http://10.239.3.13:8084" target="_blank"><el-menu-item index="2" class="menu-item">HPO术语系统</el-menu-item></a>
+                    <a href="/RareDisease/Search"><el-menu-item index="3" class="menu-item">罕见病详情</el-menu-item></a>
+                    <a href="/Cabin/Index"><el-menu-item index="4" class="menu-item" target="_blank">驾驶舱</el-menu-item></a>
+                    <a href="/Log/Index"><el-menu-item index="5" class="menu-item">操作日志</el-menu-item></a>
                 </el-menu>
             </span>
         </div>
@@ -78,7 +79,7 @@
                         <el-col :span="8">
                             <div class="ci-tie" style=" height:100px">
                                 <el-row>
-                                    <el-col :span="12" class="xu-xian" v-for="(item,index) in cixiData">
+                                    <el-col :span="8" class="xu-xian" v-for="(item,index) in cixiData">
                                         <div class="number">
                                             {{item.iresult}}
                                         </div>
@@ -190,11 +191,12 @@
         var menuActiveIndex = 0;
         // 回退按钮导致菜单选中失效
         var navList = [
-            { index: "0", path: "Home/Index", name: "表征疾病" },
-            { index: "1", path: "http://10.239.3.13:8084", name: "HPO术语详情" },
-            { index: "2", path: "RareDisease/Search", name: "罕见病详情" },
-            { index: "3", path: "/Cabin/Index", name: "驾驶舱" },
-            { index: "4", path: "Log/Index", name: "日志管理" }
+            { index: "0", path: "Home/Index", name: "罕见病决策系统" },
+            { index: "1", path: "Home/DiseaseCaculate", name: "罕见病计算" },
+            { index: "2", path: "http://10.239.3.13:8084", name: "HPO术语系统" },
+            { index: "3", path: "RareDisease/Search", name: "罕见病详情" },
+            { index: "4", path: "/Cabin/Index", name: "驾驶舱" },
+            { index: "5", path: "Log/Index", name: "日志管理" }
         ];
 
         url = window.location.href;
