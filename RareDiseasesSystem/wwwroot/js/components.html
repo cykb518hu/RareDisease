@@ -460,44 +460,166 @@
 <template id="v-disease-caculate">
     <div class="paddinglr5px">
 
-            <div class="panel panel-default">
-                <!-- Default panel contents -->
-                <div class="panel-heading">初始数据</div>
-                <div class="panel-body padding0px">
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">输入数据</div>
+            <div class="panel-body padding0px">
 
-                    <div class="breadcrumbs" style="margin:5px">
-                        <el-row>
-                            <el-col v-bind:span="16">
-                                <el-input id="txt_HPOStr" type="textarea" width="500"
-                                          :rows="3"
-                                          placeholder="HPO ID HP:12345;HP:54321"
-                                          v-model="HPOStr">
-                                </el-input>
-                            </el-col>
-                            <el-col v-bind:span="6">
+                <div class="breadcrumbs" style="margin:5px">
+                    <el-row>
+                        <el-col v-bind:span="17">
+                            <el-input id="txt_HPOStr" type="text"
+                                      placeholder="HPO ID HP:12345;HP:54321"
+                                      v-model="HPOStr">
+                            </el-input>
+                        </el-col>
+                        <el-col v-bind:span="5">
 
-                                <template>
-                                    <span style="color: black; margin-left: 20px;">匹配知识库选择:</span>
-                                    <el-select v-model="dataBaseEngine" placeholder="匹配知识库选择" style="width:100px">
-                                        <el-option v-for="item in dataBaseEngineOptions"
-                                                   :key="item.value"
-                                                   :label="item.label"
-                                                   :value="item.value">
-                                        </el-option>
-                                    </el-select>
-                                </template>
-                              
+                            <template>
+                                <span style="color: black; margin-left: 20px;">匹配知识库选择：</span>
+                                <el-select v-model="dataBaseEngine" placeholder="匹配知识库选择" style="width:150px">
+                                    <el-option v-for="item in dataBaseEngineOptions"
+                                               :key="item.value"
+                                               :label="item.label"
+                                               :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
 
-                            </el-col>
-                            <el-col v-bind:span="2">
-                                <span style="float:right">
+
+                        </el-col>
+                        <el-col v-bind:span="2">
+                            <span style="float:left">
                                 <el-button type="primary" v-on:click="onGetDiseaseCaculateResult">计算</el-button>
-                                </span>
-                            </el-col>
-                        </el-row>
-                    </div>
+                            </span>
+                        </el-col>
+                    </el-row>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">罕见病-HPO详细分布图</div>
+            <div class="panel-body">
+                <div id="disease_hpo_distribution" style="width: 100%;height:400px;">
+
                 </div>
             </div>
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">罕见病-HPO 概览图</div>
+            <div class="panel-body">
+                <div id="disease_hpo_bar" style="width: 100%;height:400px;">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">罕见病相似度排序</div>
+            <div class="panel-body padding0px">
+                <el-table v-bind:data="overviewList"
+                          style="width: 100%">
+                    <el-table-column prop="rank"
+                                     label="排序" min-width="7">
+                    </el-table-column>
+                    <el-table-column prop="disease"
+                                     label="疾病" min-width="7">
+                    </el-table-column>
+                    <el-table-column prop="supportMethod"
+                                     label="算法" min-width="7">
+                    </el-table-column>
+                    <el-table-column prop="score"
+                                     label="分数" min-width="7">
+                    </el-table-column>
+                </el-table>
+            </div>
+        </div>
+
+        <div>
+            <el-row>
+                <el-col v-bind:span="12">
+                    <div class="panel panel-default" style="margin-right:5px">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">Jaccard 算法</div>
+                        <div class="panel-body padding0px">
+                            <el-table v-bind:data="diseaseList.filter(item => item.source === 'Jaccard')"
+                                      style="width: 100%">
+                                <el-table-column prop="disease"
+                                                 label="疾病" min-width="7">
+                                </el-table-column>
+                                <el-table-column prop="score"
+                                                 label="分数" min-width="7">
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                </el-col>
+                <el-col v-bind:span="12">
+                    <div class="panel panel-default" style="margin-left:5px">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">Tanimoto 算法</div>
+                        <div class="panel-body padding0px">
+                            <el-table v-bind:data="diseaseList.filter(item => item.source === 'Tanimoto')"
+                                      style="width: 100%">
+                                <el-table-column prop="disease"
+                                                 label="疾病" min-width="7">
+                                </el-table-column>
+                                <el-table-column prop="score"
+                                                 label="分数" min-width="7">
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+        <div>
+            <el-row>
+                <el-col v-bind:span="12">
+                    <div class="panel panel-default" style="margin-right:5px">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">Overlap 算法</div>
+                        <div class="panel-body padding0px">
+                            <el-table v-bind:data="diseaseList.filter(item => item.source === 'Overlap')"
+                                      style="width: 100%">
+                                <el-table-column prop="disease"
+                                                 label="疾病" min-width="7">
+                                </el-table-column>
+                                <el-table-column prop="score"
+                                                 label="分数" min-width="7">
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                </el-col>
+                <el-col v-bind:span="12">
+                    <div class="panel panel-default" style="margin-left:5px">
+                        <!-- Default panel contents -->
+                        <div class="panel-heading">Loglikelihood 算法</div>
+                        <div class="panel-body padding0px">
+                            <el-table v-bind:data="diseaseList.filter(item => item.source === 'Loglikelihood')"
+                                      style="width: 100%">
+                                <el-table-column prop="disease"
+                                                 label="疾病" min-width="7">
+                                </el-table-column>
+                                <el-table-column prop="score"
+                                                 label="分数" min-width="7">
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+
+
     </div>
 </template>
 

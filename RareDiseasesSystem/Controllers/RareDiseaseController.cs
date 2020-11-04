@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using RareDisease.Data.Repository;
 namespace RareDiseasesSystem.Controllers
 {
 
+    [Authorize]
     public class RareDiseaseController : Controller
     {
         private readonly ILogger<RareDiseaseController> _logger;
@@ -79,20 +81,27 @@ namespace RareDiseasesSystem.Controllers
                 var engineList = rareAnalyzeEngine.Split(",");
 
                 var diseaseCaluateBar = new DiseaseCaluateBarModel();
-                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "命中HPO", Value = new List<int>() });
-                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "疾病HPO", Value = new List<int>() });
-                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "提交HPO", Value = new List<int>() });
-                diseaseCaluateBar.SeriesDataModel.Add(new SeriesDataModel { Name = "命中算法", Value = new List<int>() });
+                var diseaseCaculateDistribution = new DiseaseCaluateHPODistributionModel();
+                diseaseCaculateDistribution.Disease = new List<string>();
+                diseaseCaculateDistribution.Disease.Add("初始HPO");
+                diseaseCaculateDistribution.HPOId = new List<string>();
+
+                diseaseCaluateBar.SeriesDataModel = new List<SeriesData>();
+                diseaseCaluateBar.Disease = new List<string>();
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesData { Name = "命中HPO", Value = new List<int>() });
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesData { Name = "疾病HPO", Value = new List<int>() });
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesData { Name = "初始HPO", Value = new List<int>() });
+                diseaseCaluateBar.SeriesDataModel.Add(new SeriesData { Name = "支持算法", Value = new List<int>() });
 
                 List<NlpRareDiseaseResponseModel> allList = new List<NlpRareDiseaseResponseModel>();
 
                 var diseaseList = new List<DiseaseCaculateSingleModel>();
-                foreach(var engine in engineList)
+                foreach (var engine in engineList)
                 {
                     var list = await _nLPSystemRepository.GetRareDiseaseResult(hpoStr, engine, rareDataBaseEngine);
-                    foreach(var data in list)
+                    foreach (var data in list)
                     {
-                        diseaseList.Add(new DiseaseCaculateSingleModel { Souce = engine, Disease = data.Name, Score = data.Ratio });
+                        diseaseList.Add(new DiseaseCaculateSingleModel { Source = engine, Disease = data.Name, Score = data.Ratio });
                     }
                     allList.AddRange(list);
 
@@ -102,7 +111,7 @@ namespace RareDiseasesSystem.Controllers
                 {
                     var overview = new DiseaseCaculateOverviewModel();
                     overview.Disease = disease.Key;
-                    overview.SupportMethod = string.Join(",", disease.ToList().Select(x => x.Souce));
+                    overview.SupportMethod = string.Join(",", disease.ToList().Select(x => x.Source));
                     overview.Score = Math.Round(disease.Sum(x => x.Score) / disease.Count(), 4);
                     overviewList.Add(overview);
                 }
@@ -112,8 +121,10 @@ namespace RareDiseasesSystem.Controllers
                 {
                     overviewList[i].Rank = i + 1;
                     diseaseCaluateBar.Disease.Add(overviewList[i].Disease);
-                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "提交HPO").Value.Add(hpoCount);
-                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "命中算法").Value.Add(overviewList[i].SupportMethod.Split(",").Count());
+                    diseaseCaculateDistribution.Disease.Add(overviewList[i].Disease);
+                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "初始HPO").Value.Add(hpoCount);
+                    diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "支持算法").Value.Add(overviewList[i].SupportMethod.Split(",").Count());
+
                     var diseaseHPOCount = 0;
                     var matchedHPOCount = 0;
                     foreach (var data in allList)
@@ -125,22 +136,58 @@ namespace RareDiseasesSystem.Controllers
                             {
                                 matchedHPOCount = data.HPOMatchedList.Where(x => x.Match == 1).Count();
                             }
+                            foreach (var item in data.HPOMatchedList)
+                            {
+                                if (!diseaseCaculateDistribution.HPOId.Any(x => x == item.HpoId))
+                                {
+                                    diseaseCaculateDistribution.HPOId.Add(item.HpoId);
+                                }
+                            }
                         }
                     }
                     diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "疾病HPO").Value.Add(diseaseHPOCount);
                     diseaseCaluateBar.SeriesDataModel.FirstOrDefault(x => x.Name == "命中HPO").Value.Add(matchedHPOCount);
                 }
-
-               
-                return Json(new { success = true, overviewList });
+                ArrayList marks = new ArrayList();
+                for (int j = 0; j < diseaseCaculateDistribution.Disease.Count; j++)
+                {
+                    var tempHPOStr = "";
+                    if (diseaseCaculateDistribution.Disease[j] == "初始HPO")
+                    {
+                        tempHPOStr = hpoStr;
+                    }
+                    var matchedHPOCount = 0;
+                    foreach (var data in allList)
+                    {
+                        if (data.Name == diseaseCaculateDistribution.Disease[j])
+                        {
+                            if (data.HPOMatchedList.Where(x => x.Match == 1).Count() > matchedHPOCount)
+                            {
+                                matchedHPOCount = data.HPOMatchedList.Where(x => x.Match == 1).Count();
+                                tempHPOStr = string.Join(",", data.HPOMatchedList.Where(x => x.Match == 1).Select(x => x.HpoId));
+                            }
+                        }
+                    }
+                    for (int i = 0; i < diseaseCaculateDistribution.HPOId.Count; i++)
+                    {
+                        if(tempHPOStr.Contains(diseaseCaculateDistribution.HPOId[i]))
+                        {
+                            int[] mark = new int[] { i, j };
+                            marks.Add(mark);
+                        } 
+                    }                  
+                }
+                diseaseCaculateDistribution.Marks = marks;
+                return Json(new { success = true, overviewList, diseaseList, diseaseCaluateBar, diseaseCaculateDistribution });
             }
             catch (Exception ex)
             {
-                _logger.LogError("罕见病分析结果：" + ex.ToString());
+                _logger.LogError("GetDiseaseCaculateResult：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }
 
+        [AllowAnonymous]
         public string GetNLPRareDiseaseResultMockUp(string texts)
         {
             try
@@ -179,6 +226,7 @@ namespace RareDiseasesSystem.Controllers
                 return "";
             }
         }
+        [AllowAnonymous]
         public string GetNLHPOMockUp(string texts)
         {
             try

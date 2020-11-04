@@ -634,7 +634,10 @@
                         value: 'all',
                         label: '整合库'
                     }
-                ]
+                ],
+                overviewList: [],
+                diseaseList: [],
+                diseaseCaluateBar:[]
             };
         },
         template: "#v-disease-caculate",
@@ -664,6 +667,11 @@
                     dataType: 'json',
                     success: function (data) {
                         if (data && data.success) {
+                            that.overviewList = data.overviewList;
+                            that.diseaseList = data.diseaseList;
+                            that.diseaseCaluateBar = data.diseaseCaluateBar;
+                            disease_hpo_bar_chart(data.diseaseCaluateBar);
+                            disease_hpo_distribution_chart(data.diseaseCaculateDistribution);
                         }
                         else {
                             console.log(data);
@@ -676,8 +684,154 @@
         mounted: function () {
             if (sessionStorage["diseaseCaculate-hpoStr"] !== "") {
                 this.HPOStr = sessionStorage["diseaseCaculate-hpoStr"];
-            }
+            };
+            document.getElementsByClassName("login-footer")[0].style.position = 'relative';
+        
         }
     });
 
 })();
+
+
+function disease_hpo_distribution_chart(disease) {
+    option = {
+        legend: {
+            data: ['HPO'],
+            left: 'right'
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: disease.xAxis,
+            boundaryGap: false,
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    color: '#999',
+                    type: 'dashed'
+                }
+            },
+            axisLabel: {
+                interval: 0,
+                rotate: 40
+            } 
+        },
+        yAxis: {
+            type: 'category',
+            data: disease.yAxis,
+            inverse: true,
+            boundaryGap: false,
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    color: '#999',
+                    type: 'dashed'
+                }
+            }
+        },
+        series: [{
+            name: 'HPO',
+            type: 'scatter',
+            symbolSize: function (val) {
+                return 10;
+            },
+            data: disease.marks
+        }]
+    };
+
+    var dom = document.getElementById("disease_hpo_distribution");
+    var myChart = echarts.init(dom);
+    if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+    }
+
+    window.addEventListener("resize", function () {
+        myChart.resize();
+    });
+}
+
+
+function disease_hpo_bar_chart(disease) {
+    option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        legend: {
+            data: disease.SeriesData.map(function (item) { return item.name; })
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value'
+        },
+        yAxis: {
+            type: 'category',
+            data: disease.yAxis,
+            inverse: true
+        },
+        series: [
+            {
+                name: disease.SeriesData[0].name,
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    show: true,
+                    position: 'insideRight'
+                },
+                data: disease.SeriesData[0].value
+            },
+            {
+                name: disease.SeriesData[1].name,
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    show: true,
+                    position: 'insideRight'
+                },
+                data: disease.SeriesData[1].value
+            },
+            {
+                name: disease.SeriesData[2].name,
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    show: true,
+                    position: 'insideRight'
+                },
+                data: disease.SeriesData[2].value
+            },
+            {
+                name: disease.SeriesData[3].name,
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    show: true,
+                    position: 'insideRight'
+                },
+                data: disease.SeriesData[3].value
+            }
+        ]
+    };
+
+    var dom = document.getElementById("disease_hpo_bar");
+    var myChart = echarts.init(dom);
+    if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+    }
+
+    window.addEventListener("resize", function () {
+        myChart.resize();
+    });
+}

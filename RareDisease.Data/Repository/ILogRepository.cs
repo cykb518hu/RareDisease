@@ -58,13 +58,13 @@ namespace RareDisease.Data.Repository
             var resultsTask = new List<OperationLog>();
             if (role == "admin")
             {
-                countTask=query.Count(x => x.CreatedOn >= startDate && x.CreatedOn <= endDate);
-                resultsTask = query.Where(x => x.CreatedOn > startDate && x.CreatedOn <= endDate).OrderByDescending(x => x.CreatedOn).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+                countTask=query.Count(x => x.CreatedOn >= startDate && x.CreatedOn < endDate);
+                resultsTask = query.Where(x => x.CreatedOn >= startDate && x.CreatedOn < endDate).OrderByDescending(x => x.CreatedOn).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
             }
             else
             {
-                countTask = query.Count(x => x.CreatedOn >= startDate && x.CreatedOn <= endDate && x.CreatedBy == userName);
-                resultsTask = query.Where(x => x.CreatedOn > startDate && x.CreatedOn <= endDate && x.CreatedBy == userName).OrderByDescending(x => x.CreatedOn).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+                countTask = query.Count(x => x.CreatedOn >= startDate && x.CreatedOn < endDate && x.CreatedBy == userName);
+                resultsTask = query.Where(x => x.CreatedOn >= startDate && x.CreatedOn < endDate && x.CreatedBy == userName).OrderByDescending(x => x.CreatedOn).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
             }
              
             totalCount = countTask;

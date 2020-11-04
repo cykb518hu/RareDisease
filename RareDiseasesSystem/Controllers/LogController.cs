@@ -40,6 +40,10 @@ namespace RareDiseasesSystem.Controllers
                 }
                 var role = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
                 var userName = HttpContext.User.Identity.Name;
+                if (startDate == endDate)
+                {
+                    endDate = endDate.AddDays(1);
+                }
                 var data = _logRepository.Search(pageIndex, pageSize, startDate, endDate, role, userName, ref total);
                 return Json(new { success = true, data, total });
             }
