@@ -151,12 +151,16 @@ namespace RareDiseasesSystem.Controllers
                 ArrayList marks = new ArrayList();
                 for (int j = 0; j < diseaseCaculateDistribution.Disease.Count; j++)
                 {
-                    var tempHPOStr = "";
+                    var HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>();
                     if (diseaseCaculateDistribution.Disease[j] == "初始HPO")
                     {
-                        tempHPOStr = hpoStr;
+                        foreach(var r in hpoStr.Split(","))
+                        {
+                            HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = r, Match = 1 });
+                        }
                     }
                     var matchedHPOCount = 0;
+                    
                     foreach (var data in allList)
                     {
                         if (data.Name == diseaseCaculateDistribution.Disease[j])
@@ -164,17 +168,27 @@ namespace RareDiseasesSystem.Controllers
                             if (data.HPOMatchedList.Where(x => x.Match == 1).Count() > matchedHPOCount)
                             {
                                 matchedHPOCount = data.HPOMatchedList.Where(x => x.Match == 1).Count();
-                                tempHPOStr = string.Join(",", data.HPOMatchedList.Where(x => x.Match == 1).Select(x => x.HpoId));
+                                HPOMatchedList = data.HPOMatchedList;
+                                //tempHPOStr = string.Join(",", data.HPOMatchedList.Where(x => x.Match == 1).Select(x => x.HpoId));
                             }
                         }
                     }
                     for (int i = 0; i < diseaseCaculateDistribution.HPOId.Count; i++)
                     {
-                        if(tempHPOStr.Contains(diseaseCaculateDistribution.HPOId[i]))
+                        var item = HPOMatchedList.FirstOrDefault(x => x.HpoId == diseaseCaculateDistribution.HPOId[i]);
+                        if (item != null)
                         {
-                            int[] mark = new int[] { i, j };
-                            marks.Add(mark);
-                        } 
+                            if (item.Match == 1)
+                            {
+                                int[] mark = new int[] { i, j, 1 };
+                                marks.Add(mark);
+                            }
+                            else if (item.Source == "知识库")
+                            {
+                                int[] mark = new int[] { i, j, 0 };
+                                marks.Add(mark);
+                            }                        
+                        }
                     }                  
                 }
                 diseaseCaculateDistribution.Marks = marks;

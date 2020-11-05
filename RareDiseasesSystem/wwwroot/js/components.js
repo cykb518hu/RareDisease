@@ -170,7 +170,11 @@
                     {
                         value: 'Overlap',
                         label: 'Overlap'
-                    },             
+                    },
+                    {
+                        value: 'Oss',
+                        label: 'Oss'
+                    },
                     {
                         value: 'Loglikelihood',
                         label: 'Log-likelihood & ratio'
@@ -657,7 +661,8 @@
                 var para = {};
                 para = {
                     hpoStr: this.HPOStr,
-                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Loglikelihood",
+                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Oss",
+                   // rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Loglikelihood",
                     rareDataBaseEngine: this.dataBaseEngine
                 };
                 $.ajax({
@@ -739,6 +744,15 @@ function disease_hpo_distribution_chart(disease) {
             type: 'scatter',
             symbolSize: function (val) {
                 return 10;
+            },
+            color: function (val) {
+                if (val.data[2] === 1) {
+                    return "green"; 
+                }
+                else {
+                    return "red";
+                }
+               
             },
             data: disease.marks
         }]
