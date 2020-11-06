@@ -456,11 +456,11 @@
                 this.multipleSearchedHPOSelection = val;
             },
             onSearchedHPOSelectionIn: function () {
-                var names = this.multipleSearchedHPOSelection.map(function (item) {
-                    return item.name;
+                var hpoIds = this.multipleSearchedHPOSelection.map(function (item) {
+                    return item.hpoId;
                 });
 
-                if (names.length === 0) {
+                if (hpoIds.length === 0) {
                     alert("请选择相应的HPO 表征");
                     return;
                 }
@@ -469,7 +469,7 @@
                     this.multipleSearchedHPOSelection.map(function (item) {
                         var exist = false;
                         for (var i = 0; i < that.patientHPOList.length; i++) {
-                            if (that.patientHPOList[i].name === item.name) {
+                            if (that.patientHPOList[i].hpoId === item.hpoId) {
                                 exist = true;
                                 break;
                             }
@@ -661,7 +661,7 @@
                 var para = {};
                 para = {
                     hpoStr: this.HPOStr,
-                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Oss",
+                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap",
                    // rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Loglikelihood",
                     rareDataBaseEngine: this.dataBaseEngine
                 };
@@ -737,7 +737,20 @@ function disease_hpo_distribution_chart(disease) {
                     color: '#999',
                     type: 'dashed'
                 }
-            }
+            },
+            axisLabel: {
+                interval: 0,
+                formatter: function (value) {
+                    if (value.length > 50) {
+                        value = value.slice(0, 100) + '...';
+                    }
+                    return value;
+                },
+                tooltip: {
+                    show: true
+                }
+            } 
+            
         },
         series: [{
             name: 'HPO',
@@ -747,10 +760,10 @@ function disease_hpo_distribution_chart(disease) {
             },
             color: function (val) {
                 if (val.data[2] === 1) {
-                    return "green"; 
+                    return "red"; 
                 }
                 else {
-                    return "red";
+                    return "gray";
                 }
                
             },
@@ -793,7 +806,19 @@ function disease_hpo_bar_chart(disease) {
         yAxis: {
             type: 'category',
             data: disease.yAxis,
-            inverse: true
+            inverse: true,
+            axisLabel: {
+                interval: 0,
+                formatter: function (value) {
+                    if (value.length > 50) {
+                        value = value.slice(0, 100) + '...';
+                    }
+                    return value;
+                },
+                tooltip: {
+                    show: true
+                }
+            }
         },
         series: [
             {

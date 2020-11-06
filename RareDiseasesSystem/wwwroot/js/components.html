@@ -336,7 +336,7 @@
                                      width="50">
                     </el-table-column>
                     <el-table-column prop="visitTime"
-                                     label="诊断时间" width="120">
+                                     label="诊断时间" width="150">
                     </el-table-column>
                     <el-table-column prop="visitType"
                                      label="类别" width="100">
@@ -345,7 +345,7 @@
                                      label="病历">
                     </el-table-column>
                     <el-table-column prop="center"
-                                     label="机构" width="100">
+                                     label="机构" width="150">
                     </el-table-column>
                 </el-table>
                 <el-pagination background style="float:right;"
@@ -527,16 +527,16 @@
                 <el-table v-bind:data="overviewList"
                           style="width: 100%">
                     <el-table-column prop="rank"
-                                     label="排序" min-width="7">
+                                     label="排序" min-width="10%">
                     </el-table-column>
                     <el-table-column prop="disease"
-                                     label="疾病" min-width="7">
+                                     label="疾病" min-width="50%">
                     </el-table-column>
                     <el-table-column prop="supportMethod"
-                                     label="算法" min-width="7">
+                                     label="算法" min-width="20%">
                     </el-table-column>
                     <el-table-column prop="score"
-                                     label="分数" min-width="7">
+                                     label="分数" min-width="10%">
                     </el-table-column>
                 </el-table>
             </div>
@@ -552,10 +552,10 @@
                             <el-table v-bind:data="diseaseList.filter(item => item.source === 'Jaccard')"
                                       style="width: 100%">
                                 <el-table-column prop="disease"
-                                                 label="疾病" min-width="7">
+                                                 label="疾病" min-width="80%">
                                 </el-table-column>
                                 <el-table-column prop="score"
-                                                 label="分数" min-width="7">
+                                                 label="分数" min-width="20%">
                                 </el-table-column>
                             </el-table>
                         </div>
@@ -569,10 +569,10 @@
                             <el-table v-bind:data="diseaseList.filter(item => item.source === 'Tanimoto')"
                                       style="width: 100%">
                                 <el-table-column prop="disease"
-                                                 label="疾病" min-width="7">
+                                                 label="疾病" min-width="80%">
                                 </el-table-column>
                                 <el-table-column prop="score"
-                                                 label="分数" min-width="7">
+                                                 label="分数" min-width="20%">
                                 </el-table-column>
                             </el-table>
                         </div>
@@ -590,10 +590,10 @@
                             <el-table v-bind:data="diseaseList.filter(item => item.source === 'Overlap')"
                                       style="width: 100%">
                                 <el-table-column prop="disease"
-                                                 label="疾病" min-width="7">
+                                                 label="疾病" min-width="80%">
                                 </el-table-column>
                                 <el-table-column prop="score"
-                                                 label="分数" min-width="7">
+                                                 label="分数" min-width="20%">
                                 </el-table-column>
                             </el-table>
                         </div>
@@ -607,10 +607,10 @@
                             <el-table v-bind:data="diseaseList.filter(item => item.source === 'Oss')"
                                       style="width: 100%">
                                 <el-table-column prop="disease"
-                                                 label="疾病" min-width="7">
+                                                 label="疾病" min-width="80%">
                                 </el-table-column>
                                 <el-table-column prop="score"
-                                                 label="分数" min-width="7">
+                                                 label="分数" min-width="20%">
                                 </el-table-column>
                             </el-table>
                         </div>
