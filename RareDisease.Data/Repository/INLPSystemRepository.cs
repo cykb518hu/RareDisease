@@ -101,6 +101,7 @@ namespace RareDisease.Data.Repository
                                 data.StartIndex = r.Start;
                                 data.EndIndex = r.End;
                                 data.HPOId = hpo;
+                                data.TermSource = r.TermSource == null ? "" : string.Join(",", r.TermSource);
                                 data.Editable = true;
                                 data.IndexList = new List<HPOMatchIndexModel>();
                                 data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
@@ -138,7 +139,21 @@ namespace RareDisease.Data.Repository
                 }
                 else
                 {
-                    hpoList.AddRange(_rdrDataRepository.GetPatientNlpResult(patientVisitIds));
+                    hpoList.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31, Editable = true });
+
+                    hpoList[0].IndexList = new List<HPOMatchIndexModel>();
+                    hpoList[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 26, EndIndex = 31 });
+                    hpoList[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 36, EndIndex = 41 });
+                    hpoList.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394, Positivie = 0, Editable = true, CHPOName = "常染色体隐性遗传" });
+                    hpoList[1].IndexList = new List<HPOMatchIndexModel>();
+                    hpoList[1].IndexList.Add(new HPOMatchIndexModel { StartIndex = 386, EndIndex = 394 });
+                    hpoList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true });
+                    hpoList[2].IndexList = new List<HPOMatchIndexModel>();
+                    hpoList[2].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
+
+                    hpoList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true });
+                    hpoList[3].IndexList = new List<HPOMatchIndexModel>();
+                    hpoList[3].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
                 }
             }
             return hpoList;
@@ -165,7 +180,7 @@ namespace RareDisease.Data.Repository
                 requestData.HPOList = hpoStr;
                 var data = string.Empty;
                 var requestStr = JsonConvert.SerializeObject(requestData);
-                _logger.LogError("GetPatientRareDiseaseResult NLP request data：" + requestStr);
+                _logger.LogError("GetPatientRareDiseaseResult 请求数据：" + requestStr);
 
                 var client = _clientFactory.CreateClient("DiseaseHost");
                 var api = _config.GetValue<string>("NLPAddress:DiseaseApi");

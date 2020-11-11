@@ -613,7 +613,7 @@
     Vue.component("v-disease-caculate", {
         data: function () {
             return {
-                HPOStr: "",
+                HPOStr: "HP:0001345,HP:0001545,HP:0002043,HP:0000707,HP:0003268,HP:0000787,HP:0003828,HP:0003131",
                 dataBaseEngine:"eRAM",
                 dataBaseEngineOptions: [
                     {
@@ -661,7 +661,7 @@
                 var para = {};
                 para = {
                     hpoStr: this.HPOStr,
-                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap",
+                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Oss",
                    // rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Loglikelihood",
                     rareDataBaseEngine: this.dataBaseEngine
                 };

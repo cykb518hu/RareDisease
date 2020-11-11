@@ -44,9 +44,6 @@
     <None Update="App_Data\sql\home-get-exam-data-sql.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="App_Data\sql\home-get-hpo-result-sql.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="App_Data\sql\home-patient-EMR-sql.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

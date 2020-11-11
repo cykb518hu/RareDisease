@@ -36,10 +36,9 @@ namespace RareDiseasesSystem.Controllers
         }
         public IActionResult Index()
         {
-            _logRepository.Add("查看罕见病系统首页");
+            _logRepository.Add("罕见病系统首页");
             return View();
         }
-
 
         public IActionResult DiseaseCaculate()
         {
@@ -62,7 +61,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                _logRepository.Add("查询患者就诊记录");
+                _logRepository.Add("查询患者就诊记录", "", $"number:{number},numberType:{numberType}");
                 var patientOverview = _rdrDataRepository.GetPatientOverview(number, numberType);              
                 if (patientOverview.Any())
                 {
@@ -82,6 +81,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
+                _logRepository.Add("获取患者电子病历文本", "", $"patientVisitIds:{patientVisitIds}");
                 var data = _rdrDataRepository.GetPatientEMRDetail(patientVisitIds);
                 return Json(new { success = true, data });
             }
@@ -97,13 +97,13 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 var hpoList = new List<HPODataModel>();
-                hpoList = _nLPSystemRepository.GetPatientHPOResult(nlpEngine, patientEMRDetail, patientVisitIds);             
-                _logRepository.Add("获取病人HPO", "", JsonConvert.SerializeObject(hpoList));
+                hpoList = _nLPSystemRepository.GetPatientHPOResult(nlpEngine, patientEMRDetail, patientVisitIds);
+                _logRepository.Add("分析HPO");
                 return Json(new { success = true, data = hpoList, });
             }
             catch (Exception ex)
             {
-                _logger.LogError("获取病人HPO：" + ex.ToString());
+                _logger.LogError("分析HPO：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }
@@ -128,7 +128,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                _logRepository.Add($"删除HPO Term:{hpoId},{hpoTerm}");
+                _logRepository.Add($"删除HPO Term","",$"HPO ID:{hpoId},HPO Term:{hpoTerm}");
 
                 return Json(new { success = true });
             }

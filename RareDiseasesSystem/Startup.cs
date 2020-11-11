@@ -63,7 +63,7 @@ namespace RareDiseasesSystem
                 options.ValueCountLimit = int.MaxValue;
             });
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
-            services.AddScoped<ILogRepository, LogRepository>();
+            services.AddScoped<ILogRepository, GPLogRepositry>();
             services.AddScoped<IRdrDataRepository, RdrDataRepository>();
             services.AddScoped<INLPSystemRepository, NLPSystemRepository>();
             services.AddCors(options =>

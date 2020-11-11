@@ -147,7 +147,9 @@
                                                     width="300"
                                                     title="HPO term"
                                                     trigger="hover">
-                                            <p>{{scope.row.chpoName}} : {{scope.row.nameEnglish}}</p>
+                                            <p>中文: {{scope.row.chpoName}}</p>
+                                            <p>英文: {{scope.row.nameEnglish}}</p>
+                                            <p>来源：{{scope.row.termSource}}</p>
                                             <div style="text-align: right; margin: 0">
                                                 <el-button type="primary" size="mini" v-if="scope.row.editable"
                                                            v-on:click="onDeleteHPOTerm(scope.row)">删除</el-button>
@@ -469,7 +471,7 @@
                     <el-row>
                         <el-col v-bind:span="17">
                             <el-input id="txt_HPOStr" type="text"
-                                      placeholder="HPO ID HP:12345;HP:54321"
+                                      placeholder="HP:0001345,HP:0001545,HP:0002043,HP:0000707,HP:0003268,HP:0000787,HP:0003828,HP:0003131"
                                       v-model="HPOStr">
                             </el-input>
                         </el-col>

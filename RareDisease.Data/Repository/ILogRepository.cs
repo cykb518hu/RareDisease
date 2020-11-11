@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RareDisease.Data.Entity;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,53 @@ namespace RareDisease.Data.Repository
         List<OperationLogOutPut> Search(int pageIndex, int pageSize, DateTime startDate, DateTime endDate, string role, string userName, ref int totalCount);
     }
 
+    public class GPLogRepositry: RareDiseaseGPDbContext,ILogRepository
+    {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<GPLogRepositry> _logger;
+        public GPLogRepositry(IHttpContextAccessor httpContextAccessor, ILogger<GPLogRepositry> logger)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
+        }
+        public void Add(string action, string userName = "", string message = "")
+        {
+            OperationLog log = new OperationLog();
+            if (string.IsNullOrEmpty(userName))
+            {
+                userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+            }
+            log.Action = action;
+            log.Message = message;
+            log.Guid = Guid.NewGuid().ToString();
+            log.CreatedOn = DateTime.Now;
+            log.CreatedBy = userName;
+            dbgp.Insertable(log).ExecuteCommand();
+        }
+        public List<OperationLogOutPut> Search(int pageIndex, int pageSize, DateTime startDate, DateTime endDate, string role, string userName, ref int totalCount)
+        {
+
+            var query = dbgp.Queryable<OperationLog>();
+
+            if (role == "admin")
+            {
+                query.Where(x => x.CreatedOn >= startDate && x.CreatedOn < endDate);
+            }
+            else
+            {
+                query.Where(x => x.CreatedOn >= startDate && x.CreatedOn < endDate && x.CreatedBy == userName);
+            }
+            var result = query.OrderBy(it => it.CreatedOn, OrderByType.Desc).ToPageList(pageIndex, pageSize, ref totalCount);
+
+            var list = new List<OperationLogOutPut>();
+            foreach (var r in result)
+            {
+                list.Add(new OperationLogOutPut { Action = r.Action, CreatedBy = r.CreatedBy, CreatedOn = r.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss") });
+            }
+            return list;
+        }
+
+    }
     public class LogRepository : ILogRepository
     {
         private readonly RareDiseaseDbContext _context;

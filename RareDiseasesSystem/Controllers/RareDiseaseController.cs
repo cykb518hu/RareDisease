@@ -31,6 +31,7 @@ namespace RareDiseasesSystem.Controllers
         }
         public IActionResult Search()
         {
+            _logRepository.Add("查询罕见病详情页面");
             return View();
         }
 
@@ -38,7 +39,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                _logRepository.Add("查询罕见病详情", "", search);
+                _logRepository.Add("查询罕见病", "", search);
 
                 var globalList = _rdrDataRepository.SearchStandardRareDiseaseList(search);
                 var chinaList = _localMemoryCache.GetChinaRareDiseaseList(search);
@@ -63,7 +64,7 @@ namespace RareDiseasesSystem.Controllers
                 var rareDiseaseList = new List<NlpRareDiseaseResponseModel>();
                 rareDiseaseList = await _nLPSystemRepository.GetRareDiseaseResult(hpoStr, rareAnalyzeEngine, rareDataBaseEngine);
 
-                _logRepository.Add("罕见病分析结果", "", JsonConvert.SerializeObject(rareDiseaseList));
+                _logRepository.Add("罕见病分析", "", $"分析引擎:{rareAnalyzeEngine},罕见病库:{rareDataBaseEngine}");
                 return Json(new { success = true, rareDiseaseList });
             }
             catch (Exception ex)
@@ -77,6 +78,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
+                _logRepository.Add("罕见病详细计算", "", $"分析引擎:{rareAnalyzeEngine},罕见病库:{rareDataBaseEngine},HPO str:{hpoStr}");
                 var hpoCount = hpoStr.Split(",").Count();
                 var engineList = rareAnalyzeEngine.Split(",");
 
@@ -196,7 +198,7 @@ namespace RareDiseasesSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("GetDiseaseCaculateResult：" + ex.ToString());
+                _logger.LogError("罕见病详细计算错误：" + ex.ToString());
                 return Json(new { success = false, msg = ex.ToString() });
             }
         }
@@ -213,23 +215,27 @@ namespace RareDiseasesSystem.Controllers
 
                 item.Add(new NlpRareDiseaseResponseModel { Name = "anemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsa", Ratio = 0.9, HPOMatchedList = new List<NLPRareDiseaseResponseHPODataModel>() });
                 item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001644", HpoName = "痴呆", Match = 1 });
-                item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP0001345", HpoName = "行动不便", Match = 0 });
+                item[1].HPOMatchedList.Add(new NLPRareDiseaseResponseHPODataModel { HpoId = "HP:0001345", HpoName = "行动不便", Match = 0 });
                 var str = "";
                 if (texts.Contains("Jaccard"))
                 {
-                    str = "[{'name':';jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsaanemiadlsk;jjjjjjjjjjjsdfsdfadljdslkjflkasjdlfakjsdlkjflaksjdl;fkjasldkjfsalkjdflkjads;lkfjskaljdkljdslfjlskajdfl;kjasdlkjflasdjfljadsjflsdjf;lsajljfasjdlf;jadsljfl;asdjf;ladjslfj;saj;flkdsjflkdsjjsa','ratio':0.9,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病1','ratio':0.777,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                    str = "[{'name':'帕金森','ratio':0.9,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP:0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病1','ratio':0.777,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP:0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
                 }
                 if (texts.Contains("Tanimoto"))
                 {
-                    str = "[{'name':'帕金森','ratio':0.5,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病2','ratio':0.999,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                    str = "[{'name':'帕金森','ratio':0.5,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP:0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病2','ratio':0.999,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP:0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
                 }
                 if (texts.Contains("Overlap"))
                 {
-                    str = "[{'name':'帕金森Overlap','ratio':0.1,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病Overlap','ratio':0.01,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                    str = "[{'name':'帕金森Overlap','ratio':0.1,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP:0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病Overlap','ratio':0.01,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP:0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                }
+                if (texts.Contains("Oss"))
+                {
+                    str = "[{'name':'帕金森Oss','ratio':0.1,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP:0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病Oss','ratio':0.01,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP:0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
                 }
                 if (texts.Contains("Loglikelihood"))
                 {
-                    str = "[{'name':'帕金森Loglikelihood','ratio':0.4,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病Loglikelihood','ratio':0.23,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
+                    str = "[{'name':'帕金森Loglikelihood','ratio':0.4,'Hpolist':[{'HpoId':'HP:0002067','hpoName':'痴呆','match':0}, {'HpoId':'HP:0001545','hpoName':'行动不便','match':1},{'HpoId':'HP:0002067','hpoName':'痴呆','match':0},{'HpoId':'HP:0002068','hpoName':'痴呆','match':0},{'HpoId':'HP:0002069','hpoName':'痴呆','match':0}]},{'name':'白化病Loglikelihood','ratio':0.23,'Hpolist':[{'HpoId':'HP0001344','hpoName':'流血','match':0}, {'HpoId':'HP:0001345','hpoName':'止不住','match':1},{'HpoId':'HP0001145','hpoName':'测试数据','match':1}]}]";
                 }
                 return str;// JsonConvert.SerializeObject(item);
                 //return str;
@@ -247,7 +253,7 @@ namespace RareDiseasesSystem.Controllers
             {
 
                 var str = "[ {'ratio': 1, 'emrword': '腹泻', 'similarchpoterm': '腹泻', 'similarchpoid': \"['hp:00101', 'hp:00102']\",'start': 0, 'end': 2 }, {'ratio': 1,'emrword': '腹泻','similarchpoterm': '腹泻CHPO','similarchpoid': \"['hp:00103','hp:00104']\",'start': 0, 'end': 2 }]";
-                var str1 = "[ {'positive':0,'ratio': 1, 'emrword': '腹泻', 'similarchpoterm': '腹泻', 'similarchpoid': ['hp:00101', 'hp:00102'],'start': 0, 'end': 2 }, {'ratio': 1,'emrword': '腹泻','similarchpoterm': '腹泻','similarchpoid': ['hp:00101','hp:00102'],'start': 4, 'end': 6 }]";
+                var str1 = "[ {'positive':0,'ratio': 1, 'emrword': '腹泻', 'similarchpoterm': '腹泻', 'similarchpoid': ['HP:0002014', 'HP:0002028'],'termlaiyuan': ['umls', 'omaha'],'start': 0, 'end': 2 }, {'ratio': 1,'emrword': '腹泻','similarchpoterm': '腹泻','similarchpoid': ['hp:00101','hp:00102'],'start': 4, 'end': 6 } ,{'ratio': 1,'emrword': '食管狭窄','similarchpoterm': '食管狭窄','similarchpoid': ['HP:0002043'],'termlaiyuan': [],'start': 4, 'end': 6 }]";
 
                 return str1;// JsonConvert.SerializeObject(item);
                 //return str;

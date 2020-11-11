@@ -22,12 +22,6 @@ namespace RareDisease.Data.Repository
         List<PatientVisitInfoModel> GetPatientVisitList(string number);
         string GetPatientEMRDetail(string patientVisitIds);
 
-        /// <summary>
-        /// NLP 语义分析出来的HPO结果
-        /// </summary>
-        /// <param name="patientEmpiId"></param>
-        /// <returns></returns>
-        List<HPODataModel> GetPatientNlpResult(string patientVisitIds);
 
         /// <summary>
         /// 病人原始检验数据
@@ -164,119 +158,6 @@ namespace RareDisease.Data.Repository
             // return "";
         }
 
-
-        public List<HPODataModel> GetPatientNlpResult(string patientVisitIds)
-        {
-            //emr_chpo_heng
-            var result = new List<HPODataModel>();
-            if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(patientVisitIds))
-            {
-                string sql = GetSqlText("home-get-hpo-result-sql.txt");
-                sql = string.Format(sql, patientVisitIds);
-                var HPOTextList = new List<PatientVisitHPOResultModel>();
-                using (var reader = dbgp.Ado.GetDataReader(sql))
-                {
-                    while (reader.Read())
-                    {
-                        var data = new PatientVisitHPOResultModel();
-                        data.HPOResult = reader["hpo_result_str"] == DBNull.Value ? "" : reader["hpo_result_str"].ToString();
-                        data.EMR = reader["emr_text"] == DBNull.Value ? "" : reader["emr_text"].ToString();
-
-                        //多次就诊，需要将上次开始index和这次病例文本长度相加
-                        var item = HPOTextList.LastOrDefault();
-                        if(item!=null)
-                        {
-                            //2 行换行符
-                            data.StartIndex = item.StartIndex + item.EMR.Length + 2;
-                        }
-                       
-                        HPOTextList.Add(data);
-                    }
-                }
-                foreach (var visitItem in HPOTextList)
-                {
-                    var hpoStr = visitItem.HPOResult;
-                    hpoStr = hpoStr.Replace(" ", "").Replace("'", "");
-                    hpoStr = hpoStr.Substring(2, hpoStr.Length - 2);
-                    hpoStr = hpoStr.Substring(0, hpoStr.Length - 2);
-                    string[] hpoArray = hpoStr.Split(new string[] { "],[" }, StringSplitOptions.None);
-                    var regex = new Regex("HP:");
-                    foreach (var s in hpoArray)
-                    {
-                        try
-                        {
-                            var single = s;
-                            single = single.Replace("[", "").Replace("]", "");
-                            //查看有多少HPO
-                            var index = regex.Matches(single).Count;
-                            for (int i = 0; i < index; i++)
-                            {
-                                try
-                                {
-                                    var data = new HPODataModel();
-                                    string[] subArrary = single.Split(',');
-                                    //需要叠加上次病历文本的长度
-                                    data.StartIndex = Convert.ToInt32(subArrary[0]) + visitItem.StartIndex;
-                                    data.EndIndex = Convert.ToInt32(subArrary[1]) + visitItem.StartIndex;
-                                    data.Name = subArrary[2];
-                                    data.Positivie = Convert.ToInt32(subArrary[3]);
-                                    data.HPOId = subArrary[4 + i];
-                                    data.Editable = true;
-                                    data.IndexList = new List<HPOMatchIndexModel>();
-                                    data.IndexList.Add(new HPOMatchIndexModel { StartIndex = data.StartIndex, EndIndex = data.EndIndex });
-                                    var item = result.FirstOrDefault(x => x.HPOId == data.HPOId && x.Name == data.Name);
-                                    if (item != null)
-                                    {
-                                        item.IndexList.AddRange(data.IndexList);
-                                        item.IndexList = item.IndexList.OrderBy(x => x.StartIndex).ToList();
-                                    }
-                                    else
-                                    {
-                                        var chpo2020Data = _localMemoryCache.GetCHPO2020StandardList().FirstOrDefault(x => x.HpoId == data.HPOId);
-                                        if (chpo2020Data != null)
-                                        {
-                                            data.CHPOName = chpo2020Data.NameChinese;
-                                            data.NameEnglish = chpo2020Data.NameEnglish;
-                                        }
-                                        result.Add(data);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogError("读取单个HPO出错：" + ex.ToString());
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("读取单组HPO出错：" + ex.ToString());
-                        }
-
-                    }
-                }            
-            }
-            else
-            {
-                result.Add(new HPODataModel { Name = "运动迟缓", NameEnglish = "Bradykinesia", HPOId = "HP:0002067", StartIndex = 26, EndIndex = 31,  Editable = true  });
-               
-                result[0].IndexList = new List<HPOMatchIndexModel>();
-                result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 26, EndIndex = 31 });
-                result[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 36, EndIndex = 41 });
-                result.Add(new HPODataModel { Name = "常染色体隐性遗传", NameEnglish = "Autosomal recessive inheritance", HPOId = "HP:0000007", StartIndex = 386, EndIndex = 394,Positivie = 0, Editable = true,  CHPOName= "常染色体隐性遗传" });
-                result[1].IndexList = new List<HPOMatchIndexModel>();
-                result[1].IndexList.Add(new HPOMatchIndexModel { StartIndex = 386, EndIndex = 394 });
-                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true});
-                result[2].IndexList = new List<HPOMatchIndexModel>();
-                result[2].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
-
-                result.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", StartIndex = 334, EndIndex = 338, Editable = true });
-                result[3].IndexList = new List<HPOMatchIndexModel>();
-                result[3].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
-            }
-            return result;
-        }
-
-
         public List<HPODataModel> GetPatientExamDataResult(string patientVisitIds)
         {
             var result = new List<HPODataModel>();
@@ -337,6 +218,7 @@ namespace RareDisease.Data.Repository
                             hpoItem.Name = r.HPOName;
                             hpoItem.CHPOName = r.HPOName;
                             hpoItem.NameEnglish = r.HPOEnglish;
+                            hpoItem.TermSource = "检验规则";
                             hpoItem.HasExam = true;
                             hpoItem.ExamData = new List<ExamBaseDataModel>();
                             hpoItem.ExamData.AddRange(list);
@@ -348,7 +230,7 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                var hpoItem = new HPODataModel { Name = "高蛋白血症", NameEnglish = "Hyperproteinemia", HPOId = "HP:0002152"};
+                var hpoItem = new HPODataModel { Name = "高蛋白血症", NameEnglish = "Hyperproteinemia", HPOId = "HP:0002152", CHPOName = "高蛋白血症" , TermSource = "检验规则" };
                 var item = new ExamBaseDataModel();
                 item.HPOId = "HP:0002152";
                 item.HPOName = "高蛋白血症";
@@ -362,7 +244,6 @@ namespace RareDisease.Data.Repository
                 item.ExamTimeStr = "2019-12-12";
                 hpoItem.HasExam = true;
                 hpoItem.ExamData = new List<ExamBaseDataModel>();
-                hpoItem.ExamData.Add(item);
                 hpoItem.ExamData.Add(item);
                 result.Add(hpoItem);
             }

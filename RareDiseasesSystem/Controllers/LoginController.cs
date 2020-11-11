@@ -43,6 +43,7 @@ namespace RareDiseasesSystem.Controllers
             if (!string.IsNullOrEmpty(HttpContext.Request.Query["tk"]))
             {
                 LoginModel loginModel = new LoginModel { UserName = "admin", Password = "admin123456" };
+                _logRepository.Add("统一平台进入");
                 Auth(loginModel);
                 HttpContext.Response.Redirect("/Home/Index");
             }

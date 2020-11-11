@@ -68,6 +68,9 @@ namespace RareDisease.Data.Model
         [JsonProperty("indexList")]
         public List<HPOMatchIndexModel> IndexList { get; set; }
 
+        [JsonProperty("termSource")]
+        public string TermSource { get; set; }
+
         
     }
 
@@ -129,6 +132,9 @@ namespace RareDisease.Data.Model
 
         [JsonProperty("positive")]
         public int Positivie { get; set; } = 1;
+
+        [JsonProperty("termlaiyuan")]
+        public List<string> TermSource { get; set; }
     }
 
 }

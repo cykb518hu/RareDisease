@@ -45,7 +45,7 @@ namespace RareDiseasesSystem
                 request.IPAddress = ipAddress.ToString();
                 var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, request.EMRDetail, "");
                 var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
-                _logRepository.Add(appName+ "：调用接口 GetRareDiseaseByEMR", "API", JsonConvert.SerializeObject(request) + " " + JsonConvert.SerializeObject(rareDiseaseList));
+                _logRepository.Add(appName + "：调用接口 GetRareDiseaseByEMR", "API", $"输入参数:{JsonConvert.SerializeObject(request)} 返回数据:{JsonConvert.SerializeObject(rareDiseaseList)}");
 
                 return Json(new { result = "ok", Response= rareDiseaseList });
             }
@@ -83,7 +83,7 @@ namespace RareDiseasesSystem
                 var emrDetail= string.Join(",", patientVisitList.Select(x=>x.DiagDesc));
                 var hpoList = _nLPSystemRepository.GetPatientHPOResult(request.NlpEngine, emrDetail, patientVisitIds);
                 var rareDiseaseList = _nLPSystemRepository.GetPatientRareDiseaseResult(hpoList, request.RareAnalyzeEngine, request.RareDataBaseEngine);
-                _logRepository.Add(appName + "：调用接口 GetRareDiseaseByNumber", "API", JsonConvert.SerializeObject(request)+ " " + JsonConvert.SerializeObject(rareDiseaseList));
+                _logRepository.Add(appName + "：调用接口 GetRareDiseaseByNumber", "API", $"输入参数:{JsonConvert.SerializeObject(request)} 返回数据:{JsonConvert.SerializeObject(rareDiseaseList)}");
 
                 return Json(new { result = "ok", Response = rareDiseaseList });
             }
