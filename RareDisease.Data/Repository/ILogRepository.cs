@@ -28,17 +28,24 @@ namespace RareDisease.Data.Repository
         }
         public void Add(string action, string userName = "", string message = "")
         {
-            OperationLog log = new OperationLog();
-            if (string.IsNullOrEmpty(userName))
+            try
             {
-                userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+                OperationLog log = new OperationLog();
+                if (string.IsNullOrEmpty(userName))
+                {
+                    userName = _httpContextAccessor.HttpContext.User.Identity.Name;
+                }
+                log.Action = action;
+                log.Message = message;
+                log.Guid = Guid.NewGuid().ToString();
+                log.CreatedOn = DateTime.Now;
+                log.CreatedBy = userName;
+                dbgp.Insertable(log).ExecuteCommand();
             }
-            log.Action = action;
-            log.Message = message;
-            log.Guid = Guid.NewGuid().ToString();
-            log.CreatedOn = DateTime.Now;
-            log.CreatedBy = userName;
-            dbgp.Insertable(log).ExecuteCommand();
+            catch(Exception ex)
+            {
+                _logger.LogError("添加日志失败：" + ex.ToString());
+            }
         }
         public List<OperationLogOutPut> Search(int pageIndex, int pageSize, DateTime startDate, DateTime endDate, string role, string userName, ref int totalCount)
         {

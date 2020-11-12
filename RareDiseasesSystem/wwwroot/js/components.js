@@ -352,7 +352,7 @@
             },
             onDeletePatientHPOList: function (subgroup) {
                 for (var i = this.patientHPOList.length - 1; i >= 0; i--) {
-                    if (this.patientHPOList[i].name === subgroup.name) {
+                    if (this.patientHPOList[i].name === subgroup.name && this.patientHPOList[i].hpoId === subgroup.hpoId) {
                         this.patientHPOList.splice(i, 1);
                     }
                 }

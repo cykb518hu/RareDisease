@@ -31,7 +31,7 @@ namespace RareDiseasesSystem.Controllers
         }
         public IActionResult Search()
         {
-            _logRepository.Add("查询罕见病详情页面");
+            _logRepository.Add("罕见病详情页面");
             return View();
         }
 
@@ -39,7 +39,7 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                _logRepository.Add("查询罕见病", "", search);
+                _logRepository.Add("罕见病查询", "", search);
 
                 var globalList = _rdrDataRepository.SearchStandardRareDiseaseList(search);
                 var chinaList = _localMemoryCache.GetChinaRareDiseaseList(search);
