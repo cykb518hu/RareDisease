@@ -83,7 +83,7 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                result.Add(new PatientOverviewModel { EMPINumber = "12345678", Address = "成都市龙泉驿区大面镇银河路118号恒大绿洲", CardNo = "511025196903220551", Gender = "男", Name = "叶问", PhoneNumber = "13550330299" });
+                result.Add(new PatientOverviewModel { EMPINumber = "1234567890", Address = "成都市龙泉驿区大面镇银河路118号恒大绿洲", CardNo = "511025196903220551", Gender = "男", Name = "叶问", PhoneNumber = "13550330299" });
 
             }
             return result;
@@ -242,9 +242,23 @@ namespace RareDisease.Data.Repository
                 item.Range = "60.0-83.0 g/L";
                 item.ExamValue = 121;
                 item.ExamTimeStr = "2019-12-12";
+
+                var item1 = new ExamBaseDataModel();
+                item1.HPOId = "HP:0002152";
+                item1.HPOName = "高蛋白血症";
+                item1.HPOEnglish = "Hyperproteinemia";
+                item1.ExamCode = "2925";
+                item1.ExamName = "总蛋白";
+                item1.SampleCode = "LIS126";
+                item1.SampleName = "血清";
+                item1.Range = "60.0-83.0 g/L";
+                item1.ExamValue = 99;
+                item1.ExamTimeStr = "2020-01-12";
+
                 hpoItem.HasExam = true;
                 hpoItem.ExamData = new List<ExamBaseDataModel>();
                 hpoItem.ExamData.Add(item);
+                hpoItem.ExamData.Add(item1);
                 result.Add(hpoItem);
             }
 
@@ -276,34 +290,34 @@ namespace RareDisease.Data.Repository
             else
             {
                 var data = new RareDiseaseDetailModel();
-                data.Source = "OMIM";
-                data.NameEnglish = "Wilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjda";
+                data.Source = "omaha";
+                data.NameEnglish = "Hyperproteinemia";
                 data.HPOId = "HP:000007";
-                data.HPONameChinese = "高蛋白血症";
+                data.HPONameChinese = "帕金森病";
                 data.HPONameEnglish = "Hyperproteinemia";
                 result.Add(data);
-                var data1 = new RareDiseaseDetailModel();
-                data1.Source = "OMIM";
-                data1.NameEnglish = "Wilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjd";
-                data1.HPOId = "HP:000007";
-                data1.HPONameChinese = "高蛋白血症2";
-                data1.HPONameEnglish = "Hyperproteinemia";
-                result.Add(data1);
-                var data2 = new RareDiseaseDetailModel();
-                data2.Source = "OMIM";
-                data2.NameEnglish = "WWilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjde";
-                data2.HPOId = "HP:000007";
-                data2.HPONameChinese = "高蛋白血症3";
-                data2.HPONameEnglish = "Hyperproteinemia";
-                result.Add(data2);
+                //var data1 = new RareDiseaseDetailModel();
+                //data1.Source = "OMIM";
+                //data1.NameEnglish = "Wilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjd";
+                //data1.HPOId = "HP:000007";
+                //data1.HPONameChinese = "高蛋白血症2";
+                //data1.HPONameEnglish = "Hyperproteinemia";
+                //result.Add(data1);
+                //var data2 = new RareDiseaseDetailModel();
+                //data2.Source = "OMIM";
+                //data2.NameEnglish = "WWilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjde";
+                //data2.HPOId = "HP:000007";
+                //data2.HPONameChinese = "高蛋白血症3";
+                //data2.HPONameEnglish = "Hyperproteinemia";
+                //result.Add(data2);
 
-                var data3 = new RareDiseaseDetailModel();
-                data3.Source = "OMIM";
-                data3.NameEnglish = "WWilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjde";
-                data3.HPOId = "HP:000007";
-                data3.HPONameChinese = "高蛋白血症4";
-                data3.HPONameEnglish = "Hyperproteinemia";
-                result.Add(data3);
+                //var data3 = new RareDiseaseDetailModel();
+                //data3.Source = "OMIM";
+                //data3.NameEnglish = "WWilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjde";
+                //data3.HPOId = "HP:000007";
+                //data3.HPONameChinese = "高蛋白血症4";
+                //data3.HPONameEnglish = "Hyperproteinemia";
+                //result.Add(data3);
             }
 
             return result;

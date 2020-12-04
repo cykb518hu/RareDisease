@@ -64,6 +64,7 @@ namespace RareDiseasesSystem
             });
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
             services.AddScoped<ILogRepository, GPLogRepositry>();
+            //services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IRdrDataRepository, RdrDataRepository>();
             services.AddScoped<INLPSystemRepository, NLPSystemRepository>();
             services.AddCors(options =>
