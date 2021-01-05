@@ -1,4 +1,5 @@
-﻿@{
+﻿@using RareDisease.Data.Handler;
+@{
     Layout = null;
 }
 
@@ -10,7 +11,7 @@
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>@ViewData["Title"]</title>
+    <title>罕见病决策系统</title>
     <link rel="shortcut icon" href="~/images/favicon.ico" />
     <link rel="stylesheet" href="~/lib/element-ui/theme-chalk/index.css" />
     <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
@@ -29,7 +30,17 @@
     <div id="mainArea" class="mainArea">
         <div class="sys-header">
             <span>
-                <img src="~/images/clbrlogo.png" height="20" class="logo" />
+                @{
+                    if (LogoHandler.IsHuaxi)
+                    {
+                        <img src="~/images/logo1.png" height="30" class="logo" />
+
+                    }
+                    else
+                    {
+                        <img src="~/images/clbrlogo.png" height="20" class="logo" />
+                    }
+                }
             </span>
 
             <span class="system-text">
@@ -142,8 +153,18 @@
         </div>
     </div>
     <div class="login-footer">
-        <img src="~/images/login-bg-footer-logo.png">
-        <div class="right">上海柯林布瑞信息技术有限公司 Copyright© @DateTime.Now.Year clinbrain All Rights Reserved </div>
+        @{
+            if (LogoHandler.IsHuaxi)
+            {
+                <div class="right"> Copyright© @DateTime.Now.Year  All Rights Reserved </div>
+
+            }
+            else
+            {
+                <img src="~/images/login-bg-footer-logo.png">
+                <div class="right">上海柯林布瑞信息技术有限公司 Copyright© @DateTime.Now.Year clinbrain All Rights Reserved </div>
+            }
+        }
     </div>
 
     <div id="component-template">

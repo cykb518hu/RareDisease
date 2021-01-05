@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RareDisease.Data;
+using RareDisease.Data.Handler;
 using RareDisease.Data.Repository;
 
 namespace RareDiseasesSystem
@@ -41,7 +42,7 @@ namespace RareDiseasesSystem
                 });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMemoryCache();
-            
+
             services.AddDbContext<RareDiseaseDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LogConnection")));
             RareDiseaseGPDbContext.NLP_ConnectionString = Configuration.GetConnectionString("NLPConnection");   //为数据库连接字符串赋值
             services.AddHttpContextAccessor();
@@ -63,20 +64,29 @@ namespace RareDiseasesSystem
                 options.ValueCountLimit = int.MaxValue;
             });
             services.AddScoped<ILocalMemoryCache, LocalMemoryCache>();
-            services.AddScoped<ILogRepository, GPLogRepositry>();
-            //services.AddScoped<ILogRepository, LogRepository>();
+
             services.AddScoped<IRdrDataRepository, RdrDataRepository>();
             services.AddScoped<INLPSystemRepository, NLPSystemRepository>();
-            services.AddCors(options =>
+            services.AddScoped<IExcelRepository, ExcelRepository>();
+            if (Configuration.GetValue<string>("EnvironmentName") == "Production")
             {
-                options.AddPolicy(MyAllowSpecificOrigins,
-                    builder =>
-                    {
-                        builder.AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowAnyOrigin();
-                    });
-            });
+                services.AddScoped<ILogRepository, GPLogRepositry>();
+            }
+            else
+            {
+                services.AddScoped<ILogRepository, LogRepository>();
+            }
+            LogoHandler.IsHuaxi = Configuration.GetValue<bool>("GlobalSetting:HuaxiLogo");
+            services.AddCors(options =>
+             {
+                 options.AddPolicy(MyAllowSpecificOrigins,
+                     builder =>
+                     {
+                         builder.AllowAnyHeader()
+                         .AllowAnyMethod()
+                         .AllowAnyOrigin();
+                     });
+             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,13 +1,14 @@
-﻿
+﻿@using RareDisease.Data.Handler;
 @{
     Layout = null;
+    
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>华西罕见病决策系统 - 上海柯林布瑞信息技术有限公司</title>
+    <title>罕见病决策系统</title>
     <link rel="shortcut icon" href="~/images/favicon.ico" />
     <link href="~/css/login.css" rel="stylesheet" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -15,8 +16,19 @@
 <body>
     <div id="bg" class="login-container">
         <div class="header">
-            <img src="~/images/login-bg-header-logo.png">
-            <span>上海柯林布瑞信息技术有限公司</span>
+            @{
+                if (LogoHandler.IsHuaxi)
+                {
+                    <img src="~/images/logo1.png" style="height:40px">
+
+                }
+                else
+                {
+                    <img src="~/images/login-bg-header-logo.png">
+                    <span>上海柯林布瑞信息技术有限公司</span>
+                }
+            }
+
             <div class="clear"></div>
         </div>
         <div class="login-content">
@@ -47,8 +59,20 @@
             </div>
         </div>
         <div class="login-footer">
-            <img src="~/images/login-bg-footer-logo.png">
-            <div class="right">上海柯林布瑞信息技术有限公司 Copyright© @DateTime.Now.Year clinbrain All Rights Reserved </div>
+            @{
+                if (LogoHandler.IsHuaxi)
+                {
+                    <div class="right">Copyright© @DateTime.Now.Year  All Rights Reserved </div>
+
+                }
+                else
+                {
+                    <img src="~/images/login-bg-footer-logo.png">
+                    <div class="right">上海柯林布瑞信息技术有限公司 Copyright© @DateTime.Now.Year clinbrain All Rights Reserved </div>
+                }
+            }
+
+
         </div>
     </div>
 

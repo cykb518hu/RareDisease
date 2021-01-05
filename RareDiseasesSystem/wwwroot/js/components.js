@@ -550,6 +550,9 @@
                 }
                 hpoStr = hpoStr.substring(0, hpoStr.length - 1);
                 return hpoStr;
+            },
+            filterTag(value, row) {
+                return row.certain === value;
             }
         },
         mounted: function () {
@@ -661,7 +664,7 @@
                 var para = {};
                 para = {
                     hpoStr: this.HPOStr,
-                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Oss",
+                    rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap",
                    // rareAnalyzeEngine: "Jaccard,Tanimoto,Overlap,Loglikelihood",
                     rareDataBaseEngine: this.dataBaseEngine
                 };
@@ -837,7 +840,7 @@ function disease_hpo_bar_chart(disease) {
                 stack: '总量',
                 label: {
                     show: true,
-                    position: 'insideRight'
+                    position: 'insideLeft'
                 },
                 data: disease.SeriesData[1].value
             },
@@ -847,7 +850,7 @@ function disease_hpo_bar_chart(disease) {
                 stack: '总量',
                 label: {
                     show: true,
-                    position: 'insideRight'
+                    position: 'insideLeft'
                 },
                 data: disease.SeriesData[2].value
             },
@@ -857,7 +860,7 @@ function disease_hpo_bar_chart(disease) {
                 stack: '总量',
                 label: {
                     show: true,
-                    position: 'insideRight'
+                    position: 'insideLeft'
                 },
                 data: disease.SeriesData[3].value
             }
@@ -874,3 +877,58 @@ function disease_hpo_bar_chart(disease) {
         myChart.resize();
     });
 }
+
+
+(function () {
+    Vue.component("v-disease-summary", {
+        data: function () {
+            return {
+                diseaseText: "21-羟化酶缺乏症",
+                diseaseOptions: []
+            };
+        },
+        template: "#v-disease-summary",
+        methods: {
+            onDiseaseSummaryResult: function () {
+                const loading = this.$loading({
+                    lock: true,
+                    text: '拼命加载中...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
+                var that = this;
+                $.ajax({
+                    url: "/RareDisease/GetDiseaseHPOSummaryBar?diseaseText=" + encodeURI(that.diseaseText),
+                    type: "Get",
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data && data.success) {
+                            disease_hpo_bar_chart(data.data);
+                        }
+                        else {
+                            console.log(data);
+                        }
+                        loading.close();
+                    }
+                });
+            }
+        },
+        mounted: function () {
+            var that = this;
+            $.ajax({
+                url: "/RareDisease/GetDiseaseNameList",
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data && data.success) {
+                        that.diseaseOptions = data.data;
+                    }
+                    else {
+                        console.log(data);
+                    }
+                }
+            });
+        }
+    });
+
+})();

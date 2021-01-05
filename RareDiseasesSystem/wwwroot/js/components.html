@@ -161,7 +161,10 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="确定程度"
-                                                 min-width="18%">
+                                                 min-width="18%"
+                                                 :filters="[{ text: '阴性', value: '阴性' }, { text: '阳性', value: '阳性' }]"
+                                                 :filter-method="filterTag"
+                                                 filter-placement="bottom-end">
                                     <template slot-scope="scope">
                                         <el-select v-model="scope.row.certain" placeholder="请选择">
                                             <el-option v-for="item in certainOptions"
@@ -460,7 +463,7 @@
 
 <!--罕见病计算模块-->
 <template id="v-disease-caculate">
-    <div class="paddinglr5px" >
+    <div class="paddinglr5px">
 
         <div class="panel panel-default">
             <!-- Default panel contents -->
@@ -625,3 +628,55 @@
     </div>
 </template>
 
+
+
+<!--罕见病summary模块-->
+<template id="v-disease-summary">
+    <div class="paddinglr5px">
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">选择疾病</div>
+            <div class="panel-body padding0px">
+
+                <div class="breadcrumbs" style="margin:5px">
+                    <el-row>
+                        <el-col v-bind:span="22">
+
+                            <template>
+                                <span style="color: black; margin-left: 20px;">罕见病选择：</span>
+                                <el-select v-model="diseaseText" placeholder="罕见病选择" >
+                                    <el-option v-for="item in diseaseOptions"
+                                               :key="item.value"
+                                               :label="item.label"
+                                               :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
+
+
+                        </el-col>
+                        <el-col v-bind:span="2">
+                            <span style="float:left">
+                                <el-button type="primary" v-on:click="onDiseaseSummaryResult">计算</el-button>
+                            </span>
+                        </el-col>
+                    </el-row>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">罕见病-HPO详细分布图</div>
+            <div class="panel-body">
+                <div id="disease_hpo_bar" style="width: 100%;height:800px;">
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>

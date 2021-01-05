@@ -17,6 +17,8 @@ namespace RareDisease.Data.Repository
         List<HPODataModel> GetPatientHPOResult(string nlpEngine, string patientEMRDetail, string patientVisitIds);
         List<NlpRareDiseaseResponseModel> GetPatientRareDiseaseResult(List<HPODataModel> hpoList, string rareAnalyzeEngine, string rareDataBaseEngine);
         Task<List<NlpRareDiseaseResponseModel>> GetRareDiseaseResult(string hpoStr, string rareAnalyzeEngine, string rareDataBaseEngine);
+
+        List<HPODataModel> GetNlpHPOResultBatch(string patientEMRDetail);
     }
 
     public class NLPSystemRepository : INLPSystemRepository
@@ -235,6 +237,55 @@ namespace RareDisease.Data.Repository
             rareDiseaseList = rareDiseaseList.OrderByDescending(x => x.Ratio).ToList();
 
             return  rareDiseaseList;
+        }
+
+        /// <summary>
+        /// for batch task
+        /// </summary>
+        /// <param name="nlpEngine"></param>
+        /// <param name="patientEMRDetail"></param>
+        /// <returns></returns>
+        public List<HPODataModel> GetNlpHPOResultBatch(string patientEMRDetail)
+        {
+            var hpoList = new List<HPODataModel>();
+            if (!string.IsNullOrWhiteSpace(patientEMRDetail))
+            {
+                try
+                {
+                    var clientName = "HPOStringMatchHost";
+                    var api = _config.GetValue<string>("NLPAddress:HPOStringMatchApi");
+                    var client = _clientFactory.CreateClient(clientName);
+                    string boundary = DateTime.Now.Ticks.ToString("X");
+                    var formData = new MultipartFormDataContent(boundary);
+                    patientEMRDetail = "{\"text\":\"" + patientEMRDetail + "\"}";
+                    formData.Add(new StringContent(patientEMRDetail), "texts");
+                    var response = client.PostAsync(api, formData);
+                    var result = response.Result.Content.ReadAsStringAsync().Result.ToString();
+                    var hpoEngineList = JsonConvert.DeserializeObject<List<HPOAPIEngineResultModel>>(result);
+                    foreach (var r in hpoEngineList)
+                    {
+                        if (r.Positivie == 0)
+                        {
+                            continue;
+                        }
+                        foreach (var hpo in r.Similarchpoid)
+                        {
+                            var data = new HPODataModel();
+                            data.HPOId = hpo;
+                            var item = hpoList.FirstOrDefault(x => x.HPOId == data.HPOId);
+                            if (item == null)
+                            {
+                                hpoList.Add(data);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("NLPSystemRepository GetPatientHPOResult报错：" + ex.ToString());
+                }
+            }
+            return hpoList;
         }
 
 

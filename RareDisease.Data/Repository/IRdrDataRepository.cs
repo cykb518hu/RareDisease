@@ -35,6 +35,12 @@ namespace RareDisease.Data.Repository
 
         List<HPODataModel> SearchStandardHPOList(string searchHPOText);
 
+        string GetVisitIdByNumber(string number);
+        string GetEmrForNLP(string patientVisitId);
+
+        string GetFullEmrAll(string patientVisitId);
+        List<HPODataModel> GetExamHPOResultBatch(string patientVisitId);
+
 
     }
 
@@ -366,6 +372,184 @@ namespace RareDisease.Data.Repository
             }
             return searchedHPOList;
         }
+
+
+        public string GetVisitIdByNumber(string number)
+        {
+            var result = string.Empty;
+            if (!string.IsNullOrWhiteSpace(number))
+            {
+                string sql = GetSqlText("get-visitid-sql.txt");
+                sql = string.Format(sql, number);
+                using (var reader = dbgp.Ado.GetDataReader(sql))
+                {
+                    if (reader.Read())
+                    {
+                        result = reader["id"] == DBNull.Value ? "" : reader["id"].ToString();
+                    }
+                }
+            }
+            return result;
+            // return "";
+        }
+
+        public string GetEmrForNLP(string patientVisitId)
+        {
+            var emrList = new List<PatientEMRModel>();
+            var result = string.Empty;
+            if (!string.IsNullOrWhiteSpace(patientVisitId))
+            {
+                string sql = GetSqlText("home-patient-EMR-full-sql.txt");
+                sql = string.Format(sql, patientVisitId);
+                using (var reader = dbgp.Ado.GetDataReader(sql))
+                {
+                    while (reader.Read())
+                    {
+                        var data = new PatientEMRModel();
+                        data.Detail = reader["emr_text"] == DBNull.Value ? "" : reader["emr_text"].ToString();
+                        data.Type = reader["emr_type"] == DBNull.Value ? "" : reader["emr_type"].ToString();
+                        emrList.Add(data);
+                    }
+                }
+            }
+
+            emrList = emrList.Where(x => x.Detail.Length > 20).ToList();
+            var mainemr = emrList.FirstOrDefault(x => x.Type == "主诉");
+            if (mainemr != null)
+            {
+                emrList.Remove(mainemr);
+                emrList.Insert(0, mainemr);
+            }
+            var currentemr = emrList.FirstOrDefault(x => x.Type == "现病史");
+            if (currentemr != null)
+            {
+                emrList.Remove(currentemr);
+                emrList.Insert(0, currentemr);
+            }
+            foreach (var r in emrList)
+            {
+                if (result.Length < 50000)
+                {
+                    result += r.Detail;
+                }
+            }
+            return result;
+        }
+
+
+        public string GetFullEmrAll(string patientVisitId)
+        {
+            var emrList = new List<PatientEMRModel>();
+            var result = string.Empty;
+            if (!string.IsNullOrWhiteSpace(patientVisitId))
+            {
+                string sql = GetSqlText("home-patient-EMR-full-sql.txt");
+                sql = string.Format(sql, patientVisitId);
+                using (var reader = dbgp.Ado.GetDataReader(sql))
+                {
+                    while (reader.Read())
+                    {
+                        var data = new PatientEMRModel();
+                        data.Detail = reader["emr_text"] == DBNull.Value ? "" : reader["emr_text"].ToString();
+                        data.Type = reader["emr_type"] == DBNull.Value ? "" : reader["emr_type"].ToString();
+                        emrList.Add(data);
+                    }
+                }
+            }
+
+            var mainemr = emrList.FirstOrDefault(x => x.Type == "主诉");
+            if (mainemr != null)
+            {
+                emrList.Remove(mainemr);
+                emrList.Insert(0, mainemr);
+            }
+            var currentemr = emrList.FirstOrDefault(x => x.Type == "现病史");
+            if (currentemr != null)
+            {
+                emrList.Remove(currentemr);
+                emrList.Insert(0, currentemr);
+            }
+            foreach (var r in emrList)
+            {
+                result += r.Detail;
+            }
+            return result;
+        }
+
+        public List<HPODataModel> GetExamHPOResultBatch(string patientVisitId)
+        {
+            var result = new List<HPODataModel>();
+            if (string.IsNullOrWhiteSpace(patientVisitId))
+            {
+                //获取所有检验HPO规则
+                var examBase = _localMemoryCache.GetExamBaseDataList();
+                //获取所有检验数据
+                var examList = new List<ExamBaseDataModel>();
+                string sql = GetSqlText("home-get-exam-data-sql.txt");
+                sql = string.Format(sql, patientVisitId);
+                using (var reader = dbgp.Ado.GetDataReader(sql))
+                {
+                    while (reader.Read())
+                    {
+                        var data = new ExamBaseDataModel();
+                        data.ExamCode = reader["exam_code"] == DBNull.Value ? "" : reader["exam_code"].ToString();
+                        data.ExamName = reader["exam_name"] == DBNull.Value ? "" : reader["exam_name"].ToString();
+                        data.SampleCode = reader["sample_code"] == DBNull.Value ? "" : reader["sample_code"].ToString();
+                        data.SampleName = reader["sample_name"] == DBNull.Value ? "" : reader["sample_name"].ToString();
+                        data.Range = reader["range"] == DBNull.Value ? "" : reader["range"].ToString();
+                        data.ExamValue = reader["value"] == DBNull.Value ? 0 : Convert.ToDecimal(reader["value"]);
+                        data.ExamTimeStr = reader["examTimeStr"] == DBNull.Value ? "" : reader["examTimeStr"].ToString();
+                        examList.Add(data);
+                    }
+
+                }
+                //遍历每条规则，查看检验数据里面是否有符合规则的数据
+                foreach (var r in examBase)
+                {
+                    var subList = examList.Where(x => x.ExamCode == r.ExamCode && x.SampleCode.ToUpper() == r.SampleCode.ToUpper()).ToList();
+                    if (subList.Count == 0)
+                    {
+                        continue;
+                    }
+                    var list = new List<ExamBaseDataModel>();
+                    //区间命中
+                    if (r.Maxinum > 0 && r.Minimum > 0)
+                    {
+                        list = subList.Where(x => x.ExamValue > r.Minimum && x.ExamValue < r.Maxinum).ToList();
+                    }
+                    //低于最小值命中
+                    else if (r.Maxinum == 0 && r.Minimum > 0)
+                    {
+                        list = subList.Where(x => x.ExamValue < r.Minimum).ToList();
+                    }
+                    //大于最大值命中
+                    else if (r.Maxinum > 0 && r.Minimum == 0)
+                    {
+                        list = subList.Where(x => x.ExamValue > r.Maxinum).ToList();
+                    }
+                    if (list != null && list.Any())
+                    {
+                        if (list.Count >= r.MatchTime)
+                        {
+                            if (!result.Any(x => x.HPOId == r.HPOId))
+                            {
+                                var hpoItem = new HPODataModel();
+                                hpoItem.HPOId = r.HPOId;
+                                result.Add(hpoItem);
+                            }
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+     
+            }
+
+            return result;
+        }
+
 
         public string GetSqlText(string fileName)
         {

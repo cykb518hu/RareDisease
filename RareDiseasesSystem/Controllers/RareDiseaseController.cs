@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,17 +22,25 @@ namespace RareDiseasesSystem.Controllers
         private readonly ILogRepository _logRepository;
         private readonly IRdrDataRepository _rdrDataRepository;
         private readonly INLPSystemRepository _nLPSystemRepository;
-        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger,ILogRepository logRepository, IRdrDataRepository rdrDataRepository, INLPSystemRepository nLPSystemRepository)
+        private readonly IExcelRepository _excelRepository;
+        public RareDiseaseController(ILocalMemoryCache localMemoryCache, ILogger<RareDiseaseController> logger,ILogRepository logRepository, IRdrDataRepository rdrDataRepository, INLPSystemRepository nLPSystemRepository,IExcelRepository excelRepository)
         {
             _localMemoryCache = localMemoryCache;
             _logger = logger;
             _logRepository = logRepository;
             _rdrDataRepository = rdrDataRepository;
             _nLPSystemRepository = nLPSystemRepository;
+            _excelRepository = excelRepository;
         }
         public IActionResult Search()
         {
-            _logRepository.Add("罕见病详情页面");
+            _logRepository.Add("罕见病查询页面");
+            return View();
+        }
+
+        public IActionResult Summary()
+        {
+            _logRepository.Add("罕见病整理页面");
             return View();
         }
 
@@ -56,6 +65,36 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
+        public JsonResult GetDiseaseNameList()
+        {
+            try
+            {
+                var data = _excelRepository.GetDiseaseNameList();
+                return Json(new { success = true, data});
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("GetDiseaseNameList：" + ex.ToString());
+                return Json(new { success = false, msg = ex.ToString() });
+            }
+        }
+
+        public JsonResult GetDiseaseHPOSummaryBar(string diseaseText)
+        {
+            try
+            {
+                var bar = new DiseaseHPOSummaryBarModel();
+                bar.HPOId = new List<string>();
+                diseaseText = HttpUtility.UrlDecode(diseaseText);
+                var data = _excelRepository.GetDiseaseHPOSummaryBar(diseaseText);
+                return Json(new { success = true, data });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("GetDiseaseNameList：" + ex.ToString());
+                return Json(new { success = false, msg = ex.ToString() });
+            }
+        }
 
         public async Task<JsonResult> GetPatientRareDiseaseResult(string rareAnalyzeEngine, string rareDataBaseEngine, string hpoStr)
         {

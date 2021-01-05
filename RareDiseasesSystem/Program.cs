@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
+using RareDisease.Data.Handler;
 
 namespace RareDiseasesSystem
 {
@@ -21,6 +22,7 @@ namespace RareDiseasesSystem
             try
             {
                 logger.Debug("init main");
+               
                 CreateWebHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
@@ -38,8 +40,8 @@ namespace RareDiseasesSystem
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-           // .UseUrls("http://0.0.0.0:5000")
-            .UseIISIntegration()
+            //.UseUrls("http://0.0.0.0:80")
+            //.UseIISIntegration()
                 .UseStartup<Startup>()
              .ConfigureLogging(builder =>
              {
