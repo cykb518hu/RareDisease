@@ -16,12 +16,8 @@ namespace RareDisease.Data.Model
     public class DiseaseHPOSummaryHPOModel
     {
         public string HPOId { get; set; }
-
-        public string HPOChineseName { get; set; }
-
-        public string HPOEnglishName { get; set; }
-        public int MatchedCount { get; set; }
-
+        public int NlpCount { get; set; }
+        public int ExamCount { get; set; }
         public int EramCount { get; set; }
         public int OMIMCount { get; set; }
         public int ORPHACount { get; set; }
@@ -53,8 +49,10 @@ namespace RareDisease.Data.Model
 
     public class DiseaseHPOSummaryBarModel
     {
+        [JsonProperty("casesCount")]
+        public int CasesCount { get; set; }
         [JsonProperty("yAxis")]
-        public List<string> HPOId { get; set; }
+        public List<CHPO2020Model> HPOItem { get; set; }
 
         [JsonProperty("SeriesData")]
         public List<SeriesData> SeriesDataModel { get; set; }

@@ -18,9 +18,11 @@ namespace RareDisease.Data.Repository
     public class ExcelRepository: IExcelRepository
     {
         private readonly IConfiguration _config;
-        public ExcelRepository(IConfiguration config)
+        private readonly ILocalMemoryCache _localMemoryCache;
+        public ExcelRepository(IConfiguration config, ILocalMemoryCache localMemoryCache)
         {
             _config = config;
+            _localMemoryCache = localMemoryCache;
         }
         public DiseaseHPOSummaryBarModel GetDiseaseHPOSummaryBar(string name)
         {
@@ -46,12 +48,36 @@ namespace RareDisease.Data.Repository
                         //NLP hpo
                         if (workSheet.Cells[i, 3].Value != null)
                         {
-                            CaculateHPOCount(workSheet.Cells[i, 3].Value.ToString(), result);
+                            var arr = workSheet.Cells[i, 3].Value.ToString().Split(",");
+                            foreach (var r in arr)
+                            {
+                                var hpo = result.HPOList.FirstOrDefault(x => x.HPOId == r);
+                                if (hpo != null)
+                                {
+                                    hpo.NlpCount++;
+                                }
+                                else
+                                {
+                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = r, NlpCount = 1 });
+                                }
+                            }
                         }
                         //检验 hpo
                         if (workSheet.Cells[i, 4].Value != null)
                         {
-                            CaculateHPOCount(workSheet.Cells[i, 4].Value.ToString(), result);
+                            var arr = workSheet.Cells[i, 4].Value.ToString().Split(",");
+                            foreach (var r in arr)
+                            {
+                                var hpo = result.HPOList.FirstOrDefault(x => x.HPOId == r);
+                                if (hpo != null)
+                                {
+                                    hpo.ExamCount++;
+                                }
+                                else
+                                {
+                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = r, ExamCount = 1 });
+                                }
+                            }
                         }
                     }
                 }
@@ -88,11 +114,11 @@ namespace RareDisease.Data.Repository
                                 var hpo = result.HPOList.FirstOrDefault(x => x.HPOId == hpoId);
                                 if (hpo != null)
                                 {
-                                    hpo.EramCount = 1;
+                                    hpo.EramCount = -1;
                                 }
                                 else
                                 {
-                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = hpoId, EramCount = 1 });
+                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = hpoId, EramCount = -1 });
                                 }
                             }
                         }
@@ -115,11 +141,11 @@ namespace RareDisease.Data.Repository
                                 var hpo = result.HPOList.FirstOrDefault(x => x.HPOId == hpoId);
                                 if (hpo != null)
                                 {
-                                    hpo.OMIMCount = 1;
+                                    hpo.OMIMCount = -1;
                                 }
                                 else
                                 {
-                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = hpoId, OMIMCount = 1 });
+                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = hpoId, OMIMCount = -1 });
                                 }
                             }
                         }
@@ -132,47 +158,53 @@ namespace RareDisease.Data.Repository
                                 var hpo = result.HPOList.FirstOrDefault(x => x.HPOId == hpoId);
                                 if (hpo != null)
                                 {
-                                    hpo.ORPHACount = 1;
+                                    hpo.ORPHACount = -1;
                                 }
                                 else
                                 {
-                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = hpoId, ORPHACount = 1 });
+                                    result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = hpoId, ORPHACount = -1 });
                                 }
                             }
                         }
                     }
                 }
             }
-            result.HPOList = result.HPOList.OrderByDescending(x => x.MatchedCount).ToList();
-            summaryBar.HPOId = result.HPOList.Select(x => x.HPOId).ToList();
+
+            result.HPOList = result.HPOList.OrderByDescending(x => x.NlpCount).ThenByDescending(x=>x.ExamCount).ToList();
+            var chpoList = from T1 in _localMemoryCache.GetCHPO2020StandardList()
+                           join T2 in result.HPOList.Select(x => x.HPOId) on T1.HpoId equals T2
+                           select new CHPO2020Model { NameChinese = T1.NameChinese, HpoId = T1.HpoId, NameEnglish = T1.NameEnglish };
+            summaryBar.HPOItem = new List<CHPO2020Model>();
+            foreach (var hpo in result.HPOList)
+            {
+                var chpo = chpoList.FirstOrDefault(x => x.HpoId == hpo.HPOId);
+                if(chpo != null)
+                {
+                    if(string.IsNullOrWhiteSpace(chpo.NameChinese))
+                    {
+                        chpo.NameChinese = hpo.HPOId;
+                    }
+                    if (string.IsNullOrWhiteSpace(chpo.NameEnglish))
+                    {
+                        chpo.NameEnglish = hpo.HPOId;
+                    }
+                }
+                else
+                {
+                    chpo = new CHPO2020Model { HpoId = hpo.HPOId, NameChinese = hpo.HPOId, NameEnglish = hpo.HPOId };
+                }
+                summaryBar.HPOItem.Add(chpo);
+            }
+            summaryBar.CasesCount = result.CasesCount;
             summaryBar.SeriesDataModel = new List<SeriesData>();
-            summaryBar.SeriesDataModel.Add(new SeriesData { Name = "命中HPO", Value = result.HPOList.Select(x=>x.MatchedCount).ToList()});
+            summaryBar.SeriesDataModel.Add(new SeriesData { Name = "NLP命中", Value = result.HPOList.Select(x=>x.NlpCount).ToList()});
+            summaryBar.SeriesDataModel.Add(new SeriesData { Name = "检验命中", Value = result.HPOList.Select(x => x.ExamCount).ToList() });
             summaryBar.SeriesDataModel.Add(new SeriesData { Name = "eRAM命中", Value = result.HPOList.Select(x => x.EramCount).ToList() });
             summaryBar.SeriesDataModel.Add(new SeriesData { Name = "OMIM命中", Value = result.HPOList.Select(x => x.OMIMCount).ToList() });
             summaryBar.SeriesDataModel.Add(new SeriesData { Name = "Orphanet命中", Value = result.HPOList.Select(x => x.ORPHACount).ToList() });
 
             return summaryBar;
         }
-        public void CaculateHPOCount(string text, DiseaseHPOSummaryModel result)
-        {
-            if (!string.IsNullOrEmpty(text))
-            {
-                var arr = text.Split(",");
-                foreach (var r in arr)
-                {
-                    var hpo = result.HPOList.FirstOrDefault(x => x.HPOId == r);
-                    if (hpo != null)
-                    {
-                        hpo.MatchedCount++;
-                    }
-                    else
-                    {
-                        result.HPOList.Add(new DiseaseHPOSummaryHPOModel { HPOId = r, MatchedCount = 1 });
-                    }
-                }
-            }
-        }
-
         public List<DiseaseHPOSummaryDiseaseNameModel> GetDiseaseNameList()
         {
             var result = new List<DiseaseHPOSummaryDiseaseNameModel>();
@@ -185,7 +217,7 @@ namespace RareDisease.Data.Repository
                 int row = workSheet.Dimension.Rows;
                 for (int i = 2; i <= row; i++)
                 {
-                    result.Add(new DiseaseHPOSummaryDiseaseNameModel { Value = workSheet.Cells[i, 1].Value.ToString(), Label = workSheet.Cells[i, 1].Value.ToString()+"  " + workSheet.Cells[i, 2].Value.ToString() });
+                    result.Add(new DiseaseHPOSummaryDiseaseNameModel { Value = workSheet.Cells[i, 1].Value.ToString(), Label = workSheet.Cells[i, 1].Value.ToString()+" | " + workSheet.Cells[i, 2].Value.ToString() });
                 }
             }
             return result;

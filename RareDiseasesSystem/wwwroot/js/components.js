@@ -692,7 +692,7 @@
         mounted: function () {
             if (sessionStorage["diseaseCaculate-hpoStr"] !== "") {
                 this.HPOStr = sessionStorage["diseaseCaculate-hpoStr"];
-            };
+            }
             document.getElementsByClassName("login-footer")[0].style.position = 'relative';
         
         }
@@ -884,7 +884,25 @@ function disease_hpo_bar_chart(disease) {
         data: function () {
             return {
                 diseaseText: "21-羟化酶缺乏症",
-                diseaseOptions: []
+                diseaseOptions: [],
+                casesCount: 0,
+                diseaseAllData: [],
+                displayText: "hpoId",
+                displayOptions: [
+                    {
+                        value: 'hpoId',
+                        label: 'HPO ID'
+                    },
+                    {
+                        value: 'Chinease',
+                        label: '中文 HPO'
+                    },
+                    //for nlp engine
+                    {
+                        value: 'English',
+                        label: '英文 HPO'
+                    }
+                ]
             };
         },
         template: "#v-disease-summary",
@@ -903,7 +921,14 @@ function disease_hpo_bar_chart(disease) {
                     dataType: 'json',
                     success: function (data) {
                         if (data && data.success) {
-                            disease_hpo_bar_chart(data.data);
+                        
+                            that.diseaseAllData = data.data;
+                            that.casesCount = that.diseaseAllData.casesCount;
+                            var dom = document.getElementById("disease_hpo_bar");
+                            dom.innerHTML === "";
+                            dom.removeAttribute("_echarts_instance_");
+                            dom.style.height = (that.diseaseAllData.yAxis.length * 25) + "px";
+                            disease_hpo_bar_chart_summary(data.data, that.diseaseAllData.yAxis.map(function (item) { return item.hpoId; }));
                         }
                         else {
                             console.log(data);
@@ -911,9 +936,27 @@ function disease_hpo_bar_chart(disease) {
                         loading.close();
                     }
                 });
+            },
+            onSwtichSummaryResult: function () {
+                if (this.displayText === "hpoId") {
+                    disease_hpo_bar_chart_summary(this.diseaseAllData, this.diseaseAllData.yAxis.map(function (item) { return item.hpoId; }));
+                }
+                if (this.displayText === "Chinease") {
+                    disease_hpo_bar_chart_summary(this.diseaseAllData, this.diseaseAllData.yAxis.map(function (item) { return item.name_cn; }));
+                }
+                if (this.displayText === "English") {
+                    disease_hpo_bar_chart_summary(this.diseaseAllData, this.diseaseAllData.yAxis.map(function (item) { return item.name_en; }));
+                }
             }
         },
         mounted: function () {
+            document.getElementsByClassName("login-footer")[0].style.position = 'relative';
+            const loading = this.$loading({
+                lock: true,
+                text: '拼命加载中...',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0, 0, 0, 0.7)'
+            });
             var that = this;
             $.ajax({
                 url: "/RareDisease/GetDiseaseNameList",
@@ -926,9 +969,101 @@ function disease_hpo_bar_chart(disease) {
                     else {
                         console.log(data);
                     }
+                },
+                complete: function () {
+                    loading.close();
                 }
             });
         }
     });
 
 })();
+
+function disease_hpo_bar_chart_summary(disease,yAxisData) {
+    option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            }
+        },
+        legend: {
+            data: disease.SeriesData.map(function (item) { return item.name; })
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value'
+        },
+        yAxis: {
+            type: 'category',
+            data: yAxisData, 
+            inverse: true,
+            axisLabel: {
+                interval: 0,
+                formatter: function (value) {
+                    if (value.length > 50) {
+                        value = value.slice(0, 100) + '...';
+                    }
+                    return value;
+                },
+                tooltip: {
+                    show: true
+                }
+            }
+        },
+        series: [
+            {
+                name: disease.SeriesData[0].name,
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    show: true,
+                    position: 'insideRight'
+                },
+                data: disease.SeriesData[0].value
+            },
+            {
+                name: disease.SeriesData[1].name,
+                type: 'bar',
+                stack: '总量',
+                data: disease.SeriesData[1].value
+            },
+            {
+                name: disease.SeriesData[2].name,
+                type: 'bar',
+                stack: '总量',
+                data: disease.SeriesData[2].value
+            },
+            {
+                name: disease.SeriesData[3].name,
+                type: 'bar',
+                stack: '总量',
+                data: disease.SeriesData[3].value
+            },
+            {
+                name: disease.SeriesData[4].name,
+                type: 'bar',
+                stack: '总量',
+                itemStyle: {
+                    normal: { color: '#72b201' }
+                },
+                data: disease.SeriesData[4].value
+            }
+        ]
+    };
+
+    var dom = document.getElementById("disease_hpo_bar");
+    var myChart = echarts.init(dom);
+    if (option && typeof option === "object") {
+        myChart.setOption(option, true);
+    }
+    window.addEventListener("resize", function () {
+        myChart.resize();
+    });
+}
+

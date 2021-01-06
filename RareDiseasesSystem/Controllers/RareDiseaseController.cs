@@ -83,8 +83,6 @@ namespace RareDiseasesSystem.Controllers
         {
             try
             {
-                var bar = new DiseaseHPOSummaryBarModel();
-                bar.HPOId = new List<string>();
                 diseaseText = HttpUtility.UrlDecode(diseaseText);
                 var data = _excelRepository.GetDiseaseHPOSummaryBar(diseaseText);
                 return Json(new { success = true, data });

@@ -641,11 +641,11 @@
 
                 <div class="breadcrumbs" style="margin:5px">
                     <el-row>
-                        <el-col v-bind:span="22">
+                        <el-col v-bind:span="10">
 
                             <template>
                                 <span style="color: black; margin-left: 20px;">罕见病选择：</span>
-                                <el-select v-model="diseaseText" placeholder="罕见病选择" >
+                                <el-select v-model="diseaseText" placeholder="罕见病选择"  style="width:400px">
                                     <el-option v-for="item in diseaseOptions"
                                                :key="item.value"
                                                :label="item.label"
@@ -656,7 +656,7 @@
 
 
                         </el-col>
-                        <el-col v-bind:span="2">
+                        <el-col v-bind:span="14">
                             <span style="float:left">
                                 <el-button type="primary" v-on:click="onDiseaseSummaryResult">计算</el-button>
                             </span>
@@ -670,9 +670,34 @@
 
         <div class="panel panel-default">
             <!-- Default panel contents -->
-            <div class="panel-heading">罕见病-HPO详细分布图</div>
+            <div class="panel-heading">{{diseaseText}}  --- 总共发现 {{casesCount}} 病例 </div>
             <div class="panel-body">
-                <div id="disease_hpo_bar" style="width: 100%;height:800px;">
+
+                <div class="breadcrumbs">
+                    <el-row>
+                            <el-col v-bind:span="4">
+                                <template>
+                                    <span style="color: black; margin-left: 20px;">显示维度：</span>
+                                    <el-select v-model="displayText" placeholder="HPO ID">
+                                        <el-option v-for="item in displayOptions"
+                                                   :key="item.value"
+                                                   :label="item.label"
+                                                   :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+
+
+                            </el-col>
+                            <el-col v-bind:span="20">
+                                <span style="float:left">
+                                    <el-button type="primary" v-on:click="onSwtichSummaryResult">切换</el-button>
+                                </span>
+                            </el-col>
+                    </el-row>
+                </div>
+
+                <div id="disease_hpo_bar" style="width: 100%;height:400px;">
 
                 </div>
             </div>
