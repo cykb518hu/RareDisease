@@ -12,7 +12,7 @@ namespace RareDisease.Data.Repository
     public interface IExcelRepository
     {
         List<DiseaseHPOSummaryDiseaseNameModel> GetDiseaseNameList();
-        DiseaseHPOSummaryBarModel GetDiseaseHPOSummaryBar(string name);
+        DiseaseHPOSummaryBarModel GetDiseaseHPOSummaryBar(string name, string hideHpoStr, int nlpMinCount);
     }
 
     public class ExcelRepository: IExcelRepository
@@ -24,7 +24,7 @@ namespace RareDisease.Data.Repository
             _config = config;
             _localMemoryCache = localMemoryCache;
         }
-        public DiseaseHPOSummaryBarModel GetDiseaseHPOSummaryBar(string name)
+        public DiseaseHPOSummaryBarModel GetDiseaseHPOSummaryBar(string name, string hideHpoStr, int nlpMinCount)
         {
             name = name.Trim();
             var summaryBar = new DiseaseHPOSummaryBarModel();
@@ -169,14 +169,23 @@ namespace RareDisease.Data.Repository
                     }
                 }
             }
-
             result.HPOList = result.HPOList.OrderByDescending(x => x.NlpCount).ThenByDescending(x=>x.ExamCount).ToList();
+
+           
             var chpoList = from T1 in _localMemoryCache.GetCHPO2020StandardList()
                            join T2 in result.HPOList.Select(x => x.HPOId) on T1.HpoId equals T2
                            select new CHPO2020Model { NameChinese = T1.NameChinese, HpoId = T1.HpoId, NameEnglish = T1.NameEnglish };
             summaryBar.HPOItem = new List<CHPO2020Model>();
             foreach (var hpo in result.HPOList)
             {
+                if (!string.IsNullOrWhiteSpace(hideHpoStr) && hideHpoStr.ToLower().Contains(hpo.HPOId.ToLower()))
+                {
+                    continue;
+                }
+                if (hpo.NlpCount < nlpMinCount && hpo.ExamCount == 0 && hpo.EramCount == 0 && hpo.OMIMCount == 0 && hpo.ORPHACount == 0)
+                {
+                    continue;
+                }
                 var chpo = chpoList.FirstOrDefault(x => x.HpoId == hpo.HPOId);
                 if(chpo != null)
                 {
@@ -193,11 +202,14 @@ namespace RareDisease.Data.Repository
                 {
                     chpo = new CHPO2020Model { HpoId = hpo.HPOId, NameChinese = hpo.HPOId, NameEnglish = hpo.HPOId };
                 }
+                hpo.Display = true;
                 summaryBar.HPOItem.Add(chpo);
+                
             }
             summaryBar.CasesCount = result.CasesCount;
             summaryBar.SeriesDataModel = new List<SeriesData>();
-            summaryBar.SeriesDataModel.Add(new SeriesData { Name = "NLP命中", Value = result.HPOList.Select(x=>x.NlpCount).ToList()});
+            result.HPOList = result.HPOList.Where(x => x.Display == true).ToList();
+            summaryBar.SeriesDataModel.Add(new SeriesData { Name = "NLP命中", Value = result.HPOList.Select(x => x.NlpCount).ToList() });
             summaryBar.SeriesDataModel.Add(new SeriesData { Name = "检验命中", Value = result.HPOList.Select(x => x.ExamCount).ToList() });
             summaryBar.SeriesDataModel.Add(new SeriesData { Name = "eRAM命中", Value = result.HPOList.Select(x => x.EramCount).ToList() });
             summaryBar.SeriesDataModel.Add(new SeriesData { Name = "OMIM命中", Value = result.HPOList.Select(x => x.OMIMCount).ToList() });

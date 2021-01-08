@@ -82,7 +82,7 @@ namespace RareDiseasesSystem.Controllers
             try
             {
                 _logRepository.Add("获取患者电子病历文本", "", $"patientVisitIds:{patientVisitIds}");
-                var data = _rdrDataRepository.GetPatientEMRDetail(patientVisitIds);
+                var data = _rdrDataRepository.GetEmrForNLP(patientVisitIds);
                 return Json(new { success = true, data });
             }
             catch (Exception ex)

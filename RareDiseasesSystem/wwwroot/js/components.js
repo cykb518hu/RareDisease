@@ -271,6 +271,10 @@
                     alert("请选择相应的就诊记录");
                     return;
                 }
+                if (visitIds.length > 1) {
+                    alert("由于电子病历太长，最多只能选一次就诊病历");
+                    return;
+                }
                 this.patientEMRDetail = "";
                 this.patientHPOList = [];
                 var para = {};
@@ -902,7 +906,9 @@ function disease_hpo_bar_chart(disease) {
                         value: 'English',
                         label: '英文 HPO'
                     }
-                ]
+                ],
+                HideHpoStr: "",
+                HPOMinLimit:10
             };
         },
         template: "#v-disease-summary",
@@ -914,10 +920,16 @@ function disease_hpo_bar_chart(disease) {
                     spinner: 'el-icon-loading',
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
+                para = {
+                    diseaseText: encodeURI(this.diseaseText),
+                    hideHpoStr: encodeURI(this.HideHpoStr),
+                    minCount: this.HPOMinLimit
+                };
                 var that = this;
                 $.ajax({
-                    url: "/RareDisease/GetDiseaseHPOSummaryBar?diseaseText=" + encodeURI(that.diseaseText),
-                    type: "Get",
+                    url: "/RareDisease/GetDiseaseHPOSummaryBar",
+                    type: "POST",
+                    data: para,
                     dataType: 'json',
                     success: function (data) {
                         if (data && data.success) {
@@ -927,7 +939,12 @@ function disease_hpo_bar_chart(disease) {
                             var dom = document.getElementById("disease_hpo_bar");
                             dom.innerHTML === "";
                             dom.removeAttribute("_echarts_instance_");
-                            dom.style.height = (that.diseaseAllData.yAxis.length * 25) + "px";
+                            if (that.diseaseAllData.yAxis.length > 1000) {
+                                dom.style.height = (that.diseaseAllData.yAxis.length * 15) + "px";
+                            }
+                            else {
+                                dom.style.height = (that.diseaseAllData.yAxis.length * 25) + "px";
+                            }
                             disease_hpo_bar_chart_summary(data.data, that.diseaseAllData.yAxis.map(function (item) { return item.hpoId; }));
                         }
                         else {
@@ -1006,7 +1023,7 @@ function disease_hpo_bar_chart_summary(disease,yAxisData) {
             axisLabel: {
                 interval: 0,
                 formatter: function (value) {
-                    if (value.length > 50) {
+                    if (value.length > 100) {
                         value = value.slice(0, 100) + '...';
                     }
                     return value;
@@ -1023,7 +1040,15 @@ function disease_hpo_bar_chart_summary(disease,yAxisData) {
                 stack: '总量',
                 label: {
                     show: true,
-                    position: 'insideRight'
+                    position: 'insideRight',
+                    formatter: function (params) {
+                        if (params.value === 0) {
+                            return "";
+                        }
+                        else {
+                            return params.value;
+                        }
+                    }
                 },
                 data: disease.SeriesData[0].value
             },
@@ -1031,6 +1056,18 @@ function disease_hpo_bar_chart_summary(disease,yAxisData) {
                 name: disease.SeriesData[1].name,
                 type: 'bar',
                 stack: '总量',
+                label: {
+                    show: true,
+                    position: 'insideRight',
+                    formatter: function (params) {
+                        if (params.value === 0) {
+                            return "";
+                        }
+                        else {
+                            return params.value;
+                        }
+                    }
+                },
                 data: disease.SeriesData[1].value
             },
             {

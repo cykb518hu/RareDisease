@@ -40,8 +40,8 @@ namespace RareDiseasesSystem
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-            //.UseUrls("http://0.0.0.0:80")
-            //.UseIISIntegration()
+        //.UseUrls("http://*:5000;http://*:80")
+            .UseIISIntegration()
                 .UseStartup<Startup>()
              .ConfigureLogging(builder =>
              {
@@ -49,5 +49,8 @@ namespace RareDiseasesSystem
                  builder.SetMinimumLevel(LogLevel.Warning);
              })
              .UseNLog();
+
+
+
     }
 }

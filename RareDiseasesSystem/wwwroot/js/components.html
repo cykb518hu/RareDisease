@@ -344,7 +344,7 @@
                                      label="诊断时间" width="150">
                     </el-table-column>
                     <el-table-column prop="visitType"
-                                     label="类别" width="100">
+                                     label="登记号" width="100">
                     </el-table-column>
                     <el-table-column prop="diagDesc"
                                      label="病历">
@@ -641,11 +641,11 @@
 
                 <div class="breadcrumbs" style="margin:5px">
                     <el-row>
-                        <el-col v-bind:span="10">
+                        <el-col v-bind:span="8">
 
                             <template>
                                 <span style="color: black; margin-left: 20px;">罕见病选择：</span>
-                                <el-select v-model="diseaseText" placeholder="罕见病选择"  style="width:400px">
+                                <el-select v-model="diseaseText" placeholder="罕见病选择" style="width:300px">
                                     <el-option v-for="item in diseaseOptions"
                                                :key="item.value"
                                                :label="item.label"
@@ -656,7 +656,19 @@
 
 
                         </el-col>
-                        <el-col v-bind:span="14">
+                        <el-col v-bind:span="8">
+                            <el-input id="txt_HPOHide" type="text"
+                                      placeholder="不显示HPO: 例如HP:0001345"
+                                      v-model="HideHpoStr" style="width:90%">
+                            </el-input> 
+                        </el-col>
+                        <el-col v-bind:span="4">
+                            <el-input id="txt_HPOMinCount" type="text"
+                                      placeholder="最小命中次数: 1"
+                                      v-model="HPOMinLimit" style="width:90%">
+                            </el-input>
+                        </el-col>
+                        <el-col v-bind:span="2">
                             <span style="float:left">
                                 <el-button type="primary" v-on:click="onDiseaseSummaryResult">计算</el-button>
                             </span>
@@ -675,7 +687,7 @@
 
                 <div class="breadcrumbs">
                     <el-row>
-                            <el-col v-bind:span="4">
+                            <el-col v-bind:span="6">
                                 <template>
                                     <span style="color: black; margin-left: 20px;">显示维度：</span>
                                     <el-select v-model="displayText" placeholder="HPO ID">
@@ -689,7 +701,7 @@
 
 
                             </el-col>
-                            <el-col v-bind:span="20">
+                            <el-col v-bind:span="18">
                                 <span style="float:left">
                                     <el-button type="primary" v-on:click="onSwtichSummaryResult">切换</el-button>
                                 </span>

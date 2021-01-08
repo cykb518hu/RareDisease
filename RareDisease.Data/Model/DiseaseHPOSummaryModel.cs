@@ -21,6 +21,8 @@ namespace RareDisease.Data.Model
         public int EramCount { get; set; }
         public int OMIMCount { get; set; }
         public int ORPHACount { get; set; }
+
+        public bool Display { get; set; }
     }
 
     public class DiseaseHPOSummaryDiseaseNameModel

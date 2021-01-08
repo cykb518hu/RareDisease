@@ -79,12 +79,15 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult GetDiseaseHPOSummaryBar(string diseaseText)
+        public JsonResult GetDiseaseHPOSummaryBar(string diseaseText,string hideHpoStr,string minCount)
         {
             try
             {
+                int nlpMinCount = 0;
+                Int32.TryParse(minCount, out nlpMinCount);
                 diseaseText = HttpUtility.UrlDecode(diseaseText);
-                var data = _excelRepository.GetDiseaseHPOSummaryBar(diseaseText);
+                hideHpoStr= HttpUtility.UrlDecode(hideHpoStr);
+                var data = _excelRepository.GetDiseaseHPOSummaryBar(diseaseText, hideHpoStr, nlpMinCount);
                 return Json(new { success = true, data });
             }
             catch (Exception ex)
