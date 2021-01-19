@@ -417,7 +417,7 @@ namespace RareDisease.Data.Repository
                         emrList.Add(data);
                     }
                 }
-                emrList = emrList.Where(x => x.Detail.Length > 20).ToList();
+               // emrList = emrList.Where(x => x.Detail.Length > 20).ToList();
                 var mainemr = emrList.FirstOrDefault(x => x.Type == "主诉");
                 if (mainemr != null)
                 {
@@ -432,7 +432,7 @@ namespace RareDisease.Data.Repository
                 }
                 foreach (var r in emrList)
                 {
-                    if (result.Length < 50000)
+                    if (result.Length < 500000)
                     {
                         result += r.Detail;
                     }
@@ -488,7 +488,7 @@ namespace RareDisease.Data.Repository
         public List<HPODataModel> GetExamHPOResultBatch(string patientVisitId)
         {
             var result = new List<HPODataModel>();
-            if (string.IsNullOrWhiteSpace(patientVisitId))
+            if (!string.IsNullOrWhiteSpace(patientVisitId))
             {
                 //获取所有检验HPO规则
                 var examBase = _localMemoryCache.GetExamBaseDataList();

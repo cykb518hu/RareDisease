@@ -42,9 +42,10 @@ namespace RareDiseasesSystem.Controllers
             }
             if (!string.IsNullOrEmpty(HttpContext.Request.Query["tk"]))
             {
-                LoginModel loginModel = new LoginModel { UserName = "admin", Password = "admin123456" };
+                var userList = _localMemoryCache.GetUserList();
+                var user = userList.FirstOrDefault(x => x.UserName.ToLower().Equals("admin"));
                 _logRepository.Add("统一平台进入");
-                Auth(loginModel);
+                Auth(user);
                 HttpContext.Response.Redirect("/Home/Index");
             }
             return View();

@@ -150,12 +150,13 @@
                         label: '深度学习实体识别(约72万条)'
                     }
                 ],
-                certainOptions: [{
+                certainOptions: [
+                    {
+                        value: '阴性',
+                        label: '阴性'
+                    },{
                     value: '阳性',
                     label: '阳性'
-                }, {
-                    value: '阴性',
-                        label: '阴性'
                 }],
                 rareAnalyzeEngine: "Jaccard",
                 rareAnalyzeEngineOptions: [

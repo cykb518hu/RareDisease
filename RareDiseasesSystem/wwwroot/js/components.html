@@ -88,7 +88,7 @@
         <el-col :span="8" class="paddinglr5px">
             <div class="panel panel-default">
                 <!-- Default panel contents -->
-                <div class="panel-heading">文本识别</div>
+                <div class="panel-heading">表型术语识别</div>
                 <div class="panel-body">
                     <div class="breadcrumbs">
                         <el-button type="primary" v-on:click.stop
@@ -135,7 +135,7 @@
                         <template>
                             <el-table :data="patientHPOList"
                                       class="showIndicator" style="overflow:auto">
-                                <el-table-column label="表征术语"
+                                <el-table-column label="表型术语"
                                                  min-width="34%" prop="name">
                                 </el-table-column>
                                 <el-table-column prop="hpoId"
@@ -162,7 +162,7 @@
                                 </el-table-column>
                                 <el-table-column label="确定程度"
                                                  min-width="18%"
-                                                 :filters="[{ text: '阴性', value: '阴性' }, { text: '阳性', value: '阳性' }]"
+                                                 :filters="[{ text: '阳性', value: '阳性' }, { text: '阴性', value: '阴性' }]"
                                                  :filter-method="filterTag"
                                                  filter-placement="bottom-end">
                                     <template slot-scope="scope">
@@ -247,7 +247,7 @@
 
             <div class="panel panel-default">
                 <!-- Default panel contents -->
-                <div class="panel-heading">罕见疾病</div>
+                <div class="panel-heading">罕见病相似性列表</div>
                 <div class="panel-body padding0px">
                     <div>
                         <template>
