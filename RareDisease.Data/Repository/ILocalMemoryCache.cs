@@ -30,6 +30,8 @@ namespace RareDisease.Data.Repository
         List<ExamBaseDataModel> GetExamBaseDataList();
 
         List<CHPO2020Model> GetCHPO2020StandardList();
+
+        List<DiseaseHPOSummaryDiseaseNameModel> SummaryDiseaseList();
     }
 
     public class LocalMemoryCache : ILocalMemoryCache
@@ -102,6 +104,11 @@ namespace RareDisease.Data.Repository
         public List<CHPO2020Model> GetCHPO2020StandardList()
         {
             var result = GetList<List<CHPO2020Model>>("HPO2020Model", "//App_Data//Chpo_2020.json");
+            return result;
+        }
+        public List<DiseaseHPOSummaryDiseaseNameModel> SummaryDiseaseList()
+        {
+            var result = GetList<List<DiseaseHPOSummaryDiseaseNameModel>>("DiseaseHPOSummaryDiseaseNameModel", "//App_Data//DiseaseHPOSummaryDiseaseList.json");
             return result;
         }
         public T GetList<T>(string key, string filePath)

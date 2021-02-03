@@ -115,5 +115,22 @@ namespace RareDiseasesSystem
             }
         }
 
+
+        public JsonResult CombineExcelDatabaseEram()
+        {
+            try
+            {
+                var fileName = _config.GetValue<string>("GlobalSetting:BatchExcelPath");
+                BatchTaskHandler.CombineExcelHPO(fileName);
+
+                return Json(new { success = true, data = "成功", });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, msg = ex.ToString() });
+            }
+        }
+
+
     }
 }

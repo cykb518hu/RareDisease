@@ -1003,7 +1003,23 @@ function disease_hpo_bar_chart_summary(disease,yAxisData) {
             trigger: 'axis',
             axisPointer: {            // 坐标轴指示器，坐标轴触发有效
                 type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-            }
+            },
+            formatter: function (params) {
+                var output = "";
+                for (i = 0; i < params.length; i++) {
+                    if ((params[i].seriesName === "eRAM命中" || params[i].seriesName === "OMIM命中" || params[i].seriesName === "Orphanet命中") && params[i].value < 0) {
+                        output += params[i].marker + params[i].seriesName + ': ' + 1;
+                    }
+                    else {
+                        output += params[i].marker + params[i].seriesName + ': ' + params[i].value; 
+                    }
+                   
+                    if (i !== params.length - 1) { 
+                        output += '<br/>';
+                    }
+                }
+                return output;
+           }
         },
         legend: {
             data: disease.SeriesData.map(function (item) { return item.name; })

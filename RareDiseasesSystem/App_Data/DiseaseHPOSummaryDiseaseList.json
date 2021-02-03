@@ -1,0 +1,158 @@
+﻿[
+  {
+    "value": "21-羟化酶缺乏症",
+    "label": "21-羟化酶缺乏症 | 21-Hydroxylase Deficiency"
+  },
+  {
+    "value": "白化病",
+    "label": "白化病 | Albinism"
+  },
+  {
+    "value": "Alport 综合征",
+    "label": "Alport 综合征 | Alport Syndrome"
+  },
+  {
+    "value": "肌萎缩侧索硬化",
+    "label": "肌萎缩侧索硬化 | Amyotrophic Lateral Sclerosis"
+  },
+  {
+    "value": "腓骨肌萎缩症",
+    "label": "腓骨肌萎缩症 | Charcot-Marie-Tooth Disease"
+  },
+  {
+    "value": "法布雷病",
+    "label": "法布雷病 | Fabry Disease"
+  },
+  {
+    "value": "范可尼贫血",
+    "label": "范可尼贫血 | Fanconi Anemia"
+  },
+  {
+    "value": "半乳糖血症",
+    "label": "半乳糖血症 | Galactosemia"
+  },
+  {
+    "value": "戈谢病",
+    "label": "戈谢病 | Gaucher’s Disease"
+  },
+  {
+    "value": "全身型重症肌无力",
+    "label": "全身型重症肌无力 | Generalized Myasthenia Gravis"
+  },
+  {
+    "value": "糖原累积病（I型、Ⅱ型）",
+    "label": "糖原累积病（I型、Ⅱ型） | Glycogen Storage Disease (Type I、II）"
+  },
+  {
+    "value": "血友病",
+    "label": "血友病 | Hemophilia"
+  },
+  {
+    "value": "肝豆状核变性",
+    "label": "肝豆状核变性 | Hepatolenticular Degeneration(Wilson Disease)"
+  },
+  {
+    "value": "遗传性多发脑梗死性痴呆",
+    "label": "遗传性多发脑梗死性痴呆 | Hereditary Multi-infarct Dementia (Cerebral Autosomal Dominant Arteriopathy with Subcortical Infarcts and Leukoencephalopathy, CADASIL)"
+  },
+  {
+    "value": "亨廷顿舞蹈病",
+    "label": "亨廷顿舞蹈病 | Huntington Disease"
+  },
+  {
+    "value": "低碱性磷酸酶血症",
+    "label": "低碱性磷酸酶血症 | Hypophosphatasia"
+  },
+  {
+    "value": "低磷性佝偻病",
+    "label": "低磷性佝偻病 | Hypophosphatemic Rickets"
+  },
+  {
+    "value": "特发性肺动脉高压",
+    "label": "特发性肺动脉高压 | Idiopathic Pulmonary Arterial Hypertension"
+  },
+  {
+    "value": "卡尔曼综合征",
+    "label": "卡尔曼综合征 | Kallmann Syndrome"
+  },
+  {
+    "value": "Leber遗传性视神经病变",
+    "label": "Leber遗传性视神经病变 | Leber Hereditary Optic Neuropathy"
+  },
+  {
+    "value": "淋巴管肌瘤病",
+    "label": "淋巴管肌瘤病 | Lymphangioleiomyomatosis (LAM)"
+  },
+  {
+    "value": "马凡综合征",
+    "label": "马凡综合征 | Marfan Syndrome"
+  },
+  {
+    "value": "McCune-Albrigh综合征",
+    "label": "McCune-Albrigh综合征 | McCune-Albright Syndrome"
+  },
+  {
+    "value": "线粒体脑肌病",
+    "label": "线粒体脑肌病 | Mitochodrial Encephalomyopathy"
+  },
+  {
+    "value": "多发性硬化",
+    "label": "多发性硬化 | Multiple Sclerosis"
+  },
+  {
+    "value": "尼曼匹克病",
+    "label": "尼曼匹克病 | Niemann-Pick Disease"
+  },
+  {
+    "value": "成骨不全症（脆骨病）",
+    "label": "成骨不全症（脆骨病） | Osteogenesis Imperfecta (Brittle Bone Disease)"
+  },
+  {
+    "value": "帕金森病（青年型、早发型）",
+    "label": "帕金森病（青年型、早发型） | Parkinson Disease (Young-onset , Early-onset)"
+  },
+  {
+    "value": "阵发性睡眠性血红蛋白尿",
+    "label": "阵发性睡眠性血红蛋白尿 | Paroxysmal Nocturnal Hemoglobinuria"
+  },
+  {
+    "value": "黑斑息肉综合征",
+    "label": "黑斑息肉综合征 | Peutz-Jeghers Syndrome"
+  },
+  {
+    "value": "苯丙酮尿症",
+    "label": "苯丙酮尿症 | Phenylketonuria"
+  },
+  {
+    "value": "卟啉病",
+    "label": "卟啉病 | Porphyria"
+  },
+  {
+    "value": "Prader-Willi综合征",
+    "label": "Prader-Willi综合征 | Prader-Willi Syndrome"
+  },
+  {
+    "value": "原发性轻链型淀粉样变",
+    "label": "原发性轻链型淀粉样变 | Primary Light Chain Amyloidosis"
+  },
+  {
+    "value": "进行性肌营养不良",
+    "label": "进行性肌营养不良 | Progressive Muscular Dystrophy"
+  },
+  {
+    "value": "视网膜母细胞瘤",
+    "label": "视网膜母细胞瘤 | Retinoblastoma"
+  },
+  {
+    "value": "脊髓延髓肌萎缩症（肯尼迪病）",
+    "label": "脊髓延髓肌萎缩症（肯尼迪病） | Spinal and Bulbar Muscular Atrophy (Kennedy Disease)"
+  },
+  {
+    "value": "脊髓小脑性共济失调",
+    "label": "脊髓小脑性共济失调 | Spinocerebellar Ataxia"
+  },
+  {
+    "value": "结节性硬化症",
+    "label": "结节性硬化症 | Tuberous Sclerosis Complex"
+  }
+]
