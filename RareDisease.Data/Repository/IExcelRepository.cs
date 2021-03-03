@@ -228,7 +228,7 @@ namespace RareDisease.Data.Repository
                         {
                             chpo.NameChinese = chpo.NameChinese.Substring(0, 50) + "...";
                         }
-                        chpo.NameChinese =  chpo.NameChinese + ":" + hpo.HPOId;
+                        chpo.NameChinese =  chpo.NameChinese + "-" + hpo.HPOId;
                     }
                     if (string.IsNullOrWhiteSpace(chpo.NameEnglish))
                     {
@@ -240,7 +240,7 @@ namespace RareDisease.Data.Repository
                         {
                             chpo.NameEnglish = chpo.NameEnglish.Substring(0, 70) + "...";
                         }
-                        chpo.NameEnglish = chpo.NameEnglish + ":" + hpo.HPOId;
+                        chpo.NameEnglish = chpo.NameEnglish + "-" + hpo.HPOId;
                     }
                 }
                 else
