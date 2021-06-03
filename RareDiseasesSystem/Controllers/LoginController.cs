@@ -40,7 +40,7 @@ namespace RareDiseasesSystem.Controllers
                 }
                 HttpContext.SignOutAsync();
             }
-            if (!string.IsNullOrEmpty(HttpContext.Request.Query["tk"]))
+            if (!string.IsNullOrEmpty(HttpContext.Request.Query["tk"]) || !string.IsNullOrEmpty(HttpContext.Request.Query["token"]))
             {
                 var userList = _localMemoryCache.GetUserList();
                 var user = userList.FirstOrDefault(x => x.UserName.ToLower().Equals("admin"));

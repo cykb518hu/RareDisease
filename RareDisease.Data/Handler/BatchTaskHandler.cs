@@ -312,6 +312,13 @@ namespace RareDisease.Data.Handler
                         }
                         if (r.ExamCount > 0)
                         {
+                            if (r.NlpCount > 0)
+                            {
+                                j++;
+                            }
+                            wordSheet.Cells[j, 1].Value = "EMR";
+                            wordSheet.Cells[j, 2].Value = disease.DiseaseName;
+                            wordSheet.Cells[j, 4].Value = r.HPOId;
                             wordSheet.Cells[j, 5].Value = "LAB";
                             wordSheet.Cells[j, 6].Value = r.ExamCount;
                         }

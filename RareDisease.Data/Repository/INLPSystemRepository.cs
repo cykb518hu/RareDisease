@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RareDisease.Data.Repository
@@ -141,7 +142,14 @@ namespace RareDisease.Data.Repository
                 }
                 else
                 {
-                    hpoList.Add(new HPODataModel { Name = "僵硬", NameEnglish = "Rigors", HPOId = "HP:0025145",  Editable = true, CHPOName= "运动迟缓",TermSource="hpo,omaha" });
+                    if (string.IsNullOrWhiteSpace(patientVisitIds))
+                    {
+
+                        hpoList.Add(new HPODataModel { Name = "口咽部吞咽困难", NameEnglish = "Oral-pharyngeal dysphagia", HPOId = "HP:0200136", Editable = true, CHPOName = "吞咽困难", TermSource = "umls" });
+                        hpoList[0].IndexList = new List<HPOMatchIndexModel>();
+                        hpoList[0].IndexList.Add(new HPOMatchIndexModel { StartIndex = 315, EndIndex = 319 });
+                    }
+                    hpoList.Add(new HPODataModel { Name = "僵硬", NameEnglish = "Rigors", HPOId = "HP:0025145",  Editable = true, CHPOName= "运动迟缓",TermSource="hpo,omaha"});
 
                     hpoList[1].IndexList = new List<HPOMatchIndexModel>();
                     hpoList[1].IndexList.Add(new HPOMatchIndexModel { StartIndex = 23, EndIndex = 25 });
@@ -159,6 +167,10 @@ namespace RareDisease.Data.Repository
                     hpoList.Add(new HPODataModel { Name = "构音障碍", NameEnglish = "Dysarthria", HPOId = "HP:0001260", Editable = true, Positivie = 0, TermSource = "umls,hpo,omaha", CHPOName = "构音障碍" });
                     hpoList[4].IndexList = new List<HPOMatchIndexModel>();
                     hpoList[4].IndexList.Add(new HPOMatchIndexModel { StartIndex = 334, EndIndex = 338 });
+
+                    hpoList.Add(new HPODataModel { Name = "睡眠差", NameEnglish = "Sleep disturbance", HPOId = "HP:0002360", Editable = true, Positivie = 0, TermSource = "umls,hpo,omaha", CHPOName = "睡眠障碍" });
+                    hpoList[5].IndexList = new List<HPOMatchIndexModel>();
+                    hpoList[5].IndexList.Add(new HPOMatchIndexModel { StartIndex = 300, EndIndex = 303 });
                 }
             }
             return hpoList;
@@ -201,6 +213,7 @@ namespace RareDisease.Data.Repository
             else
             {
                 #region
+                Thread.Sleep(2000);
 
                 var data = new NlpRareDiseaseResponseModel
                 {
@@ -233,6 +246,7 @@ namespace RareDisease.Data.Repository
                 x.Ratio = Math.Round(x.Ratio, 4);
                 x.HPOMatchedList.ForEach(y => y.Source = y.Match == 1 ? "" : hpoStr.Contains(y.HpoId) ? "当前病例" : "知识库");
                 x.HPOMatchedList = x.HPOMatchedList.OrderByDescending(y => y.Match).ThenBy(y => y.Source).ToList();
+                x.Engine = rareAnalyzeEngine;
             }
             rareDiseaseList = rareDiseaseList.OrderByDescending(x => x.Ratio).ToList();
 

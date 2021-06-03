@@ -57,6 +57,9 @@ namespace RareDisease.Data.Model
         [JsonProperty("Hpolist")]
         public List<NLPRareDiseaseResponseHPODataModel> HPOMatchedList { get; set; }
 
+
+        public string Engine { get; set; }
+
     }
 
     public class NLPRareDiseaseResponseHPODataModel

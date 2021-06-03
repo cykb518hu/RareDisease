@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RareDisease.Data.Model;
 using RareDisease.Data.Model.Cabin;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RareDisease.Data.Repository
 {
@@ -32,17 +36,20 @@ namespace RareDisease.Data.Repository
         List<CHPO2020Model> GetCHPO2020StandardList();
 
         List<DiseaseHPOSummaryDiseaseNameModel> SummaryDiseaseList();
+
     }
 
     public class LocalMemoryCache : ILocalMemoryCache
     {
         private IMemoryCache _cache;
         private IHostingEnvironment _hostingEnvironment;
+        private readonly ILogger<LocalMemoryCache> _logger;
 
-        public LocalMemoryCache(IMemoryCache memoryCache, IHostingEnvironment hostingEnvironment)
+        public LocalMemoryCache(IMemoryCache memoryCache, IHostingEnvironment hostingEnvironment, ILogger<LocalMemoryCache> logger)
         {
             _cache = memoryCache;
             _hostingEnvironment = hostingEnvironment;
+            _logger = logger;
         }
 
         public List<RareDiseaseDetailModel> GetChinaRareDiseaseList(string search)
@@ -57,7 +64,7 @@ namespace RareDisease.Data.Repository
             }
             return result;
         }
-   
+
         public List<LoginModel> GetUserList()
         {
             var result = GetList<List<LoginModel>>("hjbUserList", "//App_Data//UserList.json");

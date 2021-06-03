@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +16,7 @@ using RareDisease.Data.Repository;
 namespace RareDiseasesSystem.Controllers
 {
 
-    [Authorize]
+   // [Authorize]
     public class RareDiseaseController : Controller
     {
         private readonly ILogger<RareDiseaseController> _logger;
@@ -44,15 +46,28 @@ namespace RareDiseasesSystem.Controllers
             return View();
         }
 
-        public JsonResult SearchList(string search = "", int pageIndex = 1,int pageSize = int.MaxValue)
+        public JsonResult SearchList(string search = "", int pageIndex = 1, int pageSize = int.MaxValue)
         {
             try
             {
                 _logRepository.Add("罕见病查询", "", search);
 
-                var globalList = _rdrDataRepository.SearchStandardRareDiseaseList(search);
-                var chinaList = _localMemoryCache.GetChinaRareDiseaseList(search);
-                globalList.AddRange(chinaList);
+                //var globalList = _rdrDataRepository.SearchStandardRareDiseaseList(search);
+                //var chinaList = _localMemoryCache.GetChinaRareDiseaseList(search);
+                //globalList.AddRange(chinaList);
+
+                var globalListTask = Task.Run(() => { return _rdrDataRepository.SearchStandardRareDiseaseList(search); });
+                var chinaListTask = Task.Run(() => { return _localMemoryCache.GetChinaRareDiseaseList(search); });
+
+                Task[] tasks = new Task[2];
+                tasks[0] = globalListTask;
+                tasks[1] = chinaListTask;
+
+                Task.WhenAll(tasks);
+                var globalList = new List<RareDiseaseDetailModel>();
+
+                globalList.AddRange(globalListTask.Result);
+                globalList.AddRange(chinaListTask.Result);
 
                 int count = globalList.Count;
                 var data = globalList.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
@@ -79,15 +94,15 @@ namespace RareDiseasesSystem.Controllers
             }
         }
 
-        public JsonResult GetDiseaseHPOSummaryBar(string diseaseText,string hideHpoStr,string minCount)
+        public async Task<JsonResult> GetDiseaseHPOSummaryBarAsync(string diseaseText,string hideHpoStr,int minCount)
         {
             try
             {
-                int nlpMinCount = 0;
-                Int32.TryParse(minCount, out nlpMinCount);
+                //int nlpMinCount = 0;
+                //Int32.TryParse(minCount, out nlpMinCount);
                 diseaseText = HttpUtility.UrlDecode(diseaseText);
                 hideHpoStr= HttpUtility.UrlDecode(hideHpoStr);
-                var data = _excelRepository.GetDiseaseHPOSummaryBar(diseaseText, hideHpoStr, nlpMinCount);
+                var data = await _excelRepository.GetDiseaseHPOSummaryBarAsync(diseaseText, hideHpoStr, minCount);
                 return Json(new { success = true, data });
             }
             catch (Exception ex)
@@ -138,16 +153,38 @@ namespace RareDiseasesSystem.Controllers
                 List<NlpRareDiseaseResponseModel> allList = new List<NlpRareDiseaseResponseModel>();
 
                 var diseaseList = new List<DiseaseCaculateSingleModel>();
+
+                var taskList = new List<Task<List<NlpRareDiseaseResponseModel>>>();
+
                 foreach (var engine in engineList)
                 {
-                    var list = await _nLPSystemRepository.GetRareDiseaseResult(hpoStr, engine, rareDataBaseEngine);
-                    foreach (var data in list)
-                    {
-                        diseaseList.Add(new DiseaseCaculateSingleModel { Source = engine, Disease = data.Name, Score = data.Ratio });
-                    }
-                    allList.AddRange(list);
+                    var enginStr = engine;
+
+                    var task = Task.Run(async () => {
+                       return await _nLPSystemRepository.GetRareDiseaseResult(hpoStr, enginStr, rareDataBaseEngine);
+                    }); 
+                    
+                    taskList.Add(task);
+
+                    //var list = await _nLPSystemRepository.GetRareDiseaseResult(hpoStr, engine, rareDataBaseEngine);
+                    //foreach (var data in list)
+                    //{
+                    //    diseaseList.Add(new DiseaseCaculateSingleModel { Source = engine, Disease = data.Name, Score = data.Ratio });
+                    //}
+                    //allList.AddRange(list);
 
                 }
+                await Task.WhenAll(taskList);
+
+                foreach(var r in taskList)
+                {
+                    foreach (var data in r.Result)
+                    {
+                        diseaseList.Add(new DiseaseCaculateSingleModel { Source = data.Engine, Disease = data.Name, Score = data.Ratio });
+                    }
+                    allList.AddRange(r.Result);
+                }
+
                 var overviewList = new List<DiseaseCaculateOverviewModel>();
                 foreach (var disease in diseaseList.GroupBy(x => x.Disease))
                 {

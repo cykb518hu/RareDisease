@@ -7,6 +7,7 @@ using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,7 @@ namespace RareDisease.Data.Repository
 
         List<RareDiseaseDetailModel> SearchStandardRareDiseaseList(string searchText);
 
+
         List<HPODataModel> SearchStandardHPOList(string searchHPOText);
 
         string GetVisitIdByNumber(string number);
@@ -49,6 +51,7 @@ namespace RareDisease.Data.Repository
         private IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<RdrDataRepository> _logger;
         private readonly ILocalMemoryCache _localMemoryCache;
+
         public RdrDataRepository(IHostingEnvironment hostingEnvironment, ILogger<RdrDataRepository> logger, ILocalMemoryCache localMemoryCache)
         {
             _hostingEnvironment = hostingEnvironment;
@@ -280,6 +283,7 @@ namespace RareDisease.Data.Repository
 
         public List<RareDiseaseDetailModel> SearchStandardRareDiseaseList(string searchText)
         {
+
             var result = new List<RareDiseaseDetailModel>();
             if (_hostingEnvironment.IsProduction() && !string.IsNullOrWhiteSpace(searchText))
             {
@@ -301,13 +305,13 @@ namespace RareDisease.Data.Repository
             }
             else
             {
-                var data = new RareDiseaseDetailModel();
-                data.Source = "omaha";
-                data.NameEnglish = "Hyperproteinemia";
-                data.HPOId = "HP:000007";
-                data.HPONameChinese = "帕金森病";
-                data.HPONameEnglish = "Hyperproteinemia";
-                result.Add(data);
+                //var data = new RareDiseaseDetailModel();
+                //data.Source = "omaha";
+                //data.NameEnglish = "Hyperproteinemia";
+                //data.HPOId = "HP:000007";
+                //data.HPONameChinese = "帕金森病";
+                //data.HPONameEnglish = "Hyperproteinemia";
+                //result.Add(data);
                 //var data1 = new RareDiseaseDetailModel();
                 //data1.Source = "OMIM";
                 //data1.NameEnglish = "Wilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjd";
@@ -322,7 +326,7 @@ namespace RareDisease.Data.Repository
                 //data2.HPONameChinese = "高蛋白血症3";
                 //data2.HPONameEnglish = "Hyperproteinemia";
                 //result.Add(data2);
-
+                 
                 //var data3 = new RareDiseaseDetailModel();
                 //data3.Source = "OMIM";
                 //data3.NameEnglish = "WWilson disease addsdlflajsdlfj,sdlfjlasjdfk, adsfasdlkjadskj,1,daslkjlfkjds, adslkjladj, adlkjlkdj, adljlkjd, adslkjlkjad, adlkjlkad, aldkjklad,dalkjde";
@@ -331,7 +335,6 @@ namespace RareDisease.Data.Repository
                 //data3.HPONameEnglish = "Hyperproteinemia";
                 //result.Add(data3);
             }
-
             return result;
         }
 

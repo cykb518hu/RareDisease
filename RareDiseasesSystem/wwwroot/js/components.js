@@ -234,7 +234,7 @@
                     lock: true,
                     text: '拼命加载中...',
                     spinner: 'el-icon-loading',
-                    background: 'rgba(0, 0, 0, 0.7)'
+                    background: 'lightgray'
                 });
                 var that = this;
                 $.ajax({
@@ -534,7 +534,7 @@
                 window.location.href = "/home/DiseaseCaculate";
             },
             statusFormatter(row, column) {
-                let status = row.match;
+                let status = row.isGenerated;
                 if (status === 0) {
                     return '否';
                 } else {
@@ -928,7 +928,7 @@ function disease_hpo_bar_chart(disease) {
                 };
                 var that = this;
                 $.ajax({
-                    url: "/RareDisease/GetDiseaseHPOSummaryBar",
+                    url: "/RareDisease/GetDiseaseHPOSummaryBarAsync",
                     type: "POST",
                     data: para,
                     dataType: 'json',
@@ -1007,7 +1007,7 @@ function disease_hpo_bar_chart_summary(disease,yAxisData) {
             formatter: function (params) {
                 var output = "";
                 for (i = 0; i < params.length; i++) {
-                    if ((params[i].seriesName === "eRAM命中" || params[i].seriesName === "OMIM命中" || params[i].seriesName === "Orphanet命中") && params[i].value < 0) {
+                    if ((params[i].seriesName === "Coverd by eRAM" || params[i].seriesName === "Coverd by OMIM" || params[i].seriesName === "Coverd by Orphanet") && params[i].value < 0) {
                         output += params[i].marker + params[i].seriesName + ': ' + 1;
                     }
                     else {
@@ -1022,12 +1022,17 @@ function disease_hpo_bar_chart_summary(disease,yAxisData) {
            }
         },
         legend: {
+            textStyle: { //图例文字的样式
+                fontSize: 16,
+                padding: [0, 20, 0, 0]
+            },
             data: disease.SeriesData.map(function (item) { return item.name; })
         },
         grid: {
             left: '3%',
             right: '4%',
             bottom: '3%',
+            top:40,
             containLabel: true
         },
         xAxis: {
